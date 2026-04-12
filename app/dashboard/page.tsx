@@ -2,10 +2,10 @@
 
 import { createClient } from '@/lib/supabase/client'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { OrderWithItems, Profile } from '@/lib/types'
 
-export default function DashboardPage() {
+function DashboardContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const isSuccess = searchParams.get('success') === 'true'
@@ -202,10 +202,10 @@ export default function DashboardPage() {
                   </div>
                   
                   <div className="mt-4 pt-4 border-t border-white/10 text-sm">
-                    <div className="text-gray-500 text-xs mb-1">Dostarczymy do:</div>
-                    <div className="text-gray-300 bg-black/30 p-3 rounded-lg mt-1 outline outline-1 outline-white/5">
-                       {order.shipping_address}, {order.shipping_postal_code} {order.shipping_city}
-                    </div>
+                     <div className="text-gray-500 text-xs mb-1">Dostarczymy do:</div>
+                     <div className="text-gray-300 bg-black/30 p-3 rounded-lg mt-1 outline outline-1 outline-white/5">
+                        {order.shipping_address}, {order.shipping_postal_code} {order.shipping_city}
+                     </div>
                   </div>
                 </div>
               ))}
@@ -214,5 +214,13 @@ export default function DashboardPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense fallback={<div className="pt-32 pb-16 px-4 text-center text-amber-500">Wczytywanie pulpitu...</div>}>
+      <DashboardContent />
+    </Suspense>
   )
 }
