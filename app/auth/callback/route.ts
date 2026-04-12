@@ -14,6 +14,6 @@ export async function GET(request: Request) {
     }
   }
 
-  // W przypadku błędu wróć go strony głównej (lub login)
+  // W przypadku błędu wróć do strony głównej (lub login)
   return NextResponse.redirect(`${origin}/login`)
 }
