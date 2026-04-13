@@ -83,10 +83,10 @@ export default function CheckoutPage() {
       const { error: itemsError } = await supabase.from('order_items').insert(orderItemsToInsert)
       if (itemsError) throw new Error(itemsError.message)
 
-      // 3. Po udanym zapisie wyczyść koszyk i przenieś do sukcesu
-      clearCart()
-      router.push('/dashboard?success=true')
-      
+      // Symulacja prostej zapłaty (omijamy fizyczne bramki płatności)
+      clearCart();
+      router.push(`/dashboard?success=true&order_id=${order.id}`);
+
     } catch (err: any) {
       console.error(err)
       setError(err.message || 'Wystąpił problem ze złożeniem zamówienia.')
@@ -143,8 +143,8 @@ export default function CheckoutPage() {
             <div className="pt-6 border-t border-white/10 mt-6">
               <h2 className="text-xl font-bold mb-4 text-white">Metoda płatności</h2>
               <div className="p-4 border border-amber-500/50 bg-amber-500/10 rounded-xl">
-                 <div className="font-bold text-amber-500 mb-1">Płatność przy odbiorze</div>
-                 <div className="text-sm text-gray-400">Zapłacisz gotówką za zamówienie w momencie dostawy kurierem. Brak płatności Stripe.</div>
+                 <div className="font-bold text-amber-500 mb-1">Płatność przy odbiorze / Odroczona</div>
+                 <div className="text-sm text-gray-400">Twoje zamówienie jest od razu przyjmowane do realizacji, a z naszymi zaufanymi dostawcami rozliczysz się z rąk do rąk.</div>
               </div>
             </div>
           </form>

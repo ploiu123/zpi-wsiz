@@ -33,7 +33,7 @@ function LoginContent() {
           }
         })
         if (error) throw error
-        setError('Zarejestrowano pomyślnie. Możesz się teraz zalogować!')
+        setError('Zarejestrowano pomyślnie. Sprawdź swoją skrzynkę e-mail, aby aktywować konto!')
         setIsRegistering(false)
       } else {
         const { error } = await supabase.auth.signInWithPassword({

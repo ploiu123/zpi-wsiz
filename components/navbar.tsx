@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation'
 import { useCartStore } from '@/lib/store'
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { ShoppingCart, User, Menu, X, LogOut } from 'lucide-react'
+import { ShoppingCart, User, Menu, X, LogOut, Moon, Sun } from 'lucide-react'
 
 export function Navbar() {
   const pathname = usePathname()
@@ -14,6 +14,8 @@ export function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
   const itemCount = useCartStore((s) => s.getItemCount())
+
+  const [isLight, setIsLight] = useState(false)
 
   useEffect(() => {
     setMounted(true)
@@ -26,7 +28,26 @@ export function Navbar() {
         })
       }
     })
+
+    // Theme check
+    const savedTheme = localStorage.getItem('theme')
+    if (savedTheme === 'light') {
+      setIsLight(true)
+      document.documentElement.classList.add('light-mode')
+    }
   }, [])
+
+  const toggleTheme = () => {
+    if (isLight) {
+      document.documentElement.classList.remove('light-mode')
+      localStorage.setItem('theme', 'dark')
+      setIsLight(false)
+    } else {
+      document.documentElement.classList.add('light-mode')
+      localStorage.setItem('theme', 'light')
+      setIsLight(true)
+    }
+  }
 
   const handleLogout = async () => {
     const supabase = createClient()
@@ -75,6 +96,10 @@ export function Navbar() {
 
         {/* Right side */}
         <div className="flex items-center gap-3">
+          <button onClick={toggleTheme} className="p-2 rounded-full hover:bg-white/5 transition-all text-gray-300" title="Zmień motyw">
+            {mounted && isLight ? <Moon className="w-5 h-5 text-gray-400" /> : <Sun className="w-5 h-5 text-amber-500" />}
+          </button>
+
           <Link href="/cart" className="relative p-2 rounded-full hover:bg-white/5 transition-all">
             <ShoppingCart className="w-5 h-5 text-gray-300" />
             {mounted && itemCount > 0 && (

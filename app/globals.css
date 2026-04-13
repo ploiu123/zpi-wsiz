@@ -41,3 +41,48 @@
 .animate-delay-200 { animation-delay: 0.2s; }
 .animate-delay-300 { animation-delay: 0.3s; }
 .animate-delay-400 { animation-delay: 0.4s; }
+
+/* Light Mode Overrides */
+html.light-mode {
+  background-color: #fbfbfb !important;
+  color: #111111 !important;
+  color-scheme: light;
+}
+html.light-mode body {
+  background-color: #fbfbfb !important;
+  color: #111111 !important;
+}
+html.light-mode .bg-\[\#0a0a0a\] {
+  background-color: #fbfbfb !important;
+}
+html.light-mode .bg-\[\#111\] {
+  background-color: #ffffff !important;
+  border-color: #e5e5e5 !important;
+}
+html.light-mode .text-white {
+  color: #111111 !important;
+}
+html.light-mode .text-gray-400 {
+  color: #555555 !important;
+}
+html.light-mode .text-gray-300 {
+  color: #444444 !important;
+}
+html.light-mode .border-white\/10 {
+  border-color: rgba(0,0,0,0.1) !important;
+}
+html.light-mode .border-white\/5 {
+  border-color: rgba(0,0,0,0.05) !important;
+}
+html.light-mode .bg-white\/5 {
+  background-color: rgba(0,0,0,0.03) !important;
+}
+html.light-mode .hover\:bg-white\/5:hover {
+  background-color: rgba(0,0,0,0.05) !important;
+}
+html.light-mode .bg-white\/10 {
+  background-color: rgba(0,0,0,0.08) !important;
+}
+html.light-mode .hover\:bg-white\/20:hover {
+  background-color: rgba(0,0,0,0.12) !important;
+}

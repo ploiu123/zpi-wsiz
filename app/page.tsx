@@ -25,8 +25,11 @@ export default async function HomePage() {
         <h1 className="font-serif text-5xl md:text-7xl font-bold text-amber-500">
           Złote Miody
         </h1>
-        <p className="text-gray-400 max-w-2xl mx-auto text-lg md:text-xl">
-          Naturalne miody prosto z naszej rodzinnej pasieki. Poczuj prawdziwy smak natury zebrany z troską o każdą pszczołę.
+        <p className="text-gray-400 max-w-3xl mx-auto text-lg md:text-xl leading-relaxed">
+          Złote Miody to nie tylko sklep, to wielopokoleniowa historia naszej rodziny. Pasja do pszczelarstwa 
+          przechodziła w naszej rodzinie z dziadka na ojca. Dbamy o każdą pszczołę i najdrobniejszy szczegół, 
+          by dostarczyć Ci 100% bezpieczny i naturalny miód bezpośrednio z uli zlokalizowanych w najczystszych lasach. 
+          Zamów raz, a już nigdy nie wrócisz do miodów ze sklepowych półek.
         </p>
       </section>
 
