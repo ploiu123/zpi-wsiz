@@ -2,17 +2,22 @@ import Link from 'next/link'
 
 export function Footer() {
   return (
-    <footer className="border-t border-white/5 bg-[#0a0a0a]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
+    <footer className="border-t border-white/5 bg-[#0a0a0a] relative overflow-hidden">
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[300px] bg-amber-500/5 blur-[120px] rounded-full pointer-events-none" />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
           <div className="md:col-span-2">
-            <div className="flex items-center gap-3 mb-4">
-              <img src="/logo.jpg" alt="Złote Miody" className="h-10 w-10 rounded-full" />
-              <span className="font-serif text-xl font-bold text-amber-400">Złote Miody</span>
+            <div className="flex items-center gap-3 mb-6 group">
+              <div className="relative w-12 h-12 rounded-full overflow-hidden border border-amber-500/20 group-hover:border-amber-500/50 transition-colors shadow-lg shadow-amber-500/10">
+                <img src="/logo.jpg" alt="Złote Miody" className="w-full h-full object-cover" />
+              </div>
+              <span className="font-serif text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-amber-500 tracking-wide">
+                Złote Miody
+              </span>
             </div>
-            <p className="text-gray-500 text-sm leading-relaxed max-w-sm">
-              Naturalne miody prosto z pasieki. Zdrowie, smak i tradycja zamknięte w złocistym nektarze.
+            <p className="text-gray-400 text-sm leading-relaxed max-w-sm font-light">
+              Naturalne miody prosto z pasieki. Zdrowie, smak i tradycja zamknięte w luksusowym, złocistym nektarze.
             </p>
           </div>
 

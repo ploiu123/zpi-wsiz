@@ -66,12 +66,16 @@ export function Navbar() {
   }, [])
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-[#0a0a0a]/90 backdrop-blur-xl border-b border-white/5">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-16">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-[#0a0a0a]/60 backdrop-blur-2xl border-b border-white/5 transition-all duration-300">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-20">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-3">
-          <img src="/logo.jpg" alt="Złote Miody" className="h-9 w-9 rounded-full" />
-          <span className="font-serif text-lg font-bold text-amber-400">Złote Miody</span>
+        <Link href="/" className="flex items-center gap-3 group">
+          <div className="relative w-10 h-10 rounded-full overflow-hidden border border-amber-500/20 group-hover:border-amber-500/50 transition-colors shadow-lg shadow-amber-500/10">
+            <img src="/logo.jpg" alt="Złote Miody" className="w-full h-full object-cover" />
+          </div>
+          <span className="font-serif text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-amber-500 tracking-wide">
+            Złote Miody
+          </span>
         </Link>
 
         {/* Desktop nav */}

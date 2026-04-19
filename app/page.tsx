@@ -22,24 +22,50 @@ export default async function HomePage() {
   return (
     <div className="pt-24 pb-16 px-4 md:px-8 max-w-7xl mx-auto">
       {/* Hero Section */}
-      <section className="mb-20 text-center space-y-6">
-        <h1 className="font-serif text-5xl md:text-7xl font-bold text-amber-500">
-          Złote Miody
-        </h1>
-        <p className="text-gray-400 max-w-3xl mx-auto text-lg md:text-xl leading-relaxed">
-          Złote Miody to nie tylko sklep, to wielopokoleniowa historia naszej rodziny. Pasja do pszczelarstwa 
-          przechodziła w naszej rodzinie z dziadka na ojca. Dbamy o każdą pszczołę i najdrobniejszy szczegół, 
-          by dostarczyć Ci 100% bezpieczny i naturalny miód bezpośrednio z uli zlokalizowanych w najczystszych lasach. 
-          Zamów raz, a już nigdy nie wrócisz do miodów ze sklepowych półek.
-        </p>
-        <p className="text-center mt-6">
-          <Link
-            href="/historia"
-            className="inline-flex items-center justify-center text-amber-400 font-semibold hover:text-amber-300 underline underline-offset-4 decoration-amber-500/40"
-          >
-            Przeczytaj pełną historię sklepu
-          </Link>
-        </p>
+      <section className="relative w-full overflow-hidden rounded-[2.5rem] mb-24 min-h-[85vh] flex items-center justify-center border border-white/5 shadow-2xl shadow-amber-900/20">
+        {/* Tło graficzne z gradientem */}
+        <div className="absolute inset-0 z-0">
+          <img 
+            src="https://images.unsplash.com/photo-1587049352851-8d4e89134a6d?auto=format&fit=crop&w=1920&q=80" 
+            alt="Pasieka tło" 
+            className="w-full h-full object-cover opacity-40 scale-105"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/80 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/50 to-transparent" />
+        </div>
+
+        {/* Zawartość */}
+        <div className="relative z-10 text-center px-4 md:px-8 max-w-4xl mx-auto space-y-8 animate-fade-up">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-sm font-semibold mb-4 backdrop-blur-md">
+            <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+            100% Naturalne Zbiory
+          </div>
+          
+          <h1 className="font-serif text-6xl md:text-8xl font-bold text-transparent bg-clip-text bg-gradient-to-b from-white via-amber-100 to-amber-500 drop-shadow-sm leading-tight">
+            Prawdziwe Złoto <br /> z Naszej Pasieki
+          </h1>
+          
+          <p className="text-gray-300 max-w-2xl mx-auto text-lg md:text-xl leading-relaxed font-light">
+            Złote Miody to nie tylko sklep, to wielopokoleniowa historia naszej rodziny. 
+            Dbamy o każdą pszczołę, by dostarczyć Ci 100% bezpieczny i naturalny miód 
+            z najczystszych lasów.
+          </p>
+          
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+            <a
+              href="#produkty"
+              className="px-8 py-4 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-full font-bold hover:shadow-lg hover:shadow-amber-500/40 transition-all hover:-translate-y-1 w-full sm:w-auto"
+            >
+              Zobacz produkty
+            </a>
+            <Link
+              href="/historia"
+              className="px-8 py-4 bg-white/5 hover:bg-white/10 border border-white/10 backdrop-blur-md text-white rounded-full font-semibold transition-all hover:-translate-y-1 w-full sm:w-auto"
+            >
+              Poznaj naszą historię
+            </Link>
+          </div>
+        </div>
       </section>
 
       {/* Produkty */}
