@@ -42,46 +42,66 @@
 .animate-delay-300 { animation-delay: 0.3s; }
 .animate-delay-400 { animation-delay: 0.4s; }
 
+/* Dark Mode Overrides (Warm Premium Dark) */
+html:not(.light-mode) {
+  background-color: #120e0a !important;
+}
+html:not(.light-mode) body {
+  background-color: #120e0a !important;
+}
+html:not(.light-mode) .bg-\[\#0a0a0a\], html:not(.light-mode) .bg-\[\#0a0a0a\]\/60, html:not(.light-mode) .bg-\[\#0a0a0a\]\/90, html:not(.light-mode) .bg-\[\#0a0a0a\]\/95 {
+  background-color: rgba(18, 14, 10, 0.85) !important;
+}
+html:not(.light-mode) .bg-\[\#111\], html:not(.light-mode) .bg-\[\#111\]\/80 {
+  background-color: #1c1510 !important;
+}
+html:not(.light-mode) .border-white\/10 {
+  border-color: rgba(251, 191, 36, 0.1) !important; /* amber-400 with 10% opacity */
+}
+html:not(.light-mode) .border-white\/5 {
+  border-color: rgba(251, 191, 36, 0.05) !important;
+}
+
 /* Light Mode Overrides */
 html.light-mode {
-  background-color: #fbfbfb !important;
-  color: #111111 !important;
+  background-color: #fdfaf5 !important;
+  color: #2b221a !important;
   color-scheme: light;
 }
 html.light-mode body {
-  background-color: #fbfbfb !important;
-  color: #111111 !important;
+  background-color: #fdfaf5 !important;
+  color: #2b221a !important;
 }
-html.light-mode .bg-\[\#0a0a0a\] {
-  background-color: #fbfbfb !important;
+html.light-mode .bg-\[\#0a0a0a\], html.light-mode .bg-\[\#0a0a0a\]\/60, html.light-mode .bg-\[\#0a0a0a\]\/90, html.light-mode .bg-\[\#0a0a0a\]\/95 {
+  background-color: rgba(253, 250, 245, 0.85) !important;
 }
-html.light-mode .bg-\[\#111\] {
+html.light-mode .bg-\[\#111\], html.light-mode .bg-\[\#111\]\/80 {
   background-color: #ffffff !important;
-  border-color: #e5e5e5 !important;
+  border-color: #f0e6d5 !important;
 }
 html.light-mode .text-white {
-  color: #111111 !important;
+  color: #2b221a !important;
 }
 html.light-mode .text-gray-400 {
-  color: #555555 !important;
+  color: #635242 !important;
 }
 html.light-mode .text-gray-300 {
-  color: #444444 !important;
+  color: #524436 !important;
 }
 html.light-mode .border-white\/10 {
-  border-color: rgba(0,0,0,0.1) !important;
+  border-color: rgba(180, 130, 50, 0.15) !important;
 }
 html.light-mode .border-white\/5 {
-  border-color: rgba(0,0,0,0.05) !important;
+  border-color: rgba(180, 130, 50, 0.08) !important;
 }
 html.light-mode .bg-white\/5 {
-  background-color: rgba(0,0,0,0.03) !important;
+  background-color: rgba(180, 130, 50, 0.05) !important;
 }
 html.light-mode .hover\:bg-white\/5:hover {
-  background-color: rgba(0,0,0,0.05) !important;
+  background-color: rgba(180, 130, 50, 0.08) !important;
 }
 html.light-mode .bg-white\/10 {
-  background-color: rgba(0,0,0,0.08) !important;
+  background-color: rgba(180, 130, 50, 0.1) !important;
 }
 html.light-mode .hover\:bg-white\/20:hover {
   background-color: rgba(0,0,0,0.12) !important;
