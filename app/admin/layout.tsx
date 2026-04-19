@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { AdminToolbar } from './admin-toolbar'
 import { isAdminRole } from '@/lib/roles'
+import { isAdminEmail } from '@/lib/admin-emails'
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
@@ -13,7 +14,10 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     redirect('/login?redirect=/admin')
   }
 
-  await supabase.rpc('sync_profile')
+  const { error: rpcErr } = await supabase.rpc('sync_profile')
+  if (rpcErr) {
+    console.error('[admin layout] sync_profile:', rpcErr.message)
+  }
 
   const { data: profile } = await supabase
     .from('profiles')
@@ -21,7 +25,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     .eq('id', user.id)
     .maybeSingle()
 
-  if (!profile || !isAdminRole(profile.role)) {
+  const allowed = isAdminRole(profile?.role) || isAdminEmail(user.email)
+  if (!allowed) {
     redirect('/dashboard?notice=admin_only')
   }
 
@@ -30,7 +35,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       <div className="bg-red-500/10 text-red-400 text-center text-xs py-2 font-bold uppercase tracking-widest sticky top-16 z-40 backdrop-blur-md border-b border-red-500/20">
         Tryb administratora — zmiany są widoczne od razu dla klientów sklepu
       </div>
-      <AdminToolbar email={profile.email || user.email || ''} />
+      <AdminToolbar email={profile?.email || user.email || ''} />
       <div className="pb-16">{children}</div>
     </div>
   )

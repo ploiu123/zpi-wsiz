@@ -1,6 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 import { isAdminRole } from '@/lib/roles'
+import { isAdminEmail } from '@/lib/admin-emails'
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
@@ -42,7 +43,10 @@ export async function updateSession(request: NextRequest) {
 
   // Chroń admin — sprawdź rolę (najpierw sync profilu z bazy auth — naprawia brak wiersza / starą rolę)
   if (path.startsWith('/admin') && user) {
-    await supabase.rpc('sync_profile')
+    const { error: rpcErr } = await supabase.rpc('sync_profile')
+    if (rpcErr) {
+      console.error('[middleware] sync_profile:', rpcErr.message)
+    }
 
     const { data: profile } = await supabase
       .from('profiles')
@@ -50,7 +54,8 @@ export async function updateSession(request: NextRequest) {
       .eq('id', user.id)
       .maybeSingle()
 
-    if (!isAdminRole(profile?.role)) {
+    const allowed = isAdminRole(profile?.role) || isAdminEmail(user.email)
+    if (!allowed) {
       const url = request.nextUrl.clone()
       url.pathname = '/dashboard'
       url.searchParams.set('notice', 'admin_only')

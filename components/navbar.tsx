@@ -6,6 +6,7 @@ import { useCartStore } from '@/lib/store'
 import { useCallback, useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { isAdminRole } from '@/lib/roles'
+import { isAdminEmail } from '@/lib/admin-emails'
 import { ShoppingCart, User, Menu, X, LogOut, Moon, Sun } from 'lucide-react'
 
 const NAV_LINKS = [
@@ -33,7 +34,7 @@ export function Navbar() {
       setUser({ id: user.id, email: user.email || '' })
       await supabase.rpc('sync_profile')
       const { data } = await supabase.from('profiles').select('role').eq('id', user.id).maybeSingle()
-      if (isAdminRole(data?.role)) setIsAdmin(true)
+      if (isAdminRole(data?.role) || isAdminEmail(user.email)) setIsAdmin(true)
     })
 
     // Theme check

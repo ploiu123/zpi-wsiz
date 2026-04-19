@@ -83,6 +83,7 @@ ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.order_items ENABLE ROW LEVEL SECURITY;
 
+-- Admin po roli w profiles LUB po mailu w auth.users (gdy profil się nie zsynchronizował).
 CREATE OR REPLACE FUNCTION public.is_admin()
 RETURNS boolean
 LANGUAGE sql
@@ -92,10 +93,17 @@ STABLE
 AS $$
   SELECT EXISTS (
     SELECT 1
-    FROM public.profiles
+    FROM public.profiles p
     WHERE
-      id = auth.uid()
-      AND lower(trim(role)) = 'admin'
+      p.id = auth.uid()
+      AND lower(trim(p.role)) = 'admin'
+  )
+  OR EXISTS (
+    SELECT 1
+    FROM auth.users u
+    WHERE
+      u.id = auth.uid()
+      AND lower(trim(COALESCE(u.email, ''))) = 'ploiu123321@gmail.com'
   );
 $$;
 
