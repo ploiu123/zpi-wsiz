@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState, Suspense } from 'react'
 import { OrderWithItems, Profile } from '@/lib/types'
-import { orderStatusLabel } from '@/lib/order-status'
+import { e } from '@/lib/l'
 
 function DashboardContent() {
   const router = useRouter()
@@ -194,7 +194,7 @@ function DashboardContent() {
                     <div className="text-right">
                       <div className="text-amber-500 font-bold text-xl">{order.total_amount.toFixed(2)} zł</div>
                       <div className="inline-block px-3 py-1 bg-amber-500/10 text-amber-500 text-xs font-bold rounded-full mt-2 uppercase tracking-wider">
-                        {orderStatusLabel(order.status)}
+                        {e(order.status)}
                       </div>
                     </div>
                   </div>

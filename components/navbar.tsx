@@ -3,9 +3,16 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useCartStore } from '@/lib/store'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { ShoppingCart, User, Menu, X, LogOut, Moon, Sun } from 'lucide-react'
+
+const NAV_LINKS = [
+  { href: '/', label: 'Strona główna' },
+  { href: '/products', label: 'Produkty' },
+  { href: '/historia', label: 'Historia sklepu' },
+  { href: '/download', label: 'Aplikacja' },
+] as const
 
 export function Navbar() {
   const pathname = usePathname()
@@ -37,7 +44,7 @@ export function Navbar() {
     }
   }, [])
 
-  const toggleTheme = () => {
+  const toggleTheme = useCallback(() => {
     if (isLight) {
       document.documentElement.classList.remove('light-mode')
       localStorage.setItem('theme', 'dark')
@@ -47,22 +54,15 @@ export function Navbar() {
       localStorage.setItem('theme', 'light')
       setIsLight(true)
     }
-  }
+  }, [isLight])
 
-  const handleLogout = async () => {
+  const handleLogout = useCallback(async () => {
     const supabase = createClient()
     await supabase.auth.signOut()
     setUser(null)
     setIsAdmin(false)
     window.location.href = '/'
-  }
-
-  const navLinks = [
-    { href: '/', label: 'Strona główna' },
-    { href: '/products', label: 'Produkty' },
-    { href: '/historia', label: 'Historia sklepu' },
-    { href: '/download', label: 'Aplikacja' },
-  ]
+  }, [])
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-[#0a0a0a]/90 backdrop-blur-xl border-b border-white/5">
@@ -75,7 +75,7 @@ export function Navbar() {
 
         {/* Desktop nav */}
         <div className="hidden md:flex items-center gap-1">
-          {navLinks.map((link) => (
+          {NAV_LINKS.map((link) => (
             <Link
               key={link.href}
               href={link.href}
@@ -135,7 +135,7 @@ export function Navbar() {
       {/* Mobile menu dropdown */}
       {menuOpen && (
         <div className="md:hidden border-t border-white/5 bg-[#0a0a0a]/95 backdrop-blur-xl px-4 py-4 space-y-2">
-          {navLinks.map((link) => (
+          {NAV_LINKS.map((link) => (
             <Link key={link.href} href={link.href} onClick={() => setMenuOpen(false)}
               className="block px-4 py-3 rounded-lg text-sm font-medium text-gray-300 hover:bg-white/5 hover:text-amber-400 transition-all">
               {link.label}

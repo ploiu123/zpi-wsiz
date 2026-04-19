@@ -1,12 +1,14 @@
 'use client'
 
+import { memo, useCallback } from 'react'
 import { Product } from '@/lib/types'
 import { useCartStore } from '@/lib/store'
 import { ShoppingCart } from 'lucide-react'
 import Image from 'next/image'
 
-export function ProductCard({ product }: { product: Product }) {
+export const ProductCard = memo(function ProductCard({ product }: { product: Product }) {
   const addItem = useCartStore((state) => state.addItem)
+  const onAdd = useCallback(() => addItem(product), [addItem, product])
 
   return (
     <div className="bg-[#111] border border-white/10 rounded-2xl overflow-hidden hover:border-amber-500/50 transition-all group flex flex-col">
@@ -37,7 +39,8 @@ export function ProductCard({ product }: { product: Product }) {
         </p>
         
         <button 
-          onClick={() => addItem(product)}
+          type="button"
+          onClick={onAdd}
           className="w-full bg-white/5 hover:bg-amber-500 text-white rounded-xl py-3 px-4 flex items-center justify-center gap-2 transition-colors group-hover:text-white"
         >
           <ShoppingCart className="w-4 h-4" />
@@ -46,4 +49,4 @@ export function ProductCard({ product }: { product: Product }) {
       </div>
     </div>
   )
-}
+})

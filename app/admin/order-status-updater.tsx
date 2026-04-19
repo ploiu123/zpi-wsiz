@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
-import { ORDER_STATUS_OPTIONS, normalizeOrderStatus, type OrderStatusValue } from '@/lib/order-status'
+import { n, O, type V } from '@/lib/l'
 
 export function OrderStatusUpdater({
   orderId,
@@ -12,16 +12,16 @@ export function OrderStatusUpdater({
   orderId: string
   currentStatus: string
 }) {
-  const [status, setStatus] = useState<OrderStatusValue>(() => normalizeOrderStatus(currentStatus))
+  const [status, setStatus] = useState<V>(() => n(currentStatus))
   const [loading, setLoading] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
-    setStatus(normalizeOrderStatus(currentStatus))
+    setStatus(n(currentStatus))
   }, [currentStatus])
 
   const handleStatusChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newStatus = e.target.value as OrderStatusValue
+    const newStatus = e.target.value as V
     setStatus(newStatus)
     setLoading(true)
 
@@ -55,7 +55,7 @@ export function OrderStatusUpdater({
         disabled={loading}
         className={`w-full appearance-none bg-black/50 border border-white/20 rounded-lg px-3 py-1.5 text-xs font-bold transition-colors cursor-pointer outline-none focus:border-amber-500 ${styleFor(status)}`}
       >
-        {ORDER_STATUS_OPTIONS.map((s) => (
+        {O.map((s) => (
           <option key={s.value} value={s.value} className="bg-[#111] text-white">
             {s.label}
           </option>

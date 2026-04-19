@@ -16,6 +16,9 @@ export default async function AdminPage() {
 
   const { data: products } = await supabase.from('products').select('*').order('created_at', { ascending: false })
 
+  const profileRows = profiles ?? []
+  const orderRows = orders ?? []
+
   return (
     <div className="px-4 md:px-8 max-w-7xl mx-auto py-8">
       <div className="flex justify-between items-end mb-8 border-b border-white/10 pb-4">
@@ -53,14 +56,14 @@ export default async function AdminPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {orders?.length === 0 ? (
+                    {orderRows.length === 0 ? (
                       <tr>
                         <td colSpan={4} className="px-6 py-8 text-center">
                           Brak zamówień.
                         </td>
                       </tr>
                     ) : (
-                      orders?.map((order) => (
+                      orderRows.map((order) => (
                         <tr key={order.id} className="border-t border-white/5 hover:bg-white/5">
                           <td className="px-6 py-4 whitespace-nowrap">
                             {new Date(order.created_at).toLocaleDateString('pl-PL')}
@@ -96,7 +99,7 @@ export default async function AdminPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {profiles?.map((profile) => (
+                    {profileRows.map((profile) => (
                       <tr key={profile.id} className="border-t border-white/5 hover:bg-white/5">
                         <td className="px-6 py-4">
                           <div className="text-white">{profile.full_name || '—'}</div>

@@ -4,11 +4,7 @@ import { useState, Suspense } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-
-function safeRedirectPath(raw: string | null): string {
-  if (!raw || !raw.startsWith('/') || raw.startsWith('//')) return '/'
-  return raw
-}
+import { r } from '@/lib/l'
 
 function LoginContent() {
   const [email, setEmail] = useState('')
@@ -19,7 +15,7 @@ function LoginContent() {
   
   const router = useRouter()
   const searchParams = useSearchParams()
-  const redirectParams = safeRedirectPath(searchParams.get('redirect'))
+  const redirectParams = r(searchParams.get('redirect'))
   const isAdminTarget = redirectParams.startsWith('/admin')
 
   const handleAuth = async (e: React.FormEvent) => {
