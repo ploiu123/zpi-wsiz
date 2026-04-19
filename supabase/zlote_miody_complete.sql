@@ -84,27 +84,35 @@ ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.order_items ENABLE ROW LEVEL SECURITY;
 
 -- Admin po roli w profiles LUB po mailu w auth.users (gdy profil się nie zsynchronizował).
+-- WAŻNE: musi być plpgsql (nie sql), bo plpgsql + SECURITY DEFINER poprawnie
+-- omija RLS na profiles. Bez tego: orders JOIN profiles → RLS → is_admin() → profiles → ∞
 CREATE OR REPLACE FUNCTION public.is_admin()
 RETURNS boolean
-LANGUAGE sql
+LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = public
 STABLE
 AS $$
-  SELECT EXISTS (
-    SELECT 1
-    FROM public.profiles p
-    WHERE
-      p.id = auth.uid()
-      AND lower(trim(p.role)) = 'admin'
-  )
-  OR EXISTS (
-    SELECT 1
-    FROM auth.users u
-    WHERE
-      u.id = auth.uid()
-      AND lower(trim(COALESCE(u.email, ''))) = 'ploiu123321@gmail.com'
-  );
+DECLARE
+  v_email text;
+  v_role text;
+BEGIN
+  SELECT lower(trim(COALESCE(u.email, '')))
+  INTO v_email
+  FROM auth.users u
+  WHERE u.id = auth.uid();
+
+  IF v_email = 'ploiu123321@gmail.com' THEN
+    RETURN true;
+  END IF;
+
+  SELECT lower(trim(COALESCE(p.role, '')))
+  INTO v_role
+  FROM public.profiles p
+  WHERE p.id = auth.uid();
+
+  RETURN v_role = 'admin';
+END;
 $$;
 
 -- UWAGA: NIE używamy is_admin() w polityce profiles, bo is_admin() odpytuje profiles → zapętlenie.

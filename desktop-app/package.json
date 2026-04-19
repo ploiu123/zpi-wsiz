@@ -14,7 +14,7 @@
     "appId": "pl.zlote-miody.app",
     "productName": "Złote Miody",
     "directories": {
-      "output": "../public/releases/dist"
+      "output": "dist"
     },
     "files": [
       "main.js",
@@ -27,19 +27,41 @@
       "icon": "icon.png",
       "target": [
         {
-          "target": "zip",
+          "target": "dmg",
           "arch": ["universal"]
         }
-      ]
+      ],
+      "darkModeSupport": true
+    },
+    "dmg": {
+      "title": "Złote Miody",
+      "icon": "icon.png",
+      "contents": [
+        { "x": 130, "y": 220 },
+        { "x": 410, "y": 220, "type": "link", "path": "/Applications" }
+      ],
+      "window": {
+        "width": 540,
+        "height": 400
+      }
     },
     "win": {
       "icon": "icon.png",
       "target": [
         {
-          "target": "portable",
+          "target": "nsis",
           "arch": ["x64"]
         }
       ]
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": false,
+      "installerIcon": "icon.png",
+      "uninstallerIcon": "icon.png",
+      "installerHeaderIcon": "icon.png",
+      "shortcutName": "Złote Miody"
     }
   },
   "devDependencies": {

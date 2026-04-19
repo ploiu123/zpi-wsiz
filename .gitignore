@@ -1,0 +1,47 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Next.js
+.next/
+out/
+
+# Build
+build/
+dist/
+
+# Desktop app builds (Electron) — za duże dla GitHuba
+desktop-app/dist/
+desktop-app/node_modules/
+desktop-app/out/
+*.exe
+*.dmg
+*.pkg
+*.app
+
+# Release binaries
+public/releases/
+
+# Env
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Vercel
+.vercel
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
