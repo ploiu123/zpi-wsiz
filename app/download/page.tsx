@@ -25,7 +25,12 @@ export default function DownloadPage() {
         <div className="bg-[#111] border border-white/10 rounded-3xl p-10 hover:border-amber-500/50 transition-colors group">
           <h2 className="text-2xl font-bold text-white mb-2">Dla Windows</h2>
           <p className="text-gray-400 text-sm mb-8">Wspierane wersje: Windows 10, Windows 11 (64-bit)</p>
-          <a href="/ZloteMiody-Desktop.zip" download className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-full font-bold hover:shadow-lg hover:shadow-amber-500/30 transition-all hover:-translate-y-0.5" id="windows">
+          <a
+            href="/releases/ZloteMiody-Windows.zip"
+            download="ZloteMiody-Windows.zip"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-full font-bold hover:shadow-lg hover:shadow-amber-500/30 transition-all hover:-translate-y-0.5"
+            id="windows"
+          >
             <Download className="w-5 h-5" /> Pobierz (.zip)
           </a>
         </div>
@@ -34,8 +39,12 @@ export default function DownloadPage() {
         <div className="bg-[#111] border border-white/10 rounded-3xl p-10 hover:border-amber-500/50 transition-colors group">
           <h2 className="text-2xl font-bold text-white mb-2">Dla macOS</h2>
           <p className="text-gray-400 text-sm mb-8">Wspierane procesory: Intel oraz Apple Silicon (M1/M2/M3)</p>
-          <a href="#" className="inline-flex items-center gap-2 px-8 py-4 bg-white/10 hover:bg-white/20 text-white rounded-full font-bold hover:shadow-lg transition-all hover:-translate-y-0.5">
-            <Download className="w-5 h-5" /> Pobierz (.dmg)
+          <a
+            href="/releases/ZloteMiody-macOS.zip"
+            download="ZloteMiody-macOS.zip"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-full font-bold hover:shadow-lg hover:shadow-amber-500/30 transition-all hover:-translate-y-0.5"
+          >
+            <Download className="w-5 h-5" /> Pobierz (archiwum .zip)
           </a>
         </div>
 
