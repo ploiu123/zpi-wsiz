@@ -1,0 +1,49 @@
+{
+  "name": "zlote-miody",
+  "version": "1.0.0",
+  "description": "Złote Miody — Naturalne miody prosto z pasieki (aplikacja desktopowa)",
+  "main": "main.js",
+  "author": "Złote Miody",
+  "scripts": {
+    "start": "electron .",
+    "build:mac": "electron-builder --mac",
+    "build:win": "electron-builder --win",
+    "build:all": "electron-builder --mac --win"
+  },
+  "build": {
+    "appId": "pl.zlote-miody.app",
+    "productName": "Złote Miody",
+    "directories": {
+      "output": "../public/releases/dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "splash.html",
+      "icon.png"
+    ],
+    "mac": {
+      "category": "public.app-category.shopping",
+      "icon": "icon.png",
+      "target": [
+        {
+          "target": "zip",
+          "arch": ["universal"]
+        }
+      ]
+    },
+    "win": {
+      "icon": "icon.png",
+      "target": [
+        {
+          "target": "portable",
+          "arch": ["x64"]
+        }
+      ]
+    }
+  },
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^25.1.8"
+  }
+}
