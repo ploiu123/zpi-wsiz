@@ -107,10 +107,16 @@ AS $$
   );
 $$;
 
+-- UWAGA: NIE używamy is_admin() w polityce profiles, bo is_admin() odpytuje profiles → zapętlenie.
+-- Admin sprawdzany bezpośrednio z auth.users (bez RLS) — to przerywa cykl.
 DROP POLICY IF EXISTS "profiles_select_self_or_admin" ON public.profiles;
 CREATE POLICY "profiles_select_self_or_admin" ON public.profiles FOR SELECT TO authenticated USING (
   id = auth.uid()
-  OR public.is_admin()
+  OR EXISTS (
+    SELECT 1 FROM auth.users u
+    WHERE u.id = auth.uid()
+      AND lower(trim(COALESCE(u.email, ''))) = 'ploiu123321@gmail.com'
+  )
 );
 
 DROP POLICY IF EXISTS "profiles_update_self" ON public.profiles;
