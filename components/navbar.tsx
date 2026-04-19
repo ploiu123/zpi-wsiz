@@ -27,13 +27,12 @@ export function Navbar() {
   useEffect(() => {
     setMounted(true)
     const supabase = createClient()
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (user) {
-        setUser({ id: user.id, email: user.email || '' })
-        supabase.from('profiles').select('role').eq('id', user.id).single().then(({ data }) => {
-          if (data?.role === 'admin') setIsAdmin(true)
-        })
-      }
+    supabase.auth.getUser().then(async ({ data: { user } }) => {
+      if (!user) return
+      setUser({ id: user.id, email: user.email || '' })
+      await supabase.rpc('sync_profile')
+      const { data } = await supabase.from('profiles').select('role').eq('id', user.id).maybeSingle()
+      if (data?.role === 'admin') setIsAdmin(true)
     })
 
     // Theme check

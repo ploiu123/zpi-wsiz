@@ -43,6 +43,7 @@ function LoginContent() {
           password
         })
         if (error) throw error
+        await supabase.rpc('sync_profile')
         router.push(redirectParams)
         router.refresh()
       }

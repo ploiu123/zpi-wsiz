@@ -39,13 +39,15 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // Chroń admin — sprawdź rolę
+  // Chroń admin — sprawdź rolę (najpierw sync profilu z bazy auth — naprawia brak wiersza / starą rolę)
   if (path.startsWith('/admin') && user) {
+    await supabase.rpc('sync_profile')
+
     const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
-      .single()
+      .maybeSingle()
 
     if (profile?.role !== 'admin') {
       const url = request.nextUrl.clone()
