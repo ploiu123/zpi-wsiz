@@ -84,7 +84,7 @@ export function Navbar() {
                 pathname === link.href
                   ? 'bg-amber-500/15 text-amber-400'
                   : 'text-gray-400 hover:text-amber-400 hover:bg-white/5'
-              }`}
+              } ${link.href === '/download' ? 'hide-in-electron' : ''}`}
             >
               {link.label}
             </Link>
@@ -138,7 +138,7 @@ export function Navbar() {
         <div className="md:hidden border-t border-white/5 bg-[#0a0a0a]/95 backdrop-blur-xl px-4 py-4 space-y-2">
           {NAV_LINKS.map((link) => (
             <Link key={link.href} href={link.href} onClick={() => setMenuOpen(false)}
-              className="block px-4 py-3 rounded-lg text-sm font-medium text-gray-300 hover:bg-white/5 hover:text-amber-400 transition-all">
+              className={`block px-4 py-3 rounded-lg text-sm font-medium text-gray-300 hover:bg-white/5 hover:text-amber-400 transition-all ${link.href === '/download' ? 'hide-in-electron' : ''}`}>
               {link.label}
             </Link>
           ))}

@@ -19,6 +19,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pl" className="scroll-smooth">
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: `
+          if (typeof navigator !== 'undefined' && navigator.userAgent.toLowerCase().includes('electron')) {
+            document.documentElement.classList.add('is-electron');
+          }
+        `}} />
+      </head>
       <body className={`${inter.variable} ${playfair.variable} font-sans bg-[#0a0a0a] text-white antialiased`}>
         <Navbar />
         <main className="min-h-screen">{children}</main>

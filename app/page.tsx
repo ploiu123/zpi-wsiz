@@ -62,7 +62,7 @@ export default async function HomePage() {
       </section>
 
       {/* CTA Pobranie Aplikacji */}
-      <section className="mt-24 border border-amber-500/30 bg-[#111] rounded-3xl p-8 md:p-14 text-center">
+      <section className="mt-24 border border-amber-500/30 bg-[#111] rounded-3xl p-8 md:p-14 text-center hide-in-electron">
         <h2 className="font-serif text-3xl md:text-4xl font-bold text-white mb-4">
           Odkryj naszą nową aplikację desktopową!
         </h2>
