@@ -1,4 +1,4 @@
-import { Monitor, Download } from 'lucide-react'
+import { Monitor, Download, Apple, AlertTriangle } from 'lucide-react'
 
 export const metadata = {
   title: 'Pobierz aplikację desktopową | Złote Miody'
@@ -21,31 +21,37 @@ export default function DownloadPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-center" id="download-links">
         
-        {/* Windows */}
+        {/* macOS */}
         <div className="bg-[#111] border border-white/10 rounded-3xl p-10 hover:border-amber-500/50 transition-colors group">
-          <h2 className="text-2xl font-bold text-white mb-2">Dla Windows</h2>
-          <p className="text-gray-400 text-sm mb-8">Wspierane wersje: Windows 10, Windows 11 (64-bit)</p>
+          <div className="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <Apple className="w-8 h-8 text-white" />
+          </div>
+          <h2 className="text-2xl font-bold text-white mb-2">Dla macOS</h2>
+          <p className="text-gray-400 text-sm mb-2">Wspierane procesory: Apple Silicon (M1/M2/M3/M4)</p>
+          <p className="text-gray-500 text-xs mb-8">Format: DMG • ~100 MB</p>
           <a
-            href="/releases/ZloteMiody-Windows.zip"
-            download="ZloteMiody-Windows.zip"
+            href="/releases/ZloteMiody-macOS.dmg"
+            download="ZloteMiody-macOS.dmg"
             className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-full font-bold hover:shadow-lg hover:shadow-amber-500/30 transition-all hover:-translate-y-0.5"
-            id="windows"
+            id="macos"
           >
-            <Download className="w-5 h-5" /> Pobierz (.zip)
+            <Download className="w-5 h-5" /> Pobierz (.dmg)
           </a>
         </div>
 
-        {/* macOS */}
-        <div className="bg-[#111] border border-white/10 rounded-3xl p-10 hover:border-amber-500/50 transition-colors group">
-          <h2 className="text-2xl font-bold text-white mb-2">Dla macOS</h2>
-          <p className="text-gray-400 text-sm mb-8">Wspierane procesory: Intel oraz Apple Silicon (M1/M2/M3)</p>
-          <a
-            href="/releases/ZloteMiody-macOS.zip"
-            download="ZloteMiody-macOS.zip"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-full font-bold hover:shadow-lg hover:shadow-amber-500/30 transition-all hover:-translate-y-0.5"
+        {/* Windows — brak buildu */}
+        <div className="bg-[#111] border border-white/10 rounded-3xl p-10 opacity-60">
+          <div className="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <Monitor className="w-8 h-8 text-white" />
+          </div>
+          <h2 className="text-2xl font-bold text-white mb-2">Dla Windows</h2>
+          <p className="text-gray-400 text-sm mb-2">Windows 10 / 11 (64-bit)</p>
+          <p className="text-gray-500 text-xs mb-8">Wersja będzie dostępna wkrótce</p>
+          <span
+            className="inline-flex items-center gap-2 px-8 py-4 bg-white/10 text-gray-400 rounded-full font-bold cursor-not-allowed"
           >
-            <Download className="w-5 h-5" /> Pobierz (archiwum .zip)
-          </a>
+            <AlertTriangle className="w-5 h-5" /> Wkrótce
+          </span>
         </div>
 
       </div>
