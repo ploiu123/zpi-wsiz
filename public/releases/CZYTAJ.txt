@@ -1,3 +1,0 @@
-Złote Miody — pakiet instalacyjny (placeholder).
-Zamień ten plik prawdziwą aplikacją .exe / instalatorem lub dodaj własny .zip do public/releases/.
-Kontakt: info@zlote-miody.pl
