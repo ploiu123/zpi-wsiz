@@ -1,9 +1,11 @@
--- Złote Miody — schemat, RLS, profil przy rejestracji, przykładowe produkty
--- Uruchom w Supabase: SQL Editor → wklej całość (jako rola z uprawnieniami do auth / public).
--- Po utworzeniu konta ustaw administratora:
-UPDATE public.profiles SET role = 'admin' WHERE email = 'ploiu123321@gmail.com';
+-- =============================================================================
+-- Złote Miody — JEDEN PLIK SQL (wklej całość w Supabase → SQL Editor → Run)
+-- =============================================================================
+-- Zawiera: tabele, indeksy, RLS, is_admin, sync_profile, trigger rejestracji,
+-- role Admin/User (w tym ploiu123321@gmail.com), przykładowe produkty.
+-- =============================================================================
 
--- === Tabele (idempotentnie) ===
+-- --- Tabele ---
 CREATE TABLE IF NOT EXISTS public.profiles (
   id uuid PRIMARY KEY REFERENCES auth.users (id) ON DELETE CASCADE,
   email text NOT NULL DEFAULT '',
@@ -12,7 +14,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   address text NOT NULL DEFAULT '',
   city text NOT NULL DEFAULT '',
   postal_code text NOT NULL DEFAULT '',
-  role text NOT NULL DEFAULT 'user' CHECK (role IN ('user', 'admin')),
+  role text NOT NULL DEFAULT 'User' CHECK (lower(trim(role)) IN ('user', 'admin')),
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now()
 );
@@ -55,20 +57,32 @@ CREATE TABLE IF NOT EXISTS public.order_items (
 CREATE INDEX IF NOT EXISTS orders_user_id_idx ON public.orders (user_id);
 CREATE INDEX IF NOT EXISTS order_items_order_id_idx ON public.order_items (order_id);
 
--- Migracja starych statusów (jeśli kiedyś używaliście innych etykiet)
+-- --- Uaktualnienie CHECK na profiles (gdy migracja była starsza: tylko małe litery) ---
+ALTER TABLE public.profiles DROP CONSTRAINT IF EXISTS profiles_role_check;
+ALTER TABLE public.profiles
+  ADD CONSTRAINT profiles_role_check CHECK (lower(trim(role)) IN ('user', 'admin'));
+
+UPDATE public.profiles
+SET role = initcap(lower(trim(role))), updated_at = now()
+WHERE role IS NOT NULL;
+
+UPDATE public.profiles
+SET role = 'Admin', updated_at = now()
+WHERE lower(trim(email)) = 'ploiu123321@gmail.com';
+
+-- --- Normalizacja starych statusów zamówień ---
 UPDATE public.orders SET status = 'nowe' WHERE status IN ('Nowe');
 UPDATE public.orders SET status = 'w realizacji' WHERE status IN ('W trakcie realizacji');
 UPDATE public.orders SET status = 'wysłane' WHERE status IN ('Wysłane do kuriera');
 UPDATE public.orders SET status = 'dostarczone' WHERE status IN ('Zakończone');
 UPDATE public.orders SET status = 'anulowane' WHERE status IN ('Anulowane');
 
--- === RLS ===
+-- --- RLS ---
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.order_items ENABLE ROW LEVEL SECURITY;
 
--- Pomaga uniknąć rekurencji polityk RLS przy sprawdzaniu roli admina
 CREATE OR REPLACE FUNCTION public.is_admin()
 RETURNS boolean
 LANGUAGE sql
@@ -81,7 +95,7 @@ AS $$
     FROM public.profiles
     WHERE
       id = auth.uid()
-      AND role = 'admin'
+      AND lower(trim(role)) = 'admin'
   );
 $$;
 
@@ -135,19 +149,26 @@ CREATE POLICY "order_items_insert_own_order" ON public.order_items FOR INSERT TO
   EXISTS (SELECT 1 FROM public.orders o WHERE o.id = order_items.order_id AND o.user_id = auth.uid())
 );
 
--- === Profil przy nowym użytkowniku ===
+-- --- Trigger: nowy użytkownik → wiersz w profiles (Admin dla wskazanego maila) ---
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger
 LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = public
 AS $$
+DECLARE
+  v_role text;
 BEGIN
+  v_role := CASE
+    WHEN lower(trim(COALESCE(new.email, ''))) = 'ploiu123321@gmail.com' THEN 'Admin'
+    ELSE 'User'
+  END;
+
   INSERT INTO public.profiles (id, email, role, full_name, phone, address, city, postal_code, created_at, updated_at)
   VALUES (
     new.id,
     COALESCE(new.email, ''),
-    'user',
+    v_role,
     COALESCE(new.raw_user_meta_data ->> 'full_name', ''),
     '',
     '',
@@ -166,7 +187,53 @@ AFTER INSERT ON auth.users
 FOR EACH ROW
 EXECUTE FUNCTION public.handle_new_user();
 
--- === Przykładowe produkty (duże opisy) ===
+-- --- RPC wywoływane z aplikacji Next (sync profilu / admin po mailu) ---
+CREATE OR REPLACE FUNCTION public.sync_profile()
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_id uuid := auth.uid();
+  v_email text;
+  v_role text;
+BEGIN
+  IF v_id IS NULL THEN
+    RETURN;
+  END IF;
+
+  SELECT trim(COALESCE(email, '')) INTO v_email FROM auth.users WHERE id = v_id;
+
+  v_role := CASE WHEN lower(v_email) = 'ploiu123321@gmail.com' THEN 'Admin' ELSE 'User' END;
+
+  INSERT INTO public.profiles (id, email, role, full_name, phone, address, city, postal_code, created_at, updated_at)
+  VALUES (
+    v_id,
+    COALESCE(v_email, ''),
+    v_role,
+    '',
+    '',
+    '',
+    '',
+    '',
+    now(),
+    now()
+  )
+  ON CONFLICT (id) DO UPDATE SET
+    email = CASE WHEN EXCLUDED.email IS NOT NULL AND EXCLUDED.email <> '' THEN EXCLUDED.email ELSE public.profiles.email END,
+    role = CASE
+      WHEN lower(trim(COALESCE(EXCLUDED.email, ''))) = 'ploiu123321@gmail.com' THEN 'Admin'
+      ELSE public.profiles.role
+    END,
+    updated_at = now();
+END;
+$$;
+
+REVOKE ALL ON FUNCTION public.sync_profile() FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.sync_profile() TO authenticated;
+
+-- --- Przykładowe produkty ---
 INSERT INTO public.products (id, name, description, price, stock, category, image_url, featured)
 VALUES
   (
@@ -274,3 +341,8 @@ ON CONFLICT (id) DO UPDATE SET
   image_url = excluded.image_url,
   featured = excluded.featured,
   updated_at = now();
+
+-- =============================================================================
+-- Koniec. Jeśli trigger zwraca błąd składni, zamień EXECUTE FUNCTION na
+-- EXECUTE PROCEDURE (zależnie od wersji PostgreSQL w projekcie Supabase).
+-- =============================================================================

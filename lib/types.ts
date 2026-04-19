@@ -10,7 +10,8 @@ export interface Profile {
   address: string
   city: string
   postal_code: string
-  role: 'user' | 'admin'
+  /** W bazie często: `User` / `Admin` (initcap); w kodzie używaj `isAdminRole()`. */
+  role: string
   created_at: string
   updated_at: string
 }

@@ -3,6 +3,7 @@ import { AddProductForm } from './add-product-form'
 import { OrderStatusUpdater } from './order-status-updater'
 import { AdminProductCatalog } from './admin-product-catalog'
 import type { Product } from '@/lib/types'
+import { isAdminRole } from '@/lib/roles'
 
 export default async function AdminPage() {
   const supabase = await createClient()
@@ -108,7 +109,7 @@ export default async function AdminPage() {
                         <td className="px-6 py-4">{profile.phone || '—'}</td>
                         <td className="px-6 py-4">{profile.city || '—'}</td>
                         <td className="px-6 py-4">
-                          {profile.role === 'admin' ? (
+                          {isAdminRole(profile.role) ? (
                             <span className="text-red-400 font-bold bg-red-500/10 px-2 py-1 rounded">ADMIN</span>
                           ) : (
                             <span className="text-gray-400">USER</span>

@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { isAdminRole } from '@/lib/roles'
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
@@ -49,7 +50,7 @@ export async function updateSession(request: NextRequest) {
       .eq('id', user.id)
       .maybeSingle()
 
-    if (profile?.role !== 'admin') {
+    if (!isAdminRole(profile?.role)) {
       const url = request.nextUrl.clone()
       url.pathname = '/dashboard'
       url.searchParams.set('notice', 'admin_only')

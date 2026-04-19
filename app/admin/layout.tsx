@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { AdminToolbar } from './admin-toolbar'
+import { isAdminRole } from '@/lib/roles'
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
@@ -20,7 +21,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     .eq('id', user.id)
     .maybeSingle()
 
-  if (!profile || profile.role !== 'admin') {
+  if (!profile || !isAdminRole(profile.role)) {
     redirect('/dashboard?notice=admin_only')
   }
 
