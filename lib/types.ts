@@ -1,5 +1,7 @@
 // Typy bazy danych Złote Miody
 
+import type { OrderStatusValue } from '@/lib/order-status'
+
 export interface Profile {
   id: string
   email: string
@@ -30,7 +32,7 @@ export interface Order {
   id: string
   user_id: string
   total_amount: number
-  status: 'nowe' | 'w realizacji' | 'wysłane' | 'dostarczone' | 'anulowane'
+  status: OrderStatusValue
   shipping_address: string
   shipping_city: string
   shipping_postal_code: string

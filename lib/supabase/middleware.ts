@@ -25,18 +25,22 @@ export async function updateSession(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser()
 
+  const path = request.nextUrl.pathname
+
   // Chroń ścieżki wymagające logowania
   const protectedPaths = ['/dashboard', '/checkout', '/admin']
-  const isProtected = protectedPaths.some(p => request.nextUrl.pathname.startsWith(p))
+  const isProtected = protectedPaths.some((p) => path.startsWith(p))
 
   if (isProtected && !user) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
+    const returnTo = `${path}${request.nextUrl.search || ''}`
+    url.searchParams.set('redirect', returnTo)
     return NextResponse.redirect(url)
   }
 
   // Chroń admin — sprawdź rolę
-  if (request.nextUrl.pathname.startsWith('/admin') && user) {
+  if (path.startsWith('/admin') && user) {
     const { data: profile } = await supabase
       .from('profiles')
       .select('role')
@@ -45,7 +49,8 @@ export async function updateSession(request: NextRequest) {
 
     if (profile?.role !== 'admin') {
       const url = request.nextUrl.clone()
-      url.pathname = '/'
+      url.pathname = '/dashboard'
+      url.searchParams.set('notice', 'admin_only')
       return NextResponse.redirect(url)
     }
   }
