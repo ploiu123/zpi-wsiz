@@ -1,9 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
-import { ORDER_STATUS_OPTIONS, type OrderStatusValue } from '@/lib/order-status'
+import { ORDER_STATUS_OPTIONS, normalizeOrderStatus, type OrderStatusValue } from '@/lib/order-status'
 
 export function OrderStatusUpdater({
   orderId,
@@ -12,9 +12,13 @@ export function OrderStatusUpdater({
   orderId: string
   currentStatus: string
 }) {
-  const [status, setStatus] = useState(currentStatus)
+  const [status, setStatus] = useState<OrderStatusValue>(() => normalizeOrderStatus(currentStatus))
   const [loading, setLoading] = useState(false)
   const router = useRouter()
+
+  useEffect(() => {
+    setStatus(normalizeOrderStatus(currentStatus))
+  }, [currentStatus])
 
   const handleStatusChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newStatus = e.target.value as OrderStatusValue

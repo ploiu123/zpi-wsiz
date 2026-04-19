@@ -60,7 +60,7 @@ export default async function ProductDetailPage(props: { params: Promise<{ id: s
              {product.price.toFixed(2)} zł
            </div>
            
-           <p className="text-gray-400 text-lg mb-8 leading-relaxed">
+           <p className="text-gray-400 text-lg mb-8 leading-relaxed whitespace-pre-line">
              {product.description}
            </p>
            

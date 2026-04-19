@@ -1,6 +1,6 @@
-// Typy bazy danych Złote Miody
-
 import type { OrderStatusValue } from '@/lib/order-status'
+
+// Typy bazy danych Złote Miody
 
 export interface Profile {
   id: string

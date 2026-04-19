@@ -4,11 +4,13 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState, Suspense } from 'react'
 import { OrderWithItems, Profile } from '@/lib/types'
+import { orderStatusLabel } from '@/lib/order-status'
 
 function DashboardContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const isSuccess = searchParams.get('success') === 'true'
+  const notice = searchParams.get('notice')
   
   const [user, setUser] = useState<{ id: string; email: string } | null>(null)
   const [profile, setProfile] = useState<Profile | null>(null)
@@ -103,6 +105,16 @@ function DashboardContent() {
         </div>
       )}
 
+      {notice === 'admin_only' && (
+        <div className="bg-amber-500/10 border border-amber-500/30 text-amber-200 p-6 rounded-2xl mb-8 text-center">
+          <h2 className="font-bold text-lg mb-1">Dostęp wyłącznie dla administratora</h2>
+          <p className="text-sm text-gray-400">
+            Adres <span className="text-gray-200">/admin</span> jest zarezerwowany dla kont z rolą administratora. Jeśli prowadzisz sklep, nadaj rolę w panelu Supabase (tabela{' '}
+            <code className="text-amber-400/90">profiles</code>).
+          </p>
+        </div>
+      )}
+
       <div className="flex justify-between items-end mb-8 border-b border-white/10 pb-4">
         <div>
           <h1 className="font-serif text-3xl font-bold text-amber-500 mb-2">Moje konto</h1>
@@ -182,7 +194,7 @@ function DashboardContent() {
                     <div className="text-right">
                       <div className="text-amber-500 font-bold text-xl">{order.total_amount.toFixed(2)} zł</div>
                       <div className="inline-block px-3 py-1 bg-amber-500/10 text-amber-500 text-xs font-bold rounded-full mt-2 uppercase tracking-wider">
-                        {order.status}
+                        {orderStatusLabel(order.status)}
                       </div>
                     </div>
                   </div>

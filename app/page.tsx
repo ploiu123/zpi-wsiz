@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { ProductCard } from '@/components/product-card'
 import { Product } from '@/lib/types'
@@ -30,6 +31,14 @@ export default async function HomePage() {
           przechodziła w naszej rodzinie z dziadka na ojca. Dbamy o każdą pszczołę i najdrobniejszy szczegół, 
           by dostarczyć Ci 100% bezpieczny i naturalny miód bezpośrednio z uli zlokalizowanych w najczystszych lasach. 
           Zamów raz, a już nigdy nie wrócisz do miodów ze sklepowych półek.
+        </p>
+        <p className="text-center mt-6">
+          <Link
+            href="/historia"
+            className="inline-flex items-center justify-center text-amber-400 font-semibold hover:text-amber-300 underline underline-offset-4 decoration-amber-500/40"
+          >
+            Przeczytaj pełną historię sklepu
+          </Link>
         </p>
       </section>
 

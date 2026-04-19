@@ -32,7 +32,7 @@ export function ProductCard({ product }: { product: Product }) {
           <span className="text-amber-400 font-bold whitespace-nowrap ml-3">{product.price.toFixed(2)} zł</span>
         </div>
         
-        <p className="text-sm text-gray-400 mb-6 flex-1 line-clamp-2">
+        <p className="text-sm text-gray-400 mb-6 flex-1 line-clamp-4">
           {product.description}
         </p>
         

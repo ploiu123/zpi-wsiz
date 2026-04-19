@@ -60,6 +60,7 @@ export function Navbar() {
   const navLinks = [
     { href: '/', label: 'Strona główna' },
     { href: '/products', label: 'Produkty' },
+    { href: '/historia', label: 'Historia sklepu' },
     { href: '/download', label: 'Aplikacja' },
   ]
 

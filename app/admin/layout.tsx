@@ -1,33 +1,30 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import { AdminToolbar } from './admin-toolbar'
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
 
-  // 1. Sprawdzamy czy uzytkownik jest zalogowany
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
   if (!user) {
-    redirect('/login')
+    redirect('/login?redirect=/admin')
   }
 
-  // 2. Pobieramy role profilu 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single()
+  const { data: profile } = await supabase.from('profiles').select('role, email').eq('id', user.id).single()
 
-  // 3. Wyrzucamy, jesli nie ma uprawnien admina
   if (!profile || profile.role !== 'admin') {
-    redirect('/dashboard') // Uzytkownik zwykly wraca na swoj pulpit
+    redirect('/dashboard?notice=admin_only')
   }
 
   return (
-    <div className="pt-24 pb-16 min-h-[90vh]">
-      <div className="bg-red-500/10 text-red-400 text-center text-xs py-1 font-bold uppercase tracking-widest sticky top-16 z-40 backdrop-blur-md">
-        Tryb Administratora
+    <div className="pt-24 min-h-[90vh]">
+      <div className="bg-red-500/10 text-red-400 text-center text-xs py-2 font-bold uppercase tracking-widest sticky top-16 z-40 backdrop-blur-md border-b border-red-500/20">
+        Tryb administratora — zmiany są widoczne od razu dla klientów sklepu
       </div>
-      {children}
+      <AdminToolbar email={profile.email || user.email || ''} />
+      <div className="pb-16">{children}</div>
     </div>
   )
 }

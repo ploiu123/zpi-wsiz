@@ -5,6 +5,11 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 
+function safeRedirectPath(raw: string | null): string {
+  if (!raw || !raw.startsWith('/') || raw.startsWith('//')) return '/'
+  return raw
+}
+
 function LoginContent() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -14,7 +19,8 @@ function LoginContent() {
   
   const router = useRouter()
   const searchParams = useSearchParams()
-  const redirectParams = searchParams.get('redirect') || '/'
+  const redirectParams = safeRedirectPath(searchParams.get('redirect'))
+  const isAdminTarget = redirectParams.startsWith('/admin')
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -63,6 +69,13 @@ function LoginContent() {
               ? 'Dołącz do nas i łatwiej kupuj miody' 
               : 'Witaj z powrotem! Zaloguj się, aby kontynuować.'}
           </p>
+          {isAdminTarget && !isRegistering && (
+            <p className="mt-4 text-sm text-amber-200/90 bg-amber-500/10 border border-amber-500/25 rounded-xl px-4 py-3">
+              Logujesz się do <span className="font-semibold">panelu administratora</span>. Po zalogowaniu wrócisz pod adres{' '}
+              <code className="text-amber-400">{redirectParams}</code>. Konto musi mieć rolę <code className="text-amber-400">admin</code> w tabeli{' '}
+              <code className="text-amber-400">profiles</code> (ustawiasz ją w Supabase).
+            </p>
+          )}
         </div>
 
         {error && (

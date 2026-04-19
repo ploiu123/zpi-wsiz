@@ -22,6 +22,7 @@ export function Footer() {
             <ul className="space-y-2">
               <li><Link href="/products" className="text-gray-500 hover:text-amber-400 text-sm transition-colors">Wszystkie produkty</Link></li>
               <li><Link href="/cart" className="text-gray-500 hover:text-amber-400 text-sm transition-colors">Koszyk</Link></li>
+              <li><Link href="/historia" className="text-gray-500 hover:text-amber-400 text-sm transition-colors">Historia sklepu</Link></li>
               <li><Link href="/download" className="text-gray-500 hover:text-amber-400 text-sm transition-colors">Aplikacja</Link></li>
             </ul>
           </div>

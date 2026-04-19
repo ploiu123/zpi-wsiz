@@ -61,7 +61,7 @@ export function AddProductForm() {
         
         <div>
           <label className="block text-xs font-medium text-gray-400 mb-1">Opis produktu</label>
-          <textarea rows={3} value={desc} onChange={e => setDesc(e.target.value)} className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-2 text-white focus:outline-none focus:border-amber-500" />
+          <textarea rows={8} value={desc} onChange={e => setDesc(e.target.value)} className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-2 text-white focus:outline-none focus:border-amber-500 min-h-[180px]" placeholder="Dłuższy opis: skład smaku, pożytkowa, sposób krystalizacji, porady kulinarne…" />
         </div>
 
         <div className="grid grid-cols-2 gap-4">
