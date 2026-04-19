@@ -86,3 +86,8 @@ html.light-mode .bg-white\/10 {
 html.light-mode .hover\:bg-white\/20:hover {
   background-color: rgba(0,0,0,0.12) !important;
 }
+
+/* Electron App specific styles */
+.is-electron .hide-in-electron {
+  display: none !important;
+}

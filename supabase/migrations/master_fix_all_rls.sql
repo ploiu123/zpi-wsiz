@@ -19,10 +19,11 @@ DECLARE
   v_role text;
 BEGIN
   -- Pobierz email z auth.users (tabela BEZ RLS — nigdy nie zapętli)
-  SELECT lower(trim(COALESCE(u.email, '')))
-  INTO v_email
-  FROM auth.users u
-  WHERE u.id = auth.uid();
+  v_email := (
+    SELECT lower(trim(COALESCE(u.email, '')))
+    FROM auth.users u
+    WHERE u.id = auth.uid()
+  );
 
   -- Admin po mailu
   IF v_email = 'ploiu123321@gmail.com' THEN
@@ -30,10 +31,11 @@ BEGIN
   END IF;
 
   -- Admin po roli (plpgsql + SECURITY DEFINER omija RLS na profiles)
-  SELECT lower(trim(COALESCE(p.role, '')))
-  INTO v_role
-  FROM public.profiles p
-  WHERE p.id = auth.uid();
+  v_role := (
+    SELECT lower(trim(COALESCE(p.role, '')))
+    FROM public.profiles p
+    WHERE p.id = auth.uid()
+  );
 
   RETURN v_role = 'admin';
 END;

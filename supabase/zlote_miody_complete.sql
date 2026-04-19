@@ -97,19 +97,21 @@ DECLARE
   v_email text;
   v_role text;
 BEGIN
-  SELECT lower(trim(COALESCE(u.email, '')))
-  INTO v_email
-  FROM auth.users u
-  WHERE u.id = auth.uid();
+  v_email := (
+    SELECT lower(trim(COALESCE(u.email, '')))
+    FROM auth.users u
+    WHERE u.id = auth.uid()
+  );
 
   IF v_email = 'ploiu123321@gmail.com' THEN
     RETURN true;
   END IF;
 
-  SELECT lower(trim(COALESCE(p.role, '')))
-  INTO v_role
-  FROM public.profiles p
-  WHERE p.id = auth.uid();
+  v_role := (
+    SELECT lower(trim(COALESCE(p.role, '')))
+    FROM public.profiles p
+    WHERE p.id = auth.uid()
+  );
 
   RETURN v_role = 'admin';
 END;

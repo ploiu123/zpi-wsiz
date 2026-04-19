@@ -44,8 +44,7 @@ function LoginContent() {
         })
         if (error) throw error
         await supabase.rpc('sync_profile')
-        router.push(redirectParams)
-        router.refresh()
+        window.location.href = redirectParams
       }
     } catch (err: any) {
       setError(err.message || 'Wystąpił błąd podczas uwierzytelniania.')
