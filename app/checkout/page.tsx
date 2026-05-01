@@ -45,7 +45,8 @@ export default function CheckoutPage() {
   if (items.length === 0) {
     return (
       <div className="pt-32 text-center text-gray-400">
-        Twój koszyk jest pusty. Zanim przejdziesz do kasy, dodaj produkty.
+        <div className="text-4xl mb-4">📭</div>
+        Twój koszyk jest pusty. Dodaj produkty, zanim przejdziesz do kasy.
       </div>
     )
   }
@@ -98,7 +99,7 @@ export default function CheckoutPage() {
     <div className="pt-32 pb-16 px-4 md:px-8 max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12">
       <div>
         <h1 className="font-serif text-3xl font-bold text-amber-500 mb-8 border-b border-white/10 pb-4">
-          Dostawa i Płatność
+          📦 Dostawa i płatność
         </h1>
 
         {error && (
@@ -108,10 +109,10 @@ export default function CheckoutPage() {
         )}
 
         <div className="bg-[#111] border border-white/10 rounded-3xl p-8 mb-8">
-          <h2 className="text-xl font-bold mb-6 text-white">Dane do wysyłki</h2>
+          <h2 className="text-xl font-bold mb-6 text-white">🏠 Dane do wysyłki</h2>
           <form id="checkout-form" onSubmit={handlePlaceOrder} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-2">Adres (Ulica i nr)</label>
+              <label className="block text-sm font-medium text-gray-400 mb-2">Adres (ulica i nr)</label>
               <input 
                 type="text" required
                 value={address} onChange={(e) => setAddress(e.target.value)}
@@ -141,10 +142,10 @@ export default function CheckoutPage() {
             </div>
             
             <div className="pt-6 border-t border-white/10 mt-6">
-              <h2 className="text-xl font-bold mb-4 text-white">Metoda płatności</h2>
+              <h2 className="text-xl font-bold mb-4 text-white">💳 Metoda płatności</h2>
               <div className="p-4 border border-amber-500/50 bg-amber-500/10 rounded-xl">
-                 <div className="font-bold text-amber-500 mb-1">Płatność przy odbiorze / Odroczona</div>
-                 <div className="text-sm text-gray-400">Twoje zamówienie jest od razu przyjmowane do realizacji, a z naszymi zaufanymi dostawcami rozliczysz się z rąk do rąk.</div>
+                 <div className="font-bold text-amber-500 mb-1">🤝 Płatność przy odbiorze</div>
+                 <div className="text-sm text-gray-400">Zamówienie jest realizowane od razu, a płacisz przy dostawie — wygodnie i bezpiecznie.</div>
               </div>
             </div>
           </form>
@@ -153,7 +154,7 @@ export default function CheckoutPage() {
 
       <div>
         <div className="bg-[#111] border border-white/10 rounded-3xl p-8 sticky top-24">
-          <h2 className="font-serif text-2xl font-bold text-white mb-6">Podsumowanie</h2>
+          <h2 className="font-serif text-2xl font-bold text-white mb-6">📋 Podsumowanie</h2>
           
           <div className="space-y-4 mb-6">
             {items.map(item => (
@@ -182,7 +183,7 @@ export default function CheckoutPage() {
             disabled={loading}
             className="w-full bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-xl py-4 font-bold hover:shadow-lg hover:shadow-amber-500/30 transition-all hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed text-lg"
           >
-            {loading ? 'Przetwarzanie...' : 'Złóż zamówienie'}
+            {loading ? '⏳ Przetwarzanie...' : '✅ Złóż zamówienie'}
           </button>
         </div>
       </div>

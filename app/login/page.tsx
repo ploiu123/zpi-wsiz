@@ -57,19 +57,20 @@ function LoginContent() {
     <div className="pt-32 pb-16 px-4 flex items-center justify-center min-h-[80vh]">
       <div className="bg-[#111] border border-white/10 rounded-3xl p-8 md:p-12 w-full max-w-md shadow-2xl">
         <div className="text-center mb-8">
+          <div className="text-4xl mb-3">{isRegistering ? '📝' : '🔑'}</div>
           <h1 className="font-serif text-3xl font-bold text-amber-500 mb-2">
             {isRegistering ? 'Utwórz konto' : 'Zaloguj się'}
           </h1>
           <p className="text-gray-400">
             {isRegistering 
-              ? 'Dołącz do nas i łatwiej kupuj miody' 
-              : 'Witaj z powrotem! Zaloguj się, aby kontynuować.'}
+              ? 'Dołącz do nas — kupuj miody szybciej i wygodniej' 
+              : 'Witaj z powrotem! Zaloguj się, by kontynuować.'}
           </p>
           {isAdminTarget && !isRegistering && (
             <p className="mt-4 text-sm text-amber-200/90 bg-amber-500/10 border border-amber-500/25 rounded-xl px-4 py-3">
-              Logujesz się do <span className="font-semibold">panelu administratora</span>. Po zalogowaniu wrócisz pod adres{' '}
-              <code className="text-amber-400">{redirectParams}</code>. Konto musi mieć rolę <code className="text-amber-400">admin</code> w tabeli{' '}
-              <code className="text-amber-400">profiles</code> (ustawiasz ją w Supabase).
+              🔒 Logujesz się do <span className="font-semibold">panelu administratora</span>. Konto musi mieć rolę{' '}
+              <code className="text-amber-400">admin</code> w tabeli{' '}
+              <code className="text-amber-400">profiles</code>.
             </p>
           )}
         </div>
@@ -110,7 +111,7 @@ function LoginContent() {
             disabled={loading}
             className="w-full bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-xl py-4 font-bold hover:shadow-lg hover:shadow-amber-500/30 transition-all hover:-translate-y-0.5 mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? 'Przetwarzanie...' : (isRegistering ? 'Zarejestruj się' : 'Zaloguj się')}
+            {loading ? '⏳ Przetwarzanie...' : (isRegistering ? '📝 Zarejestruj się' : '🔑 Zaloguj się')}
           </button>
         </form>
 
@@ -132,7 +133,7 @@ function LoginContent() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div className="pt-32 pb-16 px-4 text-center text-amber-500">Wczytywanie logowania...</div>}>
+    <Suspense fallback={<div className="pt-32 pb-16 px-4 text-center text-amber-500">⏳ Wczytywanie...</div>}>
       <LoginContent />
     </Suspense>
   )

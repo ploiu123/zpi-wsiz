@@ -38,7 +38,7 @@ export default async function HomePage() {
         <div className="relative z-10 text-center px-4 md:px-8 max-w-4xl mx-auto space-y-8 animate-fade-up">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-sm font-semibold mb-4 backdrop-blur-md">
             <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
-            100% Naturalne Zbiory
+            🐝 Naturalne zbiory z rodzinnej pasieki
           </div>
           
           <h1 className="font-serif text-6xl md:text-8xl font-bold text-transparent bg-clip-text bg-gradient-to-b from-white via-amber-100 to-amber-500 drop-shadow-sm leading-tight">
@@ -46,9 +46,8 @@ export default async function HomePage() {
           </h1>
           
           <p className="text-gray-300 max-w-2xl mx-auto text-lg md:text-xl leading-relaxed font-light">
-            Złote Miody to nie tylko sklep, to wielopokoleniowa historia naszej rodziny. 
-            Dbamy o każdą pszczołę, by dostarczyć Ci 100% bezpieczny i naturalny miód 
-            z najczystszych lasów.
+            Trzy pokolenia pszczelarzy, czyste lasy i zero chemii. Każdy słoik to gwarancja 
+            smaku, który pamiętasz z dzieciństwa — prosto od nas do Twojego stołu.
           </p>
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
@@ -56,27 +55,52 @@ export default async function HomePage() {
               href="#produkty"
               className="px-8 py-4 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-full font-bold hover:shadow-lg hover:shadow-amber-500/40 transition-all hover:-translate-y-1 w-full sm:w-auto"
             >
-              Zobacz produkty
+              🍯 Zobacz produkty
             </a>
             <Link
               href="/historia"
               className="px-8 py-4 bg-white/5 hover:bg-white/10 border border-white/10 backdrop-blur-md text-white rounded-full font-semibold transition-all hover:-translate-y-1 w-full sm:w-auto"
             >
-              Poznaj naszą historię
+              📖 Poznaj naszą historię
             </Link>
           </div>
+        </div>
+      </section>
+
+      {/* Info cards */}
+      <section className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-20">
+        <div className="bg-[#111] border border-white/10 rounded-2xl p-6 text-center hover:border-amber-500/20 transition-colors">
+          <div className="text-3xl mb-3">🌿</div>
+          <h3 className="font-serif text-lg font-bold text-white mb-2">100% Naturalny</h3>
+          <p className="text-gray-400 text-sm">Bez cukru, bez konserwantów, bez sztucznych barwników. Czysty miód z naszych uli.</p>
+        </div>
+        <div className="bg-[#111] border border-white/10 rounded-2xl p-6 text-center hover:border-amber-500/20 transition-colors">
+          <div className="text-3xl mb-3">📦</div>
+          <h3 className="font-serif text-lg font-bold text-white mb-2">Wysyłka 24h</h3>
+          <p className="text-gray-400 text-sm">Pakujemy w ekologiczne materiały i wysyłamy następnego dnia roboczego.</p>
+        </div>
+        <div className="bg-[#111] border border-white/10 rounded-2xl p-6 text-center hover:border-amber-500/20 transition-colors">
+          <div className="text-3xl mb-3">🏆</div>
+          <h3 className="font-serif text-lg font-bold text-white mb-2">Sprawdzona jakość</h3>
+          <p className="text-gray-400 text-sm">Każda partia miodu przechodzi kontrolę jakości. Znamy historię każdej ramki.</p>
         </div>
       </section>
 
       {/* Produkty */}
       <section id="produkty" className="scroll-mt-24">
         <div className="flex items-center justify-between mb-8 border-b border-white/10 pb-4">
-          <h2 className="font-serif text-3xl font-bold text-white">Nasza oferta</h2>
+          <div>
+            <h2 className="font-serif text-3xl font-bold text-white">🍯 Nasza oferta</h2>
+            <p className="text-gray-400 text-sm mt-1">Kliknij na produkt, żeby zobaczyć szczegóły</p>
+          </div>
+          <Link href="/products" className="text-amber-500 hover:text-amber-400 text-sm font-semibold transition-colors">
+            Wszystkie →
+          </Link>
         </div>
         
         {items.length === 0 ? (
           <div className="text-center py-20 text-gray-400">
-            Brak produktów w bazie danych. Dodaj je przez panel Supabase.
+            Brak produktów w bazie danych. Dodaj je przez panel administracyjny.
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -89,18 +113,19 @@ export default async function HomePage() {
 
       {/* CTA Pobranie Aplikacji */}
       <section className="mt-24 border border-amber-500/30 bg-[#111] rounded-3xl p-8 md:p-14 text-center hide-in-electron">
+        <div className="text-4xl mb-4">💻</div>
         <h2 className="font-serif text-3xl md:text-4xl font-bold text-white mb-4">
-          Odkryj naszą nową aplikację desktopową!
+          Aplikacja desktopowa już dostępna!
         </h2>
         <p className="text-gray-400 max-w-2xl mx-auto text-lg mb-8">
-          Kupuj nasze pyszne miody prosto z Twojego ekranu bez używania przeglądarki. Zainstaluj stabilną i superszybką aplikację przeznaczoną na Twój system operacyjny.
+          Kupuj miody bez otwierania przeglądarki. Szybka, stabilna aplikacja na macOS — idealna do powtórnych zamówień.
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <a href="/download" className="px-8 py-4 bg-white/10 hover:bg-white/20 border border-white/10 text-white rounded-full font-bold transition-all w-full sm:w-auto">
-            Dowiedz się więcej
+            📋 Dowiedz się więcej
           </a>
-          <a href="/download#windows" className="px-8 py-4 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-full font-bold hover:shadow-lg hover:shadow-amber-500/30 transition-all hover:-translate-y-0.5 w-full sm:w-auto">
-            Pobierz Aplikację
+          <a href="/download#macos" className="px-8 py-4 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-full font-bold hover:shadow-lg hover:shadow-amber-500/30 transition-all hover:-translate-y-0.5 w-full sm:w-auto">
+            ⬇️ Pobierz teraz
           </a>
         </div>
       </section>

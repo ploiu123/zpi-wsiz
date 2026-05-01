@@ -38,18 +38,19 @@ export default async function ProductDetailPage(props: { params: Promise<{ id: s
               alt={product.name} 
               fill 
               className="object-cover"
+              sizes="(max-width: 768px) 100vw, 50vw"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-amber-500 font-bold text-2xl">
-              Nasz wspaniały {product.name}
+            <div className="w-full h-full flex items-center justify-center text-amber-500 font-bold text-4xl">
+              🍯
             </div>
           )}
         </div>
         
         {/* Prawa strona - Opis */}
         <div className="md:w-1/2 p-8 md:p-12 flex flex-col justify-center">
-           <div className="inline-block px-3 py-1 bg-amber-500/10 text-amber-500 text-xs font-bold rounded-full mb-4 uppercase tracking-wider w-max">
-             {product.category || 'Miód'}
+           <div className="inline-block px-3 py-1 bg-amber-500/10 text-amber-500 text-xs font-bold rounded-full mb-4 uppercase tracking-wider w-max border border-amber-500/20">
+             {product.category || '🐝 Miód'}
            </div>
            
            <h1 className="font-serif text-4xl md:text-5xl font-bold text-white mb-4">
@@ -61,12 +62,17 @@ export default async function ProductDetailPage(props: { params: Promise<{ id: s
            </div>
            
            <p className="text-gray-400 text-lg mb-8 leading-relaxed whitespace-pre-line">
-             {product.description}
+             {product.description || 'Naturalny miód z naszej rodzinnej pasieki — bez dodatków, bez chemii, pełen smaku.'}
            </p>
            
            <div className="pt-8 border-t border-white/10 text-sm text-gray-500 mb-8 space-y-2">
-             <p>Wysyłka zapakowana ekologicznie w 24H.</p>
-             <p>Dostępność: {product.stock > 0 ? <span className="text-green-500 font-bold ml-1">W magazynie ({product.stock} szt.)</span> : <span className="text-red-500 font-bold ml-1">Brak na magazynie</span>}</p>
+             <p>📦 Wysyłka zapakowana ekologicznie w 24h</p>
+             <p>
+               {product.stock > 0 
+                 ? <span>✅ Dostępność: <span className="text-green-500 font-bold ml-1">W magazynie ({product.stock} szt.)</span></span> 
+                 : <span>❌ Dostępność: <span className="text-red-500 font-bold ml-1">Brak na magazynie</span></span>
+               }
+             </p>
            </div>
            
            <AddToCartButton product={product} />

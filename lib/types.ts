@@ -21,6 +21,8 @@ export interface Product {
   name: string
   description: string
   price: number
+  /** When set, the product is on sale — `price` is the current (lower) price, `old_price` is the original. */
+  old_price: number | null
   image_url: string
   stock: number
   category: string
