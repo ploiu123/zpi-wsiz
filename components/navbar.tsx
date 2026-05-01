@@ -24,7 +24,7 @@ export function Navbar() {
   const [mounted, setMounted] = useState(false)
   const itemCount = useCartStore((s) => s.getItemCount())
 
-  const [isLight, setIsLight] = useState(false)
+  const [isDark, setIsDark] = useState(true)
 
   useEffect(() => {
     setMounted(true)
@@ -37,25 +37,24 @@ export function Navbar() {
       if (isAdminRole(data?.role) || isAdminEmail(user.email)) setIsAdmin(true)
     })
 
-    // Theme check
-    const savedTheme = localStorage.getItem('theme')
-    if (savedTheme === 'light') {
-      setIsLight(true)
-      document.documentElement.classList.add('light-mode')
-    }
+    // Read current theme from DOM (set by blocking script)
+    const isCurrentlyLight = document.documentElement.classList.contains('light')
+    setIsDark(!isCurrentlyLight)
   }, [])
 
   const toggleTheme = useCallback(() => {
-    if (isLight) {
-      document.documentElement.classList.remove('light-mode')
-      localStorage.setItem('theme', 'dark')
-      setIsLight(false)
-    } else {
-      document.documentElement.classList.add('light-mode')
+    if (isDark) {
+      document.documentElement.classList.remove('dark')
+      document.documentElement.classList.add('light')
       localStorage.setItem('theme', 'light')
-      setIsLight(true)
+      setIsDark(false)
+    } else {
+      document.documentElement.classList.remove('light')
+      document.documentElement.classList.add('dark')
+      localStorage.setItem('theme', 'dark')
+      setIsDark(true)
     }
-  }, [isLight])
+  }, [isDark])
 
   const handleLogout = useCallback(async () => {
     const supabase = createClient()
@@ -68,9 +67,9 @@ export function Navbar() {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-[#0a0a0a]/60 backdrop-blur-2xl border-b border-white/5 transition-all duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-20">
-        {/* Logo */}
+        {/* Logo — prostokątne zaokrąglone, nie okrągłe */}
         <Link href="/" className="flex items-center gap-3 group">
-          <div className="relative w-10 h-10 rounded-full overflow-hidden border border-amber-500/20 group-hover:border-amber-500/50 transition-colors shadow-lg shadow-amber-500/10">
+          <div className="relative w-11 h-9 rounded-xl overflow-hidden border-2 border-amber-500/30 group-hover:border-amber-500/70 transition-all duration-300 shadow-lg shadow-amber-500/10 group-hover:shadow-amber-500/25">
             <img src="/logo.jpg" alt="Złote Miody" className="w-full h-full object-cover" />
           </div>
           <span className="font-serif text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-amber-500 tracking-wide">
@@ -102,8 +101,20 @@ export function Navbar() {
 
         {/* Right side */}
         <div className="flex items-center gap-3">
-          <button onClick={toggleTheme} className="p-2 rounded-full hover:bg-white/5 transition-all text-gray-300" title="Zmień motyw">
-            {mounted && isLight ? <Moon className="w-5 h-5 text-gray-400" /> : <Sun className="w-5 h-5 text-amber-500" />}
+          {/* Theme toggle */}
+          <button
+            onClick={toggleTheme}
+            className="relative p-2.5 rounded-full hover:bg-white/5 transition-all group/theme"
+            title={isDark ? 'Włącz jasny tryb' : 'Włącz ciemny tryb'}
+            aria-label="Zmień motyw"
+          >
+            {mounted && isDark ? (
+              <Sun className="w-5 h-5 text-amber-400 group-hover/theme:text-amber-300 transition-colors" />
+            ) : mounted ? (
+              <Moon className="w-5 h-5 text-amber-600 group-hover/theme:text-amber-500 transition-colors" />
+            ) : (
+              <div className="w-5 h-5" />
+            )}
           </button>
 
           <Link href="/cart" className="relative p-2 rounded-full hover:bg-white/5 transition-all">

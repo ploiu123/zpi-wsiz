@@ -18,12 +18,26 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pl" className="scroll-smooth">
+    <html lang="pl" className="dark scroll-smooth" suppressHydrationWarning>
       <head>
+        <meta name="color-scheme" content="dark light" />
+        {/* Blocking script: set theme class BEFORE first paint to prevent flash */}
         <script dangerouslySetInnerHTML={{ __html: `
-          if (typeof navigator !== 'undefined' && navigator.userAgent.toLowerCase().includes('electron')) {
-            document.documentElement.classList.add('is-electron');
-          }
+          (function() {
+            try {
+              var t = localStorage.getItem('theme');
+              if (t === 'light') {
+                document.documentElement.classList.remove('dark');
+                document.documentElement.classList.add('light');
+              } else {
+                document.documentElement.classList.remove('light');
+                document.documentElement.classList.add('dark');
+              }
+            } catch(e) {}
+            if (typeof navigator !== 'undefined' && navigator.userAgent.toLowerCase().includes('electron')) {
+              document.documentElement.classList.add('is-electron');
+            }
+          })();
         `}} />
       </head>
       <body className={`${inter.variable} ${playfair.variable} font-sans bg-[#0a0a0a] text-white antialiased`}>

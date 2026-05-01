@@ -21,13 +21,110 @@
   --color-dark-500: #333333;
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-track { background: #0a0a0a; }
-::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: #444; }
+/* ================================================================
+   THEME SYSTEM — CSS Custom Properties
+   Controlled by .dark / .light class on <html>
+   ================================================================ */
 
-/* Animations */
+:root {
+  /* Fallback to dark */
+  --bg-body: #120e0a;
+  --bg-card: #1c1510;
+  --bg-card-alt: rgba(18, 14, 10, 0.85);
+  --bg-input: rgba(0, 0, 0, 0.5);
+  --bg-subtle: rgba(255, 255, 255, 0.05);
+  --bg-hover: rgba(255, 255, 255, 0.08);
+
+  --text-primary: #ffffff;
+  --text-secondary: #a3a3a3;
+  --text-muted: #737373;
+  --text-inverse: #2b221a;
+
+  --border-primary: rgba(255, 255, 255, 0.1);
+  --border-subtle: rgba(255, 255, 255, 0.05);
+  --border-amber: rgba(251, 191, 36, 0.1);
+
+  --scrollbar-track: #0a0a0a;
+  --scrollbar-thumb: #333;
+  --scrollbar-thumb-hover: #444;
+
+  --gradient-hero-from: #0a0a0a;
+  --shadow-glow: rgba(245, 158, 11, 0.15);
+}
+
+html.dark {
+  color-scheme: dark;
+  --bg-body: #120e0a;
+  --bg-card: #1c1510;
+  --bg-card-alt: rgba(18, 14, 10, 0.85);
+  --bg-input: rgba(0, 0, 0, 0.5);
+  --bg-subtle: rgba(255, 255, 255, 0.05);
+  --bg-hover: rgba(255, 255, 255, 0.08);
+
+  --text-primary: #ffffff;
+  --text-secondary: #a3a3a3;
+  --text-muted: #737373;
+
+  --border-primary: rgba(255, 255, 255, 0.1);
+  --border-subtle: rgba(255, 255, 255, 0.05);
+  --border-amber: rgba(251, 191, 36, 0.1);
+
+  --scrollbar-track: #0a0a0a;
+  --scrollbar-thumb: #333;
+  --scrollbar-thumb-hover: #444;
+
+  --gradient-hero-from: #0a0a0a;
+  --shadow-glow: rgba(245, 158, 11, 0.15);
+}
+
+html.light {
+  color-scheme: light;
+  --bg-body: #fdfaf5;
+  --bg-card: #ffffff;
+  --bg-card-alt: rgba(253, 250, 245, 0.9);
+  --bg-input: rgba(0, 0, 0, 0.04);
+  --bg-subtle: rgba(180, 130, 50, 0.05);
+  --bg-hover: rgba(180, 130, 50, 0.08);
+
+  --text-primary: #2b221a;
+  --text-secondary: #635242;
+  --text-muted: #8a7968;
+
+  --border-primary: rgba(180, 130, 50, 0.15);
+  --border-subtle: rgba(180, 130, 50, 0.08);
+  --border-amber: rgba(180, 130, 50, 0.2);
+
+  --scrollbar-track: #f5f0e8;
+  --scrollbar-thumb: #d4c4a8;
+  --scrollbar-thumb-hover: #c4b090;
+
+  --gradient-hero-from: #fdfaf5;
+  --shadow-glow: rgba(245, 158, 11, 0.1);
+}
+
+/* ================================================================
+   GLOBAL BASE STYLES
+   ================================================================ */
+
+html, body {
+  background-color: var(--bg-body) !important;
+  color: var(--text-primary) !important;
+  transition: background-color 0.35s ease, color 0.35s ease;
+}
+
+/* ================================================================
+   SCROLLBAR
+   ================================================================ */
+
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--scrollbar-track); }
+::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-thumb-hover); }
+
+/* ================================================================
+   ANIMATIONS
+   ================================================================ */
+
 @keyframes fade-up {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
@@ -42,72 +139,208 @@
 .animate-delay-300 { animation-delay: 0.3s; }
 .animate-delay-400 { animation-delay: 0.4s; }
 
-/* Dark Mode Overrides (Warm Premium Dark) */
-html:not(.light-mode) {
-  background-color: #120e0a !important;
+/* ================================================================
+   GLOBAL OVERRIDES — auto-theme for Tailwind utility classes
+   These ensure that inline dark-mode colors adapt in light mode.
+   ================================================================ */
+
+/* — Backgrounds — */
+html.light .bg-\[\#0a0a0a\],
+html.light .bg-\[\#0a0a0a\]\/60,
+html.light .bg-\[\#0a0a0a\]\/90,
+html.light .bg-\[\#0a0a0a\]\/95 {
+  background-color: var(--bg-card-alt) !important;
 }
-html:not(.light-mode) body {
-  background-color: #120e0a !important;
+
+html.light .bg-\[\#111\],
+html.light .bg-\[\#111\]\/80 {
+  background-color: var(--bg-card) !important;
+  border-color: var(--border-primary) !important;
 }
-html:not(.light-mode) .bg-\[\#0a0a0a\], html:not(.light-mode) .bg-\[\#0a0a0a\]\/60, html:not(.light-mode) .bg-\[\#0a0a0a\]\/90, html:not(.light-mode) .bg-\[\#0a0a0a\]\/95 {
-  background-color: rgba(18, 14, 10, 0.85) !important;
+
+html.light .bg-white\/5 {
+  background-color: var(--bg-subtle) !important;
 }
-html:not(.light-mode) .bg-\[\#111\], html:not(.light-mode) .bg-\[\#111\]\/80 {
-  background-color: #1c1510 !important;
+
+html.light .bg-white\/10 {
+  background-color: var(--bg-hover) !important;
 }
-html:not(.light-mode) .border-white\/10 {
-  border-color: rgba(251, 191, 36, 0.1) !important; /* amber-400 with 10% opacity */
+
+html.light .bg-black\/50,
+html.light .bg-black\/40,
+html.light .bg-black\/30 {
+  background-color: var(--bg-input) !important;
 }
-html:not(.light-mode) .border-white\/5 {
+
+/* — Text — */
+html.light .text-white {
+  color: var(--text-primary) !important;
+}
+
+html.light .text-gray-400,
+html.light .text-gray-400\/90 {
+  color: var(--text-secondary) !important;
+}
+
+html.light .text-gray-300 {
+  color: var(--text-primary) !important;
+}
+
+html.light .text-gray-500 {
+  color: var(--text-muted) !important;
+}
+
+html.light .text-gray-600 {
+  color: var(--text-muted) !important;
+}
+
+html.light .text-gray-200 {
+  color: var(--text-primary) !important;
+}
+
+/* — Borders — */
+html.light .border-white\/10 {
+  border-color: var(--border-primary) !important;
+}
+
+html.light .border-white\/5 {
+  border-color: var(--border-subtle) !important;
+}
+
+/* — Hover states — */
+html.light .hover\:bg-white\/5:hover {
+  background-color: var(--bg-hover) !important;
+}
+
+html.light .hover\:bg-white\/10:hover {
+  background-color: rgba(180, 130, 50, 0.12) !important;
+}
+
+html.light .hover\:bg-white\/20:hover {
+  background-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+html.light .hover\:text-amber-400:hover {
+  color: #b45309 !important;
+}
+
+/* — Gradients in hero — */
+html.light .from-\[\#0a0a0a\],
+html.light .via-\[\#0a0a0a\]\/80,
+html.light .via-\[\#0a0a0a\]\/50 {
+  --tw-gradient-from: var(--gradient-hero-from) !important;
+  --tw-gradient-via: var(--gradient-hero-from) !important;
+}
+
+html.light .bg-gradient-to-t.from-\[\#0a0a0a\] {
+  background: linear-gradient(to top, var(--gradient-hero-from), rgba(253, 250, 245, 0.6), transparent) !important;
+}
+
+html.light .bg-gradient-to-r.from-\[\#0a0a0a\] {
+  background: linear-gradient(to right, var(--gradient-hero-from), rgba(253, 250, 245, 0.3), transparent) !important;
+}
+
+/* — Product card gradient overlay — */
+html.light .from-\[\#111\] {
+  --tw-gradient-from: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* — Hero heading gradient — */
+html.light .from-white.via-amber-100.to-amber-500,
+html.light .bg-gradient-to-b.from-white {
+  background: linear-gradient(to bottom, #2b221a, #78350f, #d97706) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+}
+
+/* — Outline — */
+html.light .outline-white\/5 {
+  outline-color: var(--border-subtle) !important;
+}
+
+/* — Specific light mode card enhancements — */
+html.light .bg-\[\#111\] {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 0 0 1px var(--border-subtle);
+}
+
+/* — Shadow adjustments — */
+html.light .shadow-2xl {
+  --tw-shadow-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+html.light .shadow-amber-900\/20 {
+  --tw-shadow-color: rgba(245, 158, 11, 0.08) !important;
+}
+
+/* — Admin red banner — */
+html.light .bg-red-500\/10 {
+  background-color: rgba(239, 68, 68, 0.08) !important;
+}
+
+/* — Amber badge & accents — */
+html.light .bg-amber-500\/10 {
+  background-color: rgba(245, 158, 11, 0.1) !important;
+}
+
+html.light .bg-amber-500\/5 {
+  background-color: rgba(245, 158, 11, 0.06) !important;
+}
+
+/* — Input focus in light mode — */
+html.light input:focus,
+html.light textarea:focus {
+  border-color: #d97706 !important;
+}
+
+/* — Tables — */
+html.light thead.bg-white\/5 {
+  background-color: rgba(245, 158, 11, 0.06) !important;
+}
+
+html.light tbody tr:hover.hover\:bg-white\/5 {
+  background-color: rgba(245, 158, 11, 0.04) !important;
+}
+
+/* ================================================================
+   DARK MODE WARM ENHANCEMENTS
+   ================================================================ */
+
+html.dark .bg-\[\#0a0a0a\],
+html.dark .bg-\[\#0a0a0a\]\/60,
+html.dark .bg-\[\#0a0a0a\]\/90,
+html.dark .bg-\[\#0a0a0a\]\/95 {
+  background-color: var(--bg-card-alt) !important;
+}
+
+html.dark .bg-\[\#111\],
+html.dark .bg-\[\#111\]\/80 {
+  background-color: var(--bg-card) !important;
+}
+
+html.dark .border-white\/10 {
+  border-color: var(--border-amber) !important;
+}
+
+html.dark .border-white\/5 {
   border-color: rgba(251, 191, 36, 0.05) !important;
 }
 
-/* Light Mode Overrides */
-html.light-mode {
-  background-color: #fdfaf5 !important;
-  color: #2b221a !important;
-  color-scheme: light;
-}
-html.light-mode body {
-  background-color: #fdfaf5 !important;
-  color: #2b221a !important;
-}
-html.light-mode .bg-\[\#0a0a0a\], html.light-mode .bg-\[\#0a0a0a\]\/60, html.light-mode .bg-\[\#0a0a0a\]\/90, html.light-mode .bg-\[\#0a0a0a\]\/95 {
-  background-color: rgba(253, 250, 245, 0.85) !important;
-}
-html.light-mode .bg-\[\#111\], html.light-mode .bg-\[\#111\]\/80 {
-  background-color: #ffffff !important;
-  border-color: #f0e6d5 !important;
-}
-html.light-mode .text-white {
-  color: #2b221a !important;
-}
-html.light-mode .text-gray-400 {
-  color: #635242 !important;
-}
-html.light-mode .text-gray-300 {
-  color: #524436 !important;
-}
-html.light-mode .border-white\/10 {
-  border-color: rgba(180, 130, 50, 0.15) !important;
-}
-html.light-mode .border-white\/5 {
-  border-color: rgba(180, 130, 50, 0.08) !important;
-}
-html.light-mode .bg-white\/5 {
-  background-color: rgba(180, 130, 50, 0.05) !important;
-}
-html.light-mode .hover\:bg-white\/5:hover {
-  background-color: rgba(180, 130, 50, 0.08) !important;
-}
-html.light-mode .bg-white\/10 {
-  background-color: rgba(180, 130, 50, 0.1) !important;
-}
-html.light-mode .hover\:bg-white\/20:hover {
-  background-color: rgba(0,0,0,0.12) !important;
-}
+/* ================================================================
+   ELECTRON APP
+   ================================================================ */
 
-/* Electron App specific styles */
 .is-electron .hide-in-electron {
   display: none !important;
+}
+
+/* ================================================================
+   SMOOTH TRANSITIONS for themed elements
+   ================================================================ */
+
+nav,
+footer,
+.bg-\[\#111\],
+.bg-\[\#0a0a0a\],
+main {
+  transition: background-color 0.35s ease, color 0.35s ease, border-color 0.35s ease;
 }
