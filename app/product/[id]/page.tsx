@@ -58,7 +58,15 @@ export default async function ProductDetailPage(props: { params: Promise<{ id: s
            </h1>
            
            <div className="text-3xl font-bold text-amber-400 mb-6">
-             {product.price.toFixed(2)} zł
+             {product.old_price ? (
+               <div className="flex items-center gap-3 flex-wrap">
+                 <span>{product.price.toFixed(2)} zł</span>
+                 <span className="text-red-400/70 line-through text-xl">{product.old_price.toFixed(2)} zł</span>
+                 <span className="text-xs bg-red-500/20 text-red-400 px-2 py-1 rounded-full font-semibold">🏷️ Promocja</span>
+               </div>
+             ) : (
+               <span>{product.price.toFixed(2)} zł</span>
+             )}
            </div>
            
            <p className="text-gray-400 text-lg mb-8 leading-relaxed whitespace-pre-line">
@@ -73,6 +81,9 @@ export default async function ProductDetailPage(props: { params: Promise<{ id: s
                  : <span>❌ Dostępność: <span className="text-red-500 font-bold ml-1">Brak na magazynie</span></span>
                }
              </p>
+             {product.old_price && (
+               <p>ℹ️ Najniższa cena z ostatnich 30 dni: <span className="text-amber-400 font-semibold">{product.price.toFixed(2)} zł</span></p>
+             )}
            </div>
            
            <AddToCartButton product={product} />

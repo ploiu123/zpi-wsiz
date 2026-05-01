@@ -61,7 +61,16 @@ export const ProductCard = memo(function ProductCard({ product }: { product: Pro
         <div className="p-6 flex-1 flex flex-col relative z-20">
           <div className="flex justify-between items-start mb-3 gap-2">
             <h3 className="font-serif text-xl font-bold text-white group-hover:text-amber-400 transition-colors leading-tight">{product.name}</h3>
-            <span className="text-amber-400 font-bold whitespace-nowrap bg-amber-500/10 px-3 py-1 rounded-full text-sm border border-amber-500/20">{product.price.toFixed(2)} zł</span>
+            <div className="text-right shrink-0">
+              {product.old_price ? (
+                <>
+                  <span className="text-red-400/70 line-through text-xs block">{product.old_price.toFixed(2)} zł</span>
+                  <span className="text-amber-400 font-bold whitespace-nowrap bg-red-500/10 px-3 py-1 rounded-full text-sm border border-red-500/20">{product.price.toFixed(2)} zł</span>
+                </>
+              ) : (
+                <span className="text-amber-400 font-bold whitespace-nowrap bg-amber-500/10 px-3 py-1 rounded-full text-sm border border-amber-500/20">{product.price.toFixed(2)} zł</span>
+              )}
+            </div>
           </div>
           
           <p className="text-sm text-gray-400/90 mb-4 flex-1 line-clamp-2 font-light leading-relaxed">
@@ -139,7 +148,15 @@ export const ProductCard = memo(function ProductCard({ product }: { product: Pro
                 </h2>
 
                 <div className="text-2xl font-bold text-amber-400 mb-4">
-                  {product.price.toFixed(2)} zł
+                  {product.old_price ? (
+                    <div className="flex items-center gap-3">
+                      <span>{product.price.toFixed(2)} zł</span>
+                      <span className="text-red-400/70 line-through text-base">{product.old_price.toFixed(2)} zł</span>
+                      <span className="text-xs bg-red-500/20 text-red-400 px-2 py-0.5 rounded-full font-semibold">Promocja</span>
+                    </div>
+                  ) : (
+                    <span>{product.price.toFixed(2)} zł</span>
+                  )}
                 </div>
 
                 {/* Description — full, no line clamp */}
@@ -163,6 +180,12 @@ export const ProductCard = memo(function ProductCard({ product }: { product: Pro
                     <Truck className="w-4 h-4 text-amber-500/60 shrink-0" />
                     <span>Wysyłka w 24h, ekologiczne opakowanie</span>
                   </div>
+                  {product.old_price && (
+                    <div className="flex items-center gap-2.5 text-xs text-gray-500">
+                      <span>ℹ️</span>
+                      <span>Najniższa cena z ostatnich 30 dni: <span className="text-amber-400 font-semibold">{product.price.toFixed(2)} zł</span></span>
+                    </div>
+                  )}
                 </div>
 
                 {/* Add to cart button */}
