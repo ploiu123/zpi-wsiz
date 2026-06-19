@@ -69,8 +69,8 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-20">
         {/* Logo — prostokątne zaokrąglone, nie okrągłe */}
         <Link href="/" className="flex items-center gap-3 group">
-          <div className="relative w-11 h-9 rounded-xl overflow-hidden border-2 border-amber-500/30 group-hover:border-amber-500/70 transition-all duration-300 shadow-lg shadow-amber-500/10 group-hover:shadow-amber-500/25">
-            <img src="/logo.jpg" alt="Złote Miody" className="w-full h-full object-cover" />
+          <div className="relative w-11 h-11 rounded-xl overflow-hidden border-2 border-amber-500/30 group-hover:border-amber-500/70 transition-all duration-300 shadow-lg shadow-amber-500/10 group-hover:shadow-amber-500/25">
+            <img src={isDark ? '/logo-dark.png' : '/logo.png'} alt="Złote Miody" className="w-full h-full object-contain bg-black/10" onError={(e) => e.currentTarget.src='/logo.png'} />
           </div>
           <span className="font-serif text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-amber-500 tracking-wide">
             Złote Miody
@@ -148,24 +148,29 @@ export function Navbar() {
         </div>
       </div>
 
-      {/* Mobile menu dropdown */}
+      {/* Mobile menu dropdown / overlay */}
       {menuOpen && (
-        <div className="md:hidden border-t border-white/5 bg-[#0a0a0a]/95 backdrop-blur-xl px-4 py-4 space-y-2">
-          {NAV_LINKS.map((link) => (
-            <Link key={link.href} href={link.href} onClick={() => setMenuOpen(false)}
-              className={`block px-4 py-3 rounded-lg text-sm font-medium text-gray-300 hover:bg-white/5 hover:text-amber-400 transition-all ${link.href === '/download' ? 'hide-in-electron' : ''}`}>
-              {link.label}
-            </Link>
-          ))}
-          {user ? (
-            <>
-              <Link href="/dashboard" onClick={() => setMenuOpen(false)} className="block px-4 py-3 rounded-lg text-sm font-medium text-gray-300 hover:bg-white/5">Moje konto</Link>
-              {isAdmin && <Link href="/admin" onClick={() => setMenuOpen(false)} className="block px-4 py-3 rounded-lg text-sm font-medium text-red-400 hover:bg-red-500/10">Admin</Link>}
-              <button onClick={handleLogout} className="w-full text-left px-4 py-3 rounded-lg text-sm font-medium text-gray-400 hover:bg-white/5">Wyloguj</button>
-            </>
-          ) : (
-            <Link href="/login" onClick={() => setMenuOpen(false)} className="block px-4 py-3 rounded-lg text-sm font-semibold text-amber-400 bg-amber-500/10">Zaloguj się</Link>
-          )}
+        <div className="md:hidden fixed inset-0 top-20 z-40 bg-[#0a0a0a]/95 backdrop-blur-xl border-t border-white/5 mobile-menu-overlay flex flex-col p-6">
+          <div className="flex-1 space-y-4 mobile-menu-content">
+            {NAV_LINKS.map((link) => (
+              <Link key={link.href} href={link.href} onClick={() => setMenuOpen(false)}
+                className={`block px-4 py-4 rounded-xl text-lg font-medium text-gray-300 hover:bg-white/5 hover:text-amber-400 transition-all ${link.href === '/download' ? 'hide-in-electron' : ''}`}>
+                {link.label}
+              </Link>
+            ))}
+            
+            <div className="h-px w-full bg-white/10 my-4"></div>
+            
+            {user ? (
+              <>
+                <Link href="/dashboard" onClick={() => setMenuOpen(false)} className="block px-4 py-4 rounded-xl text-lg font-medium text-gray-300 hover:bg-white/5">Moje konto</Link>
+                {isAdmin && <Link href="/admin" onClick={() => setMenuOpen(false)} className="block px-4 py-4 rounded-xl text-lg font-medium text-red-400 hover:bg-red-500/10">Panel Admina</Link>}
+                <button onClick={handleLogout} className="w-full text-left px-4 py-4 rounded-xl text-lg font-medium text-gray-400 hover:bg-white/5">Wyloguj się</button>
+              </>
+            ) : (
+              <Link href="/login" onClick={() => setMenuOpen(false)} className="block text-center px-4 py-4 mt-8 rounded-xl text-lg font-bold text-black bg-gradient-to-r from-amber-400 to-amber-500 shadow-lg shadow-amber-500/20">Zaloguj się</Link>
+            )}
+          </div>
         </div>
       )}
     </nav>

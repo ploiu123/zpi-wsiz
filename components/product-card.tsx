@@ -3,15 +3,19 @@
 import { memo, useCallback, useState } from 'react'
 import { Product } from '@/lib/types'
 import { useCartStore } from '@/lib/store'
+import { useToast } from '@/components/toast'
 import { ShoppingCart, X, Package, Truck, Check } from 'lucide-react'
 import Image from 'next/image'
 
 export const ProductCard = memo(function ProductCard({ product }: { product: Product }) {
   const addItem = useCartStore((state) => state.addItem)
+  const { addToast } = useToast()
+  
   const onAdd = useCallback((e: React.MouseEvent) => {
     e.stopPropagation()
     addItem(product)
-  }, [addItem, product])
+    addToast('cart', `Dodano do koszyka: ${product.name}`)
+  }, [addItem, product, addToast])
 
   const [showModal, setShowModal] = useState(false)
   const [addedToCart, setAddedToCart] = useState(false)
@@ -19,8 +23,9 @@ export const ProductCard = memo(function ProductCard({ product }: { product: Pro
   const handleAddFromModal = useCallback(() => {
     addItem(product)
     setAddedToCart(true)
+    addToast('cart', `Dodano do koszyka: ${product.name}`)
     setTimeout(() => setAddedToCart(false), 2000)
-  }, [addItem, product])
+  }, [addItem, product, addToast])
 
   return (
     <>

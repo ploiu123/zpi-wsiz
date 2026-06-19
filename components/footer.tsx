@@ -10,8 +10,8 @@ export function Footer() {
           <div className="md:col-span-2">
             <div className="flex items-center gap-3 mb-6 group">
               {/* Logo — prostokątne zaokrąglone, nie okrągłe */}
-              <div className="relative w-14 h-11 rounded-xl overflow-hidden border-2 border-amber-500/20 group-hover:border-amber-500/50 transition-colors shadow-lg shadow-amber-500/10">
-                <img src="/logo.jpg" alt="Złote Miody" className="w-full h-full object-cover" />
+              <div className="relative w-14 h-14 rounded-xl overflow-hidden border-2 border-amber-500/20 group-hover:border-amber-500/50 transition-colors shadow-lg shadow-amber-500/10">
+                <img src="/logo.png" alt="Złote Miody" className="w-full h-full object-contain bg-black/10" />
               </div>
               <span className="font-serif text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-amber-500 tracking-wide">
                 Złote Miody

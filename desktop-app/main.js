@@ -72,9 +72,16 @@ function createMainWindow() {
     }, 5000);
   });
 
-  // Otwieraj linki zewnętrzne w przeglądarce systemowej
+  // Otwieraj linki zewnętrzne w przeglądarce systemowej, z wyjątkiem logowania
+  const isAuthUrl = (url) => {
+    return url.includes('supabase.co') || 
+           url.includes('accounts.google.com') || 
+           url.includes('github.com/login') ||
+           url.includes('auth');
+  };
+
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
-    if (!url.startsWith(SITE_URL)) {
+    if (!url.startsWith(SITE_URL) && !isAuthUrl(url)) {
       shell.openExternal(url);
       return { action: 'deny' };
     }
@@ -83,7 +90,7 @@ function createMainWindow() {
 
   // Nawigacja — zostań w obrębie strony
   mainWindow.webContents.on('will-navigate', (event, url) => {
-    if (!url.startsWith(SITE_URL) && !url.startsWith('about:')) {
+    if (!url.startsWith(SITE_URL) && !url.startsWith('about:') && !isAuthUrl(url)) {
       event.preventDefault();
       shell.openExternal(url);
     }

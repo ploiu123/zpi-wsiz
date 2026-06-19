@@ -26,7 +26,7 @@ export default async function HomePage() {
         {/* Tło graficzne z gradientem */}
         <div className="absolute inset-0 z-0">
           <img 
-            src="https://images.unsplash.com/photo-1587049352851-8d4e89134a6d?auto=format&fit=crop&w=1920&q=80" 
+            src="/hero.png" 
             alt="Pasieka tło" 
             className="w-full h-full object-cover opacity-40 scale-105"
           />
@@ -69,18 +69,18 @@ export default async function HomePage() {
 
       {/* Info cards */}
       <section className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-20">
-        <div className="bg-[#111] border border-white/10 rounded-2xl p-6 text-center hover:border-amber-500/20 transition-colors">
-          <div className="text-3xl mb-3">🌿</div>
+        <div className="bg-[#111] border border-white/10 rounded-2xl p-6 text-center hover-lift hover-glow transition-all animate-fade-up animate-delay-100">
+          <div className="text-3xl mb-3 animate-bounce-in animate-delay-100">🌿</div>
           <h3 className="font-serif text-lg font-bold text-white mb-2">100% Naturalny</h3>
           <p className="text-gray-400 text-sm">Bez cukru, bez konserwantów, bez sztucznych barwników. Czysty miód z naszych uli.</p>
         </div>
-        <div className="bg-[#111] border border-white/10 rounded-2xl p-6 text-center hover:border-amber-500/20 transition-colors">
-          <div className="text-3xl mb-3">📦</div>
+        <div className="bg-[#111] border border-white/10 rounded-2xl p-6 text-center hover-lift hover-glow transition-all animate-fade-up animate-delay-200">
+          <div className="text-3xl mb-3 animate-bounce-in animate-delay-200">📦</div>
           <h3 className="font-serif text-lg font-bold text-white mb-2">Wysyłka 24h</h3>
           <p className="text-gray-400 text-sm">Pakujemy w ekologiczne materiały i wysyłamy następnego dnia roboczego.</p>
         </div>
-        <div className="bg-[#111] border border-white/10 rounded-2xl p-6 text-center hover:border-amber-500/20 transition-colors">
-          <div className="text-3xl mb-3">🏆</div>
+        <div className="bg-[#111] border border-white/10 rounded-2xl p-6 text-center hover-lift hover-glow transition-all animate-fade-up animate-delay-300">
+          <div className="text-3xl mb-3 animate-bounce-in animate-delay-300">🏆</div>
           <h3 className="font-serif text-lg font-bold text-white mb-2">Sprawdzona jakość</h3>
           <p className="text-gray-400 text-sm">Każda partia miodu przechodzi kontrolę jakości. Znamy historię każdej ramki.</p>
         </div>

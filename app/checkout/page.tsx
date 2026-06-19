@@ -60,33 +60,28 @@ export default function CheckoutPage() {
     const supabase = createClient()
 
     try {
-      // 1. Zapis rekordu do orders
-      const { data: order, error: orderError } = await supabase.from('orders').insert({
-        user_id: userId,
-        total_amount: getTotal(),
-        status: 'nowe', // lub zdefiniowany w typach stan
-        shipping_address: address,
-        shipping_city: city,
-        shipping_postal_code: postal
-      }).select().single()
-
-      if (orderError || !order) throw new Error(orderError?.message || 'Błąd zapisu zamówienia.')
-
-      // 2. Zapis pozycji zamówienia do order_items
+      // Użycie RPC dla zapewnienia atomowej zmiany stocku
       const orderItemsToInsert = items.map(item => ({
-        order_id: order.id,
         product_id: item.product.id,
         product_name: item.product.name,
         quantity: item.quantity,
         price: item.product.price
       }))
 
-      const { error: itemsError } = await supabase.from('order_items').insert(orderItemsToInsert)
-      if (itemsError) throw new Error(itemsError.message)
+      const { data: orderId, error: rpcError } = await supabase.rpc('place_order_with_stock', {
+        p_user_id: userId,
+        p_total_amount: getTotal(),
+        p_address: address,
+        p_city: city,
+        p_postal: postal,
+        p_items: orderItemsToInsert
+      })
 
-      // Symulacja prostej zapłaty (omijamy fizyczne bramki płatności)
+      if (rpcError) throw new Error(rpcError.message)
+
+      // Sukces
       clearCart();
-      router.push(`/dashboard?success=true&order_id=${order.id}`);
+      router.push(`/dashboard?success=true&order_id=${orderId}`);
 
     } catch (err: any) {
       console.error(err)

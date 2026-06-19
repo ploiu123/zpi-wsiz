@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { AddProductForm } from './add-product-form'
 import { OrderStatusUpdater } from './order-status-updater'
 import { AdminProductCatalog } from './admin-product-catalog'
+import { AdminRealtimeListener } from './admin-realtime-listener'
 import type { Product } from '@/lib/types'
 import { isAdminRole } from '@/lib/roles'
 
@@ -22,6 +23,7 @@ export default async function AdminPage() {
 
   return (
     <div className="px-4 md:px-8 max-w-7xl mx-auto py-8">
+      <AdminRealtimeListener />
       <div className="flex justify-between items-end mb-8 border-b border-white/10 pb-4">
         <div>
           <h1 className="font-serif text-3xl font-bold text-amber-500 mb-2">Panel administratora</h1>

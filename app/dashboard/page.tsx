@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState, Suspense } from 'react'
 import { OrderWithItems, Profile } from '@/lib/types'
 import { e } from '@/lib/l'
+import { ClientRealtimeListener } from './client-realtime-listener'
 
 function DashboardContent() {
   const router = useRouter()
@@ -96,6 +97,7 @@ function DashboardContent() {
 
   return (
     <div className="pt-32 pb-16 px-4 md:px-8 max-w-6xl mx-auto min-h-[80vh]">
+      <ClientRealtimeListener userId={user?.id || null} />
       {isSuccess && (
         <div className="bg-green-500/10 border border-green-500/30 text-green-400 p-6 rounded-2xl mb-8 flex items-center justify-center text-center">
           <div>
