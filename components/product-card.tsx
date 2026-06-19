@@ -66,14 +66,14 @@ export const ProductCard = memo(function ProductCard({ product }: { product: Pro
         <div className="p-6 flex-1 flex flex-col relative z-20">
           <div className="flex justify-between items-start mb-3 gap-2">
             <h3 className="font-serif text-xl font-bold text-white group-hover:text-amber-400 transition-colors leading-tight">{product.name}</h3>
-            <div className="text-right shrink-0">
+            <div className="flex flex-col items-end gap-1 shrink-0">
               {product.old_price ? (
                 <>
-                  <span className="text-red-400/70 line-through text-xs block">{product.old_price.toFixed(2)} zł</span>
-                  <span className="text-amber-400 font-bold whitespace-nowrap bg-red-500/10 px-3 py-1 rounded-full text-sm border border-red-500/20">{product.price.toFixed(2)} zł</span>
+                  <span className="text-red-400/70 line-through text-[10px] uppercase tracking-wider">{product.old_price.toFixed(2)} zł</span>
+                  <span className="text-amber-400 font-bold whitespace-nowrap bg-red-500/10 px-2.5 py-0.5 rounded-md text-sm border border-red-500/20">{product.price.toFixed(2)} zł</span>
                 </>
               ) : (
-                <span className="text-amber-400 font-bold whitespace-nowrap bg-amber-500/10 px-3 py-1 rounded-full text-sm border border-amber-500/20">{product.price.toFixed(2)} zł</span>
+                <span className="text-amber-400 font-bold whitespace-nowrap bg-amber-500/10 px-2.5 py-0.5 rounded-md text-sm border border-amber-500/20">{product.price.toFixed(2)} zł</span>
               )}
             </div>
           </div>
