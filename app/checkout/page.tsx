@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react'
 
 export default function CheckoutPage() {
   const router = useRouter()
-  const { items, getTotal, clearCart } = useCartStore()
+  const { items, getTotal, clearCart, cartId } = useCartStore()
   
   const [mounted, setMounted] = useState(false)
   const [userId, setUserId] = useState<string | null>(null)
@@ -74,7 +74,8 @@ export default function CheckoutPage() {
         p_address: address,
         p_city: city,
         p_postal: postal,
-        p_items: orderItemsToInsert
+        p_items: orderItemsToInsert,
+        p_cart_id: cartId
       })
 
       if (rpcError) throw new Error(rpcError.message)

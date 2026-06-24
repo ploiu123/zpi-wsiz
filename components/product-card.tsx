@@ -11,20 +11,28 @@ export const ProductCard = memo(function ProductCard({ product }: { product: Pro
   const addItem = useCartStore((state) => state.addItem)
   const { addToast } = useToast()
   
-  const onAdd = useCallback((e: React.MouseEvent) => {
+  const onAdd = useCallback(async (e: React.MouseEvent) => {
     e.stopPropagation()
-    addItem(product)
-    addToast('cart', `Dodano do koszyka: ${product.name}`)
+    const success = await addItem(product)
+    if (success) {
+      addToast('cart', `Dodano do koszyka: ${product.name}`)
+    } else {
+      addToast('error', `Nie udało się zarezerwować produktu (brak zapasów).`)
+    }
   }, [addItem, product, addToast])
 
   const [showModal, setShowModal] = useState(false)
   const [addedToCart, setAddedToCart] = useState(false)
 
-  const handleAddFromModal = useCallback(() => {
-    addItem(product)
-    setAddedToCart(true)
-    addToast('cart', `Dodano do koszyka: ${product.name}`)
-    setTimeout(() => setAddedToCart(false), 2000)
+  const handleAddFromModal = useCallback(async () => {
+    const success = await addItem(product)
+    if (success) {
+      setAddedToCart(true)
+      addToast('cart', `Dodano do koszyka: ${product.name}`)
+      setTimeout(() => setAddedToCart(false), 2000)
+    } else {
+      addToast('error', `Nie udało się zarezerwować produktu (brak zapasów).`)
+    }
   }, [addItem, product, addToast])
 
   return (

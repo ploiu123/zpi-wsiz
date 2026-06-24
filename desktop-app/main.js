@@ -72,7 +72,17 @@ function createMainWindow() {
     }, 5000);
   });
 
-  // Otwieraj linki zewnętrzne w przeglądarce systemowej, z wyjątkiem logowania
+  // Otwieraj linki zewnętrzne w przeglądarce systemowej, z wyjątkiem logowania oraz domen lokalnych
+  const ALLOWED_URLS = [
+    SITE_URL,
+    'http://localhost:3000',
+    'http://127.0.0.1:3000'
+  ];
+
+  const isSiteUrl = (url) => {
+    return ALLOWED_URLS.some(allowed => url.startsWith(allowed));
+  };
+
   const isAuthUrl = (url) => {
     return url.includes('supabase.co') || 
            url.includes('accounts.google.com') || 
@@ -81,7 +91,7 @@ function createMainWindow() {
   };
 
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
-    if (!url.startsWith(SITE_URL) && !isAuthUrl(url)) {
+    if (!isSiteUrl(url) && !isAuthUrl(url)) {
       shell.openExternal(url);
       return { action: 'deny' };
     }
@@ -90,7 +100,7 @@ function createMainWindow() {
 
   // Nawigacja — zostań w obrębie strony
   mainWindow.webContents.on('will-navigate', (event, url) => {
-    if (!url.startsWith(SITE_URL) && !url.startsWith('about:') && !isAuthUrl(url)) {
+    if (!isSiteUrl(url) && !url.startsWith('about:') && !isAuthUrl(url)) {
       event.preventDefault();
       shell.openExternal(url);
     }

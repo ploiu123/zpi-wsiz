@@ -8,7 +8,12 @@ DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users CASCADE;
 DROP FUNCTION IF EXISTS public.handle_new_user() CASCADE;
 DROP FUNCTION IF EXISTS public.sync_profile() CASCADE;
 DROP FUNCTION IF EXISTS public.is_admin() CASCADE;
+DROP FUNCTION IF EXISTS public.cleanup_expired_reservations() CASCADE;
+DROP FUNCTION IF EXISTS public.update_cart_reservation() CASCADE;
+DROP FUNCTION IF EXISTS public.place_order_with_stock(uuid, numeric, text, text, text, jsonb, text) CASCADE;
+DROP FUNCTION IF EXISTS public.place_order_with_stock(uuid, numeric, text, text, text, jsonb) CASCADE;
 
+DROP TABLE IF EXISTS public.cart_reservations CASCADE;
 DROP TABLE IF EXISTS public.order_items CASCADE;
 DROP TABLE IF EXISTS public.orders CASCADE;
 DROP TABLE IF EXISTS public.products CASCADE;
@@ -63,16 +68,29 @@ CREATE TABLE public.order_items (
   price numeric(10, 2) NOT NULL CHECK (price >= 0)
 );
 
+CREATE TABLE public.cart_reservations (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  cart_id text NOT NULL,
+  product_id uuid NOT NULL REFERENCES public.products (id) ON DELETE CASCADE,
+  quantity integer NOT NULL CHECK (quantity > 0),
+  created_at timestamptz NOT NULL DEFAULT now(),
+  expires_at timestamptz NOT NULL DEFAULT (now() + interval '30 minutes'),
+  CONSTRAINT cart_reservations_cart_product_unique UNIQUE (cart_id, product_id)
+);
+
 CREATE INDEX orders_user_id_idx ON public.orders (user_id);
 CREATE INDEX order_items_order_id_idx ON public.order_items (order_id);
+CREATE INDEX cart_reservations_cart_id_idx ON public.cart_reservations (cart_id);
+CREATE INDEX cart_reservations_expires_at_idx ON public.cart_reservations (expires_at);
 
 -- 3. WŁĄCZENIE RLS
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.order_items ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.cart_reservations ENABLE ROW LEVEL SECURITY;
 
--- 4. BEZPIECZNA FUNKCJA is_admin() - ZERO REKURENCJI (Odpytuje TYLKO auth.users)
+-- 4. BEZPIECZNA FUNKCJA is_admin()
 CREATE OR REPLACE FUNCTION public.is_admin()
 RETURNS boolean
 LANGUAGE plpgsql
@@ -83,9 +101,6 @@ AS $$
 DECLARE
   v_email text;
 BEGIN
-  -- Wersja absolutnie kuloodporna: sprawdzamy tylko email.
-  -- Zero odpytywania tabeli profiles wewnątrz tej funkcji,
-  -- więc nie ma ŻADNEJ możliwości rekurencji.
   v_email := (
     SELECT lower(trim(COALESCE(u.email, '')))
     FROM auth.users u
@@ -134,7 +149,12 @@ CREATE POLICY "order_items_insert_own_order" ON public.order_items FOR INSERT TO
   EXISTS (SELECT 1 FROM public.orders o WHERE o.id = order_items.order_id AND o.user_id = auth.uid())
 );
 
--- 6. RPC i TRIGGery (Automatyczne tworzenie profilu przy rejestracji)
+-- Cart reservations
+CREATE POLICY "cart_reservations_allow_all" ON public.cart_reservations FOR ALL USING (true) WITH CHECK (true);
+
+-- 6. RPC i TRIGGery
+
+-- handle_new_user
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger
 LANGUAGE plpgsql
@@ -166,6 +186,7 @@ AFTER INSERT ON auth.users
 FOR EACH ROW
 EXECUTE FUNCTION public.handle_new_user();
 
+-- sync_profile
 CREATE OR REPLACE FUNCTION public.sync_profile()
 RETURNS void
 LANGUAGE plpgsql
@@ -194,24 +215,128 @@ $$;
 REVOKE ALL ON FUNCTION public.sync_profile() FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION public.sync_profile() TO authenticated;
 
--- 7. WSTAWIANIE PRODUKTÓW TESTOWYCH (Dla upewnienia się, że od razu widać produkty)
-INSERT INTO public.products (id, name, description, price, stock, category, image_url, featured)
-VALUES
-  ('a1000000-0000-4000-8000-000000000001', 'Miód wielokwiatowy leśny', 'Klasyczny miód z naszej pasieki.', 42.9, 60, 'miód', 'https://images.unsplash.com/photo-1587049352846-4a222e784d38', true),
-  ('a1000000-0000-4000-8000-000000000002', 'Miód akacjowy kremowany', 'Kremowany miód akacjowy.', 48.5, 45, 'miód', 'https://images.unsplash.com/photo-1471943311424-64660e07a2e3', true),
-  ('a1000000-0000-4000-8000-000000000003', 'Miód lipowy', 'Miód z pyłkiem lipowym.', 52.0, 32, 'miód', 'https://images.unsplash.com/photo-1558642452-9d2a7deb7f62', false),
-  ('a1000000-0000-4000-8000-000000000004', 'Pyłek pszczeli', 'Świeży pyłek pszczeli.', 36.0, 28, 'pyłek', 'https://images.unsplash.com/photo-1509440159596-0249088772ff', false);
+-- cleanup_expired_reservations
+CREATE OR REPLACE FUNCTION public.cleanup_expired_reservations()
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_res record;
+BEGIN
+  FOR v_res IN 
+    DELETE FROM public.cart_reservations
+    WHERE expires_at < now()
+    RETURNING product_id, quantity
+  LOOP
+    UPDATE public.products
+    SET stock = stock + v_res.quantity,
+        updated_at = now()
+    WHERE id = v_res.product_id;
+  END LOOP;
+END;
+$$;
 
--- Koniec.
+-- update_cart_reservation
+CREATE OR REPLACE FUNCTION public.update_cart_reservation(
+  p_cart_id text,
+  p_product_id uuid,
+  p_target_qty integer
+)
+RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_current_reserved integer := 0;
+  v_diff integer;
+  v_current_stock integer;
+  v_expires_at timestamptz;
+BEGIN
+  PERFORM public.cleanup_expired_reservations();
 
--- 8. FUNKCJA DO ZMNIEJSZANIA STOCKU PRZY ZAMÓWIENIU
+  SELECT quantity INTO v_current_reserved
+  FROM public.cart_reservations
+  WHERE cart_id = p_cart_id AND product_id = p_product_id;
+
+  IF v_current_reserved IS NULL THEN
+    v_current_reserved := 0;
+  END IF;
+
+  v_diff := p_target_qty - v_current_reserved;
+
+  IF v_diff = 0 THEN
+    v_expires_at := now() + interval '30 minutes';
+    UPDATE public.cart_reservations
+    SET expires_at = v_expires_at
+    WHERE cart_id = p_cart_id AND product_id = p_product_id;
+    
+    RETURN jsonb_build_object('success', true, 'expires_at', v_expires_at);
+  END IF;
+
+  SELECT stock INTO v_current_stock
+  FROM public.products
+  WHERE id = p_product_id
+  FOR UPDATE;
+
+  IF v_current_stock IS NULL THEN
+    RAISE EXCEPTION 'Produkt nie istnieje.';
+  END IF;
+
+  IF v_diff > 0 THEN
+    IF v_current_stock < v_diff THEN
+      RAISE EXCEPTION 'Niewystarczająca ilość w magazynie. Dostępne: %', v_current_stock;
+    END IF;
+
+    UPDATE public.products
+    SET stock = stock - v_diff,
+        updated_at = now()
+    WHERE id = p_product_id;
+
+    v_expires_at := now() + interval '30 minutes';
+    INSERT INTO public.cart_reservations (cart_id, product_id, quantity, expires_at)
+    VALUES (p_cart_id, p_product_id, p_target_qty, v_expires_at)
+    ON CONFLICT (cart_id, product_id) DO UPDATE SET
+      quantity = EXCLUDED.quantity,
+      expires_at = EXCLUDED.expires_at;
+
+  ELSE
+    UPDATE public.products
+    SET stock = stock + abs(v_diff),
+        updated_at = now()
+    WHERE id = p_product_id;
+
+    IF p_target_qty > 0 THEN
+      v_expires_at := now() + interval '30 minutes';
+      UPDATE public.cart_reservations
+      SET quantity = p_target_qty,
+          expires_at = v_expires_at
+      WHERE cart_id = p_cart_id AND product_id = p_product_id;
+    ELSE
+      DELETE FROM public.cart_reservations
+      WHERE cart_id = p_cart_id AND product_id = p_product_id;
+      v_expires_at := NULL;
+    END IF;
+  END IF;
+
+  RETURN jsonb_build_object('success', true, 'expires_at', v_expires_at);
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.cleanup_expired_reservations() TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.update_cart_reservation(text, uuid, integer) TO anon, authenticated;
+
+-- place_order_with_stock
 CREATE OR REPLACE FUNCTION public.place_order_with_stock(
   p_user_id uuid,
   p_total_amount numeric,
   p_address text,
   p_city text,
   p_postal text,
-  p_items jsonb
+  p_items jsonb,
+  p_cart_id text DEFAULT NULL
 )
 RETURNS uuid
 LANGUAGE plpgsql
@@ -226,13 +351,15 @@ DECLARE
   v_price numeric;
   v_name text;
   v_current_stock integer;
+  v_reserved_qty integer := 0;
+  v_needed_qty integer := 0;
 BEGIN
-  -- 1. Utwórz zamówienie
+  PERFORM public.cleanup_expired_reservations();
+
   INSERT INTO public.orders (user_id, total_amount, status, shipping_address, shipping_city, shipping_postal_code)
   VALUES (p_user_id, p_total_amount, 'nowe', p_address, p_city, p_postal)
   RETURNING id INTO v_order_id;
 
-  -- 2. Przejdź przez każdy element koszyka
   FOR v_item IN SELECT * FROM jsonb_array_elements(p_items)
   LOOP
     v_product_id := (v_item->>'product_id')::uuid;
@@ -240,7 +367,19 @@ BEGIN
     v_price := (v_item->>'price')::numeric;
     v_name := v_item->>'product_name';
 
-    -- Sprawdź i zmniejsz stock z blokadą (FOR UPDATE)
+    v_reserved_qty := 0;
+    IF p_cart_id IS NOT NULL THEN
+      SELECT quantity INTO v_reserved_qty
+      FROM public.cart_reservations
+      WHERE cart_id = p_cart_id AND product_id = v_product_id;
+      
+      IF v_reserved_qty IS NULL THEN
+        v_reserved_qty := 0;
+      END IF;
+    END IF;
+
+    v_needed_qty := v_qty - v_reserved_qty;
+
     SELECT stock INTO v_current_stock
     FROM public.products
     WHERE id = v_product_id
@@ -250,17 +389,22 @@ BEGIN
       RAISE EXCEPTION 'Produkt % nie istnieje.', v_name;
     END IF;
 
-    IF v_current_stock < v_qty THEN
-      RAISE EXCEPTION 'Niewystarczająca ilość produktu % w magazynie. Dostępne: %', v_name, v_current_stock;
+    IF v_needed_qty > 0 THEN
+      IF v_current_stock < v_needed_qty THEN
+        RAISE EXCEPTION 'Niewystarczająca ilość produktu % w magazynie. Dostępne: %', v_name, v_current_stock;
+      END IF;
+
+      UPDATE public.products
+      SET stock = stock - v_needed_qty,
+          updated_at = now()
+      WHERE id = v_product_id;
     END IF;
 
-    -- Aktualizuj stock
-    UPDATE public.products
-    SET stock = stock - v_qty,
-        updated_at = now()
-    WHERE id = v_product_id;
+    IF v_reserved_qty > 0 THEN
+      DELETE FROM public.cart_reservations
+      WHERE cart_id = p_cart_id AND product_id = v_product_id;
+    END IF;
 
-    -- Zapisz pozycję zamówienia
     INSERT INTO public.order_items (order_id, product_id, product_name, quantity, price)
     VALUES (v_order_id, v_product_id, v_name, v_qty, v_price);
   END LOOP;
@@ -270,6 +414,17 @@ END;
 $$;
 
 GRANT EXECUTE ON FUNCTION public.place_order_with_stock TO authenticated;
+
+-- 7. WSTAWIANIE PRODUKTÓW TESTOWYCH (Dodano więcej produktów zgodnie z życzeniem)
+INSERT INTO public.products (id, name, description, price, stock, category, image_url, featured)
+VALUES
+  ('a1000000-0000-4000-8000-000000000001', 'Miód wielokwiatowy leśny', 'Klasyczny miód z naszej pasieki zebrany na skraju lasu.', 42.9, 60, 'miód', 'https://images.unsplash.com/photo-1587049352846-4a222e784d38', true),
+  ('a1000000-0000-4000-8000-000000000002', 'Miód akacjowy kremowany', 'Puszysty kremowany miód akacjowy, idealny do kanapek.', 48.5, 45, 'miód', 'https://images.unsplash.com/photo-1471943311424-64660e07a2e3', true),
+  ('a1000000-0000-4000-8000-000000000003', 'Miód lipowy', 'Miód o wyrazistym, miętowym aromacie z bieszczadzkich lip.', 52.0, 32, 'miód', 'https://images.unsplash.com/photo-1558642452-9d2a7deb7f62', false),
+  ('a1000000-0000-4000-8000-000000000004', 'Pyłek pszczeli świeży', 'Świeży pyłek pszczeli o bogatych właściwościach odżywczych.', 36.0, 28, 'pyłek', 'https://images.unsplash.com/photo-1509440159596-0249088772ff', false),
+  ('a1000000-0000-4000-8000-000000000005', 'Miód wrzosowy szlachetny', 'Rzadki i niezwykle ceniony miód o galaretowatej konsystencji i wyrazistym smaku wrzosowisk.', 65.0, 15, 'miód', 'https://images.unsplash.com/photo-1563227812-0ea4c22e6cc8', true),
+  ('a1000000-0000-4000-8000-000000000006', 'Miód gryczany leśny', 'Ciemny miód o silnym aromacie kwiatów gryki, idealny do pieczenia.', 44.9, 20, 'miód', 'https://images.unsplash.com/photo-1563227812-0ea4c22e6cc8', false),
+  ('a1000000-0000-4000-8000-000000000007', 'Miód malinowy z pasieki', 'Niezwykle delikatny, o lekko kwaskowatym smaku dzikich leśnych malin.', 49.0, 25, 'miód', 'https://images.unsplash.com/photo-1558642452-9d2a7deb7f62', false);
 
 -- WŁĄCZENIE SUPABASE REALTIME
 ALTER PUBLICATION supabase_realtime ADD TABLE products;

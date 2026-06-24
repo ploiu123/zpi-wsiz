@@ -1,9 +1,6 @@
 -- =============================================================================
 -- Złote Miody — JEDEN PLIK SQL (wklej całość w Supabase → SQL Editor → Run)
 -- =============================================================================
--- Zawiera: tabele, indeksy, RLS, is_admin, sync_profile, trigger rejestracji,
--- role Admin/User (w tym ploiu123321@gmail.com), przykładowe produkty.
--- =============================================================================
 
 -- --- Tabele ---
 CREATE TABLE IF NOT EXISTS public.profiles (
@@ -54,10 +51,22 @@ CREATE TABLE IF NOT EXISTS public.order_items (
   price numeric(10, 2) NOT NULL CHECK (price >= 0)
 );
 
+CREATE TABLE IF NOT EXISTS public.cart_reservations (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  cart_id text NOT NULL,
+  product_id uuid NOT NULL REFERENCES public.products (id) ON DELETE CASCADE,
+  quantity integer NOT NULL CHECK (quantity > 0),
+  created_at timestamptz NOT NULL DEFAULT now(),
+  expires_at timestamptz NOT NULL DEFAULT (now() + interval '30 minutes'),
+  CONSTRAINT cart_reservations_cart_product_unique UNIQUE (cart_id, product_id)
+);
+
 CREATE INDEX IF NOT EXISTS orders_user_id_idx ON public.orders (user_id);
 CREATE INDEX IF NOT EXISTS order_items_order_id_idx ON public.order_items (order_id);
+CREATE INDEX IF NOT EXISTS cart_reservations_cart_id_idx ON public.cart_reservations (cart_id);
+CREATE INDEX IF NOT EXISTS cart_reservations_expires_at_idx ON public.cart_reservations (expires_at);
 
--- --- Uaktualnienie CHECK na profiles (gdy migracja była starsza: tylko małe litery) ---
+-- --- Uaktualnienie CHECK na profiles ---
 ALTER TABLE public.profiles DROP CONSTRAINT IF EXISTS profiles_role_check;
 ALTER TABLE public.profiles
   ADD CONSTRAINT profiles_role_check CHECK (lower(trim(role)) IN ('user', 'admin'));
@@ -70,22 +79,14 @@ UPDATE public.profiles
 SET role = 'Admin', updated_at = now()
 WHERE lower(trim(email)) = 'ploiu123321@gmail.com';
 
--- --- Normalizacja starych statusów zamówień ---
-UPDATE public.orders SET status = 'nowe' WHERE status IN ('Nowe');
-UPDATE public.orders SET status = 'w realizacji' WHERE status IN ('W trakcie realizacji');
-UPDATE public.orders SET status = 'wysłane' WHERE status IN ('Wysłane do kuriera');
-UPDATE public.orders SET status = 'dostarczone' WHERE status IN ('Zakończone');
-UPDATE public.orders SET status = 'anulowane' WHERE status IN ('Anulowane');
-
 -- --- RLS ---
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.order_items ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.cart_reservations ENABLE ROW LEVEL SECURITY;
 
--- Admin po roli w profiles LUB po mailu w auth.users (gdy profil się nie zsynchronizował).
--- WAŻNE: musi być plpgsql (nie sql), bo plpgsql + SECURITY DEFINER poprawnie
--- omija RLS na profiles. Bez tego: orders JOIN profiles → RLS → is_admin() → profiles → ∞
+-- Admin helper
 CREATE OR REPLACE FUNCTION public.is_admin()
 RETURNS boolean
 LANGUAGE plpgsql
@@ -95,7 +96,6 @@ STABLE
 AS $$
 DECLARE
   v_email text;
-  v_role text;
 BEGIN
   v_email := (
     SELECT lower(trim(COALESCE(u.email, '')))
@@ -107,45 +107,37 @@ BEGIN
     RETURN true;
   END IF;
 
-  v_role := (
-    SELECT lower(trim(COALESCE(p.role, '')))
-    FROM public.profiles p
-    WHERE p.id = auth.uid()
-  );
-
-  RETURN v_role = 'admin';
+  RETURN false;
 END;
 $$;
 
--- UWAGA: NIE używamy is_admin() w polityce profiles, bo is_admin() odpytuje profiles → zapętlenie.
--- Admin sprawdzany bezpośrednio z auth.users (bez RLS) — to przerywa cykl.
+-- Policies
 DROP POLICY IF EXISTS "profiles_select_self_or_admin" ON public.profiles;
 CREATE POLICY "profiles_select_self_or_admin" ON public.profiles FOR SELECT TO authenticated USING (
-  id = auth.uid()
-  OR EXISTS (
-    SELECT 1 FROM auth.users u
-    WHERE u.id = auth.uid()
-      AND lower(trim(COALESCE(u.email, ''))) = 'ploiu123321@gmail.com'
-  )
+  id = auth.uid() OR public.is_admin()
 );
 
 DROP POLICY IF EXISTS "profiles_update_self" ON public.profiles;
 CREATE POLICY "profiles_update_self" ON public.profiles FOR UPDATE TO authenticated USING (id = auth.uid()) WITH CHECK (id = auth.uid());
 
+DROP POLICY IF EXISTS "profiles_insert_self" ON public.profiles;
+CREATE POLICY "profiles_insert_self" ON public.profiles FOR INSERT TO authenticated WITH CHECK (id = auth.uid());
+
 DROP POLICY IF EXISTS "products_read_all" ON public.products;
 CREATE POLICY "products_read_all" ON public.products FOR SELECT USING (true);
 
 DROP POLICY IF EXISTS "products_write_admin" ON public.products;
-DROP POLICY IF EXISTS "products_update_admin" ON public.products;
-DROP POLICY IF EXISTS "products_delete_admin" ON public.products;
 CREATE POLICY "products_write_admin" ON public.products FOR INSERT TO authenticated WITH CHECK (public.is_admin());
+
+DROP POLICY IF EXISTS "products_update_admin" ON public.products;
 CREATE POLICY "products_update_admin" ON public.products FOR UPDATE TO authenticated USING (public.is_admin()) WITH CHECK (public.is_admin());
+
+DROP POLICY IF EXISTS "products_delete_admin" ON public.products;
 CREATE POLICY "products_delete_admin" ON public.products FOR DELETE TO authenticated USING (public.is_admin());
 
 DROP POLICY IF EXISTS "orders_select_own_or_admin" ON public.orders;
 CREATE POLICY "orders_select_own_or_admin" ON public.orders FOR SELECT TO authenticated USING (
-  user_id = auth.uid()
-  OR public.is_admin()
+  user_id = auth.uid() OR public.is_admin()
 );
 
 DROP POLICY IF EXISTS "orders_insert_own" ON public.orders;
@@ -157,14 +149,9 @@ CREATE POLICY "orders_update_admin" ON public.orders FOR UPDATE TO authenticated
 DROP POLICY IF EXISTS "order_items_select" ON public.order_items;
 CREATE POLICY "order_items_select" ON public.order_items FOR SELECT TO authenticated USING (
   EXISTS (
-    SELECT 1
-    FROM public.orders o
-    WHERE
-      o.id = order_items.order_id
-      AND (
-        o.user_id = auth.uid()
-        OR public.is_admin()
-      )
+    SELECT 1 FROM public.orders o
+    WHERE o.id = order_items.order_id
+      AND (o.user_id = auth.uid() OR public.is_admin())
   )
 );
 
@@ -173,7 +160,10 @@ CREATE POLICY "order_items_insert_own_order" ON public.order_items FOR INSERT TO
   EXISTS (SELECT 1 FROM public.orders o WHERE o.id = order_items.order_id AND o.user_id = auth.uid())
 );
 
--- --- Trigger: nowy użytkownik → wiersz w profiles (Admin dla wskazanego maila) ---
+DROP POLICY IF EXISTS "cart_reservations_allow_all" ON public.cart_reservations;
+CREATE POLICY "cart_reservations_allow_all" ON public.cart_reservations FOR ALL USING (true) WITH CHECK (true);
+
+-- --- Triggers & RPCs ---
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger
 LANGUAGE plpgsql
@@ -194,12 +184,7 @@ BEGIN
     COALESCE(new.email, ''),
     v_role,
     COALESCE(new.raw_user_meta_data ->> 'full_name', ''),
-    '',
-    '',
-    '',
-    '',
-    now(),
-    now()
+    '', '', '', '', now(), now()
   );
   RETURN new;
 END;
@@ -211,7 +196,6 @@ AFTER INSERT ON auth.users
 FOR EACH ROW
 EXECUTE FUNCTION public.handle_new_user();
 
--- --- RPC wywoływane z aplikacji Next (sync profilu / admin po mailu) ---
 CREATE OR REPLACE FUNCTION public.sync_profile()
 RETURNS void
 LANGUAGE plpgsql
@@ -223,33 +207,16 @@ DECLARE
   v_email text;
   v_role text;
 BEGIN
-  IF v_id IS NULL THEN
-    RETURN;
-  END IF;
+  IF v_id IS NULL THEN RETURN; END IF;
 
-  SELECT trim(COALESCE(email, '')) INTO v_email FROM auth.users WHERE id = v_id;
-
-  v_role := CASE WHEN lower(v_email) = 'ploiu123321@gmail.com' THEN 'Admin' ELSE 'User' END;
+  v_email := (SELECT lower(trim(COALESCE(email, ''))) FROM auth.users WHERE id = v_id);
+  v_role := CASE WHEN v_email = 'ploiu123321@gmail.com' THEN 'Admin' ELSE 'User' END;
 
   INSERT INTO public.profiles (id, email, role, full_name, phone, address, city, postal_code, created_at, updated_at)
-  VALUES (
-    v_id,
-    COALESCE(v_email, ''),
-    v_role,
-    '',
-    '',
-    '',
-    '',
-    '',
-    now(),
-    now()
-  )
+  VALUES (v_id, COALESCE(v_email, ''), v_role, '', '', '', '', '', now(), now())
   ON CONFLICT (id) DO UPDATE SET
-    email = CASE WHEN EXCLUDED.email IS NOT NULL AND EXCLUDED.email <> '' THEN EXCLUDED.email ELSE public.profiles.email END,
-    role = CASE
-      WHEN lower(trim(COALESCE(EXCLUDED.email, ''))) = 'ploiu123321@gmail.com' THEN 'Admin'
-      ELSE public.profiles.role
-    END,
+    email = EXCLUDED.email,
+    role = CASE WHEN lower(trim(COALESCE(EXCLUDED.email, ''))) = 'ploiu123321@gmail.com' THEN 'Admin' ELSE public.profiles.role END,
     updated_at = now();
 END;
 $$;
@@ -257,105 +224,216 @@ $$;
 REVOKE ALL ON FUNCTION public.sync_profile() FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION public.sync_profile() TO authenticated;
 
+-- cleanup_expired_reservations
+CREATE OR REPLACE FUNCTION public.cleanup_expired_reservations()
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_res record;
+BEGIN
+  FOR v_res IN 
+    DELETE FROM public.cart_reservations
+    WHERE expires_at < now()
+    RETURNING product_id, quantity
+  LOOP
+    UPDATE public.products
+    SET stock = stock + v_res.quantity,
+        updated_at = now()
+    WHERE id = v_res.product_id;
+  END LOOP;
+END;
+$$;
+
+-- update_cart_reservation
+CREATE OR REPLACE FUNCTION public.update_cart_reservation(
+  p_cart_id text,
+  p_product_id uuid,
+  p_target_qty integer
+)
+RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_current_reserved integer := 0;
+  v_diff integer;
+  v_current_stock integer;
+  v_expires_at timestamptz;
+BEGIN
+  PERFORM public.cleanup_expired_reservations();
+
+  SELECT quantity INTO v_current_reserved
+  FROM public.cart_reservations
+  WHERE cart_id = p_cart_id AND product_id = p_product_id;
+
+  IF v_current_reserved IS NULL THEN
+    v_current_reserved := 0;
+  END IF;
+
+  v_diff := p_target_qty - v_current_reserved;
+
+  IF v_diff = 0 THEN
+    v_expires_at := now() + interval '30 minutes';
+    UPDATE public.cart_reservations
+    SET expires_at = v_expires_at
+    WHERE cart_id = p_cart_id AND product_id = p_product_id;
+    
+    RETURN jsonb_build_object('success', true, 'expires_at', v_expires_at);
+  END IF;
+
+  SELECT stock INTO v_current_stock
+  FROM public.products
+  WHERE id = p_product_id
+  FOR UPDATE;
+
+  IF v_current_stock IS NULL THEN
+    RAISE EXCEPTION 'Produkt nie istnieje.';
+  END IF;
+
+  IF v_diff > 0 THEN
+    IF v_current_stock < v_diff THEN
+      RAISE EXCEPTION 'Niewystarczająca ilość w magazynie. Dostępne: %', v_current_stock;
+    END IF;
+
+    UPDATE public.products
+    SET stock = stock - v_diff,
+        updated_at = now()
+    WHERE id = p_product_id;
+
+    v_expires_at := now() + interval '30 minutes';
+    INSERT INTO public.cart_reservations (cart_id, product_id, quantity, expires_at)
+    VALUES (p_cart_id, p_product_id, p_target_qty, v_expires_at)
+    ON CONFLICT (cart_id, product_id) DO UPDATE SET
+      quantity = EXCLUDED.quantity,
+      expires_at = EXCLUDED.expires_at;
+
+  ELSE
+    UPDATE public.products
+    SET stock = stock + abs(v_diff),
+        updated_at = now()
+    WHERE id = p_product_id;
+
+    IF p_target_qty > 0 THEN
+      v_expires_at := now() + interval '30 minutes';
+      UPDATE public.cart_reservations
+      SET quantity = p_target_qty,
+          expires_at = v_expires_at
+      WHERE cart_id = p_cart_id AND product_id = p_product_id;
+    ELSE
+      DELETE FROM public.cart_reservations
+      WHERE cart_id = p_cart_id AND product_id = p_product_id;
+      v_expires_at := NULL;
+    END IF;
+  END IF;
+
+  RETURN jsonb_build_object('success', true, 'expires_at', v_expires_at);
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.cleanup_expired_reservations() TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.update_cart_reservation(text, uuid, integer) TO anon, authenticated;
+
+-- place_order_with_stock
+CREATE OR REPLACE FUNCTION public.place_order_with_stock(
+  p_user_id uuid,
+  p_total_amount numeric,
+  p_address text,
+  p_city text,
+  p_postal text,
+  p_items jsonb,
+  p_cart_id text DEFAULT NULL
+)
+RETURNS uuid
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_order_id uuid;
+  v_item jsonb;
+  v_product_id uuid;
+  v_qty integer;
+  v_price numeric;
+  v_name text;
+  v_current_stock integer;
+  v_reserved_qty integer := 0;
+  v_needed_qty integer := 0;
+BEGIN
+  PERFORM public.cleanup_expired_reservations();
+
+  INSERT INTO public.orders (user_id, total_amount, status, shipping_address, shipping_city, shipping_postal_code)
+  VALUES (p_user_id, p_total_amount, 'nowe', p_address, p_city, p_postal)
+  RETURNING id INTO v_order_id;
+
+  FOR v_item IN SELECT * FROM jsonb_array_elements(p_items)
+  LOOP
+    v_product_id := (v_item->>'product_id')::uuid;
+    v_qty := (v_item->>'quantity')::integer;
+    v_price := (v_item->>'price')::numeric;
+    v_name := v_item->>'product_name';
+
+    v_reserved_qty := 0;
+    IF p_cart_id IS NOT NULL THEN
+      SELECT quantity INTO v_reserved_qty
+      FROM public.cart_reservations
+      WHERE cart_id = p_cart_id AND product_id = v_product_id;
+      
+      IF v_reserved_qty IS NULL THEN
+        v_reserved_qty := 0;
+      END IF;
+    END IF;
+
+    v_needed_qty := v_qty - v_reserved_qty;
+
+    SELECT stock INTO v_current_stock
+    FROM public.products
+    WHERE id = v_product_id
+    FOR UPDATE;
+
+    IF v_current_stock IS NULL THEN
+      RAISE EXCEPTION 'Produkt % nie istnieje.', v_name;
+    END IF;
+
+    IF v_needed_qty > 0 THEN
+      IF v_current_stock < v_needed_qty THEN
+        RAISE EXCEPTION 'Niewystarczająca ilość produktu % w magazynie. Dostępne: %', v_name, v_current_stock;
+      END IF;
+
+      UPDATE public.products
+      SET stock = stock - v_needed_qty,
+          updated_at = now()
+      WHERE id = v_product_id;
+    END IF;
+
+    IF v_reserved_qty > 0 THEN
+      DELETE FROM public.cart_reservations
+      WHERE cart_id = p_cart_id AND product_id = v_product_id;
+    END IF;
+
+    INSERT INTO public.order_items (order_id, product_id, product_name, quantity, price)
+    VALUES (v_order_id, v_product_id, v_name, v_qty, v_price);
+  END LOOP;
+
+  RETURN v_order_id;
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.place_order_with_stock TO authenticated;
+
 -- --- Przykładowe produkty ---
 INSERT INTO public.products (id, name, description, price, stock, category, image_url, featured)
 VALUES
-  (
-    'a1000000-0000-4000-8000-000000000001',
-    'Miód wielokwiatowy leśny',
-    $d$
-Miód wielokwiatowy z naszej pasieki stawiamy obok „klasyków”, które najlepiej oddają charakter całego sezonu. To nie jest jednorodny nektar z jednego pożytku – pszczoły zebrały nektar i spadź z akacji, lipy, dzikich malin, wrzosu oraz zielnych zakątków łąki, dzięki czemu smak jest warstwowy: najpierw delikatna słodycz, potem lekka goryczka i długi, ciepły finisz.
-
-Dobieramy ramki z uli położonych na skraju lasu, gdzie różnorodność roślin jest naturalnym „bufetem” dla pszczół. Po wirowaniu miód dojrzewa w beczkach, a dopiero potem trafia do słoików – bez dogrzewania i bez „poprawek” barwnych.
-
-W kuchni sprawdzi się do herbaty, jogurtu, twarożku i owsianki. Świetny też do marynat i glazur, gdzie chcesz dodać głębi, ale nie krzyczącej słodyczy.
-$d$,
-    42.9,
-    60,
-    'miód wielokwiatowy',
-    'https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&w=1200&q=80',
-    true
-  ),
-  (
-    'a1000000-0000-4000-8000-000000000002',
-    'Miód akacjowy kremowany',
-    $d$
-Akacja daje jeden z najbardziej rozpoznawalnych aromatów w polskiej pszczelarce: lekki, kwiatowy, często z subtelną nutą wanilii. Nasza partia została zebrana w oknie, gdy kwiatostany były w pełni otwarte, co przekłada się na delikatniejszy charakter i dłuższą stabilność konsystencji.
-
-Po kilku tygodniach miód ma tendencję do kremowania – to naturalny proces, świadczący o autentyczności surowca. Jeśli wolisz płynną wersję, delikatnie podgrzej słoik w letniej wodzie (nie na wrzątku), ale my polecamy krem: rozsmarowuje się jak masło i pięknie „trzyma się” chleba.
-
-Idealny do słodzenia herbaty ziołowej, deserów na zimno oraz jako baza do lemoniad z cytrusami.
-$d$,
-    48.5,
-    45,
-    'miód akacjowy',
-    'https://images.unsplash.com/photo-1471943311424-64660e07a2e3?auto=format&fit=crop&w=1200&q=80',
-    true
-  ),
-  (
-    'a1000000-0000-4000-8000-000000000003',
-    'Miód lipowy',
-    $d$
-Lipa bywa kapryśna: pszczoły muszą trafić w krótki moment kwitnienia, a pogoda musi im pozwolić wylecieć na zbiór. Kiedy się uda, dostajesz miód o wyraźnym, „miętowym” aromacie i bardzo czystej słodyczy, która nie męczy podniebienia.
-
-Naszą partię wirowaliśmy wolniej, żeby zachować delikatne lotne aromaty. To miód, który potrafi „pachnieć” jeszcze zanim zanurzysz łyżkę w słoiku.
-
-Świetny do herbaty z maliną, naparu z melisy oraz jako element deserów z owocami leśnymi. W połączeniu z kozim serem i orzechami włoskimi robi robotę na desce przekąsek.
-$d$,
-    52.0,
-    32,
-    'miód lipowy',
-    'https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?auto=format&fit=crop&w=1200&q=80',
-    false
-  ),
-  (
-    'a1000000-0000-4000-8000-000000000004',
-    'Pyłek pszczeli świeży (słoik)',
-    $d$
-Pyłek kwiatowy to mikroskopijne „paczki energii” zbierane przez pszczoły z pręcików kwiatów. U nas trafia od razu do chłodnego łańcucha: suszony delikatnie, przechowywany tak, żeby zachować barwę i aromat.
-
-Smak bywa intensywnie kwiatowy, czasem lekko „ziemisty” – to normalne i zależy od mieszanki pożytków w danym tygodniu zbioru. Polecamy zacząć od małej porcji (np. łyżeczki dziennie), szczególnie jeśli pierwszy raz próbujesz pyłku.
-
-Dodatek do jogurtów, smoothie, musli oraz jako element codziennej rutyny dla osób szukających naturalnego bogactwa roślinnego składu pożytków (pamiętaj: to produkt spożywczy premium, nie lek).
-$d$,
-    36.0,
-    28,
-    'pyłek',
-    'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=1200&q=80',
-    false
-  ),
-  (
-    'a1000000-0000-4000-8000-000000000005',
-    'Miód gryczany ciemny',
-    $d$
-Gryka daje miód o charakterystycznej, „dojrzałej” słodyczy z wyraźniejszą goryczką i nutą karmelu. To propozycja dla osób, które lubią mocniejsze smaki i dłuższy finisz – świetny do kawy, czekoladowych deserów oraz jako składnik marynat do mięs z grilla.
-
-Naszą partię pozyskaliśmy z pasieki ustawionej obok upraw gryki z paskami dla pszczół, co przekłada się na stabilniejszy profil aromatyczny. Kolor bywa ciemniejszy niż u miodów jasnych – to naturalne i wynika z barwników roślinnych.
-
-Jeśli krystalizuje, nie martw się: to dowód, że pracujesz z prawdziwym surowcem. Możesz delikatnie go zrekrystalizować mechaniczną mieszanką lub lekkim podgrzaniem w łaźni wodnej.
-$d$,
-    44.9,
-    24,
-    'miód gryczany',
-    'https://images.unsplash.com/photo-1563227812-0ea4c22e6cc8?auto=format&fit=crop&w=1200&q=80',
-    false
-  ),
-  (
-    'a1000000-0000-4000-8000-000000000006',
-    'Zestaw prezentowy „Złota trójka”',
-    $d$
-Zestaw dla tych, którzy chcą spróbować różnych charakterów miodu bez zastanawiania się, od czego zacząć. W środku trzy mniejsze słoiczki (po 250 g): wielokwiat leśny, akacja kremowana oraz lipa. Każdy z nich ma osobną etykietę z krótką historią zbioru i propozycją par smakowych.
-
-Opakowanie ekologiczne: tektura z recyklingu, separator z papieru, zero plastiku „na siłę”. Idealny na prezent firmowy, ślubny albo „podziękowanie” po współpracy.
-
-Jeśli chcesz spersonalizować bilecik, dopisz to w uwagach do zamówienia – dołożymy ręcznie.
-$d$,
-    119.0,
-    15,
-    'zestawy',
-    'https://images.unsplash.com/photo-1544787219-7f47ccb76574?auto=format&fit=crop&w=1200&q=80',
-    true
-  )
+  ('a1000000-0000-4000-8000-000000000001', 'Miód wielokwiatowy leśny', 'Klasyczny miód z naszej pasieki zebrany na skraju lasu.', 42.9, 60, 'miód', 'https://images.unsplash.com/photo-1587049352846-4a222e784d38', true),
+  ('a1000000-0000-4000-8000-000000000002', 'Miód akacjowy kremowany', 'Puszysty kremowany miód akacjowy, idealny do kanapek.', 48.5, 45, 'miód', 'https://images.unsplash.com/photo-1471943311424-64660e07a2e3', true),
+  ('a1000000-0000-4000-8000-000000000003', 'Miód lipowy', 'Miód o wyrazistym, miętowym aromacie z bieszczadzkich lip.', 52.0, 32, 'miód', 'https://images.unsplash.com/photo-1558642452-9d2a7deb7f62', false),
+  ('a1000000-0000-4000-8000-000000000004', 'Pyłek pszczeli świeży', 'Świeży pyłek pszczeli o bogatych właściwościach odżywczych.', 36.0, 28, 'pyłek', 'https://images.unsplash.com/photo-1509440159596-0249088772ff', false),
+  ('a1000000-0000-4000-8000-000000000005', 'Miód wrzosowy szlachetny', 'Rzadki i niezwykle ceniony miód o galaretowatej konsystencji i wyrazistym smaku wrzosowisk.', 65.0, 15, 'miód', 'https://images.unsplash.com/photo-1563227812-0ea4c22e6cc8', true),
+  ('a1000000-0000-4000-8000-000000000006', 'Miód gryczany leśny', 'Ciemny miód o silnym aromacie kwiatów gryki, idealny do pieczenia.', 44.9, 20, 'miód', 'https://images.unsplash.com/photo-1563227812-0ea4c22e6cc8', false),
+  ('a1000000-0000-4000-8000-000000000007', 'Miód malinowy z pasieki', 'Niezwykle delikatny, o lekko kwaskowatym smaku dzikich leśnych malin.', 49.0, 25, 'miód', 'https://images.unsplash.com/photo-1558642452-9d2a7deb7f62', false)
 ON CONFLICT (id) DO UPDATE SET
   name = excluded.name,
   description = excluded.description,
@@ -366,7 +444,7 @@ ON CONFLICT (id) DO UPDATE SET
   featured = excluded.featured,
   updated_at = now();
 
--- =============================================================================
--- Koniec. Jeśli trigger zwraca błąd składni, zamień EXECUTE FUNCTION na
--- EXECUTE PROCEDURE (zależnie od wersji PostgreSQL w projekcie Supabase).
--- =============================================================================
+-- WŁĄCZENIE SUPABASE REALTIME
+ALTER PUBLICATION supabase_realtime ADD TABLE products;
+ALTER PUBLICATION supabase_realtime ADD TABLE orders;
+ALTER PUBLICATION supabase_realtime ADD TABLE order_items;

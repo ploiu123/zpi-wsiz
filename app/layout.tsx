@@ -4,6 +4,7 @@ import "./globals.css";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { ToastProvider } from "@/components/toast";
+import { RealtimeClientListener } from "@/components/realtime-client-listener";
 
 const inter = Inter({ subsets: ["latin", "latin-ext"], variable: "--font-inter" });
 const playfair = Playfair_Display({ subsets: ["latin", "latin-ext"], variable: "--font-playfair" });
@@ -43,6 +44,7 @@ export default function RootLayout({
       </head>
       <body className={`${inter.variable} ${playfair.variable} font-sans bg-[#0a0a0a] text-white antialiased`}>
         <ToastProvider>
+          <RealtimeClientListener />
           <Navbar />
           <main className="min-h-screen">{children}</main>
           <Footer />
