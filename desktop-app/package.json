@@ -25,6 +25,7 @@
     "mac": {
       "category": "public.app-category.shopping",
       "icon": "icon.png",
+      "identity": null,
       "target": [
         {
           "target": "dmg",
