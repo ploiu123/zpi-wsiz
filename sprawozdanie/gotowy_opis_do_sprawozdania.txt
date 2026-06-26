@@ -1,0 +1,40 @@
+=== SPRAWOZDANIE Z ZESPOŁOWEGO PROJEKTU INFORMATYCZNEGO (ZPI) ===
+Temat projektu: "Złote Miody - System E-commerce z dedykowaną aplikacją desktopową dla administracji"
+
+1. OPIS OGÓLNY PROJEKTU
+Celem projektu było zaprojektowanie, zaimplementowanie oraz wdrożenie kompletnego systemu sprzedażowego (e-commerce) dla internetowego sklepu pszczelarskiego "Złote Miody". System składa się z dwóch ściśle zintegrowanych części:
+a) Nowoczesnej aplikacji webowej (sklepu internetowego dla klientów),
+b) Dedykowanej aplikacji desktopowej (panelu zarządzania dla administratora).
+Zastosowanie architektury opartej na wspólnej, chmurowej bazie danych gwarantuje pełną, bezstratną synchronizację w czasie rzeczywistym między klientem dokonującym zakupu w przeglądarce, a pracownikiem obsługującym zamówienie w aplikacji komputerowej.
+
+2. WYKORZYSTANE TECHNOLOGIE (STOS TECHNOLOGICZNY)
+* Frontend (Aplikacja Webowa): Next.js (App Router), React, Tailwind CSS (do tworzenia w pełni responsywnego interfejsu graficznego).
+* Backend i Baza Danych: Supabase (chmurowa usługa oparta na PostgreSQL) obsługująca uwierzytelnianie (Auth), przechowywanie danych (Database) oraz powiadomienia w czasie rzeczywistym (Realtime).
+* Aplikacja Desktopowa: Electron.js, Node.js (tworząca inteligentny "Wrapper" aplikacji webowej).
+* Hosting / Wdrożenie (Deployment): Vercel.
+
+3. ARCHITEKTURA I GŁÓWNE FUNKCJONALNOŚCI
+
+A. Strona Kliencka (Sklep Webowy):
+- Katalog Produktów: Dynamicznie ładowane produkty z bazy danych Supabase.
+- Koszyk Zakupowy: Implementacja lokalnego zarządzania stanem koszyka z możliwością dodawania, usuwania i modyfikowania ilości produktów.
+- Checkout (Kasa): Moduł finalizacji zamówienia oparty o logikę płatności przy odbiorze (z pominięciem bramek płatności online na potrzeby projektu edukacyjnego).
+- Responsywność (RWD) i Motyw: Płynne dostosowywanie się strony do urządzeń mobilnych oraz wbudowany mechanizm zmiany motywu (Jasny / Ciemny).
+
+B. Panel Administratora (CMS):
+- Zabezpieczenie dostępu: Mechanizmy RLS (Row Level Security) po stronie bazy PostgreSQL, które wymuszają posiadanie odpowiedniej roli (role="admin") w tabeli profili w celu uzyskania dostępu.
+- Autoryzacja: Logowanie za pomocą bezpiecznego systemu Supabase Auth (e-mail i hasło).
+- Zarządzanie Asortymentem: Formularz dodawania nowych produktów na żywo do bazy danych (nazwa, opis, cena, zdjęcie, stan magazynowy).
+- Zarządzanie Zamówieniami: Dynamiczna tabela pozwalająca na zmianę statusu zamówień klienta (np. "Oczekujące", "Wysłane do kuriera", "Zakończone"), aktualizująca się i działająca natychmiastowo.
+
+C. Aplikacja Desktopowa (Electron):
+- Zastosowano architekturę "Inteligenty Wrapper". Aplikacja Electron ładuje widok strony Vercel bezpośrednio do natywnego okna systemu operacyjnego.
+- Posiada ona własny Splash Screen (ekran ładowania) podczas pobierania danych z chmury.
+- Udostępnia natywne menu systemowe Windows/Mac ze skrótami klawiszowymi ułatwiającymi szybką nawigację (Produkty, Koszyk, Panel Admina).
+- Rozwiązuje problem braku spójności - aplikacja stacjonarna i webowa współdzielą ten sam kod, co oznacza automatyczną aktualizację i synchronizację danych (koszyka i zamówień) bez konieczności tworzenia dwóch osobnych systemów.
+
+4. BEZPIECZEŃSTWO I OCHRONA DANYCH
+Zastosowano polityki zabezpieczające w Supabase. Strona publiczna ma dostęp wyłącznie do odczytu zatwierdzonych produktów. Żadne wrażliwe endpointy (takie jak modyfikacja statusów zamówień) nie są dostępne dla zwykłego użytkownika z poziomu przeglądarki. Dodatkowo nie są używane wrażliwe pliki konfiguracyjne (.env) w repozytorium GitHub.
+
+5. PODSUMOWANIE
+Projekt z powodzeniem realizuje założenia nowoczesnego systemu E-commerce, integrując podejście Cloud-first z wygodą używania natywnych aplikacji desktopowych. Wdrożenie na platformie Vercel pozwala na pełną skalowalność i bezobsługowe utrzymanie części serwerowej.

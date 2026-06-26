@@ -54,7 +54,7 @@ export const ProductCard = memo(function ProductCard({ product }: { product: Pro
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-amber-500/50 font-serif text-2xl">
-              🍯
+              <PackageOpen className="w-12 h-12 text-amber-500/50" />
             </div>
           )}
           {/* Stock badge */}
@@ -144,7 +144,7 @@ export const ProductCard = memo(function ProductCard({ product }: { product: Pro
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-amber-500 font-serif text-4xl">
-                    🍯
+                    <PackageOpen className="w-12 h-12 text-amber-500/50" />
                   </div>
                 )}
               </div>
@@ -195,7 +195,7 @@ export const ProductCard = memo(function ProductCard({ product }: { product: Pro
                   </div>
                   {product.old_price && (
                     <div className="flex items-center gap-2.5 text-xs text-gray-500">
-                      <span>ℹ️</span>
+                      <span><Info className="w-5 h-5 text-amber-500" /></span>
                       <span>Najniższa cena z ostatnich 30 dni: <span className="text-amber-400 font-semibold">{product.price.toFixed(2)} zł</span></span>
                     </div>
                   )}

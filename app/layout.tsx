@@ -46,7 +46,10 @@ export default function RootLayout({
         <ToastProvider>
           <RealtimeClientListener />
           <Navbar />
-          <main className="min-h-screen">{children}</main>
+          <main className="min-h-screen"><a href="#main-content" className="skip-link">Przejdź do treści</a>
+        <main id="main-content" role="main" className="page-enter flex-grow">
+          {children}
+        </main></main>
           <Footer />
         </ToastProvider>
       </body>

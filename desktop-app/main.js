@@ -1,4 +1,4 @@
-const { app, BrowserWindow, shell, Menu, nativeTheme, session } = require('electron');
+const { app, BrowserWindow, shell, Menu, nativeTheme, session, ipcMain, Notification } = require('electron');
 const path = require('path');
 
 // ─── Konfiguracja ───────────────────────────────────────────────────────
@@ -91,7 +91,38 @@ function createMainWindow() {
   };
 
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
-    if (!isSiteUrl(url) && !isAuthUrl(url)) {
+    if (isAuthUrl(url)) {
+      // Create child window for OAuth flow
+      const authWindow = new BrowserWindow({
+        width: 600,
+        height: 800,
+        parent: mainWindow,
+        modal: true,
+        show: false,
+        webPreferences: {
+          nodeIntegration: false,
+          contextIsolation: true
+        }
+      });
+      
+      authWindow.loadURL(url);
+      
+      authWindow.once('ready-to-show', () => {
+        authWindow.show();
+      });
+
+      authWindow.webContents.on('will-redirect', (e, redirectUrl) => {
+        if (isSiteUrl(redirectUrl)) {
+          // OAuth flow finished, redirecting back to our site
+          mainWindow.loadURL(redirectUrl);
+          authWindow.close();
+        }
+      });
+      
+      return { action: 'deny' };
+    }
+
+    if (!isSiteUrl(url)) {
       shell.openExternal(url);
       return { action: 'deny' };
     }
@@ -227,4 +258,10 @@ app.on('window-all-closed', () => {
 // Wyczyść sesję przy zamykaniu (opcjonalnie)
 app.on('before-quit', () => {
   // Zachowuj ciastka i dane logowania między sesjami
+});
+
+ipcMain.on('show-notification', (_, { title, body }) => {
+  if (Notification.isSupported()) {
+    new Notification({ title, body, icon: path.join(__dirname, 'icon.png') }).show();
+  }
 });

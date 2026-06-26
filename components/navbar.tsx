@@ -7,7 +7,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { isAdminRole } from '@/lib/roles'
 import { isAdminEmail } from '@/lib/admin-emails'
-import { ShoppingCart, User, Menu, X, LogOut, Moon, Sun } from 'lucide-react'
+import { ShoppingCart, User, Menu, X, LogOut, Moon, Sun, Settings, Download } from 'lucide-react'
 
 const NAV_LINKS = [
   { href: '/', label: 'Strona główna' },
@@ -131,6 +131,9 @@ export function Navbar() {
               <Link href="/dashboard" className="p-2 rounded-full hover:bg-white/5 transition-all">
                 <User className="w-5 h-5 text-gray-300" />
               </Link>
+              <Link href="/settings" className="block px-4 py-2 text-sm text-gray-300 hover:text-amber-500 hover:bg-white/5" role="menuitem">
+                <div className="flex items-center gap-2"><Settings className="w-4 h-4" /> Ustawienia</div>
+              </Link>
               <button onClick={handleLogout} className="p-2 rounded-full hover:bg-white/5 transition-all" title="Wyloguj">
                 <LogOut className="w-5 h-5 text-gray-400" />
               </button>
@@ -164,6 +167,9 @@ export function Navbar() {
             {user ? (
               <>
                 <Link href="/dashboard" onClick={() => setMenuOpen(false)} className="block px-4 py-4 rounded-xl text-lg font-medium text-gray-300 hover:bg-white/5">Moje konto</Link>
+              <Link href="/settings" className="block px-4 py-2 text-sm text-gray-300 hover:text-amber-500 hover:bg-white/5" role="menuitem">
+                <div className="flex items-center gap-2"><Settings className="w-4 h-4" /> Ustawienia</div>
+              </Link>
                 {isAdmin && <Link href="/admin" onClick={() => setMenuOpen(false)} className="block px-4 py-4 rounded-xl text-lg font-medium text-red-400 hover:bg-red-500/10">Panel Admina</Link>}
                 <button onClick={handleLogout} className="w-full text-left px-4 py-4 rounded-xl text-lg font-medium text-gray-400 hover:bg-white/5">Wyloguj się</button>
               </>

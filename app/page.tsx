@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { ProductCard } from '@/components/product-card'
 import { Product } from '@/lib/types'
+import { Leaf, Package, Award, Droplets, BookOpen, Download, Monitor, Apple } from 'lucide-react'
 
 export default async function HomePage() {
   const supabase = await createClient()
@@ -38,7 +39,10 @@ export default async function HomePage() {
         <div className="relative z-10 text-center px-4 md:px-8 max-w-4xl mx-auto space-y-8 animate-fade-up">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-sm font-semibold mb-4 backdrop-blur-md">
             <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
-            🐝 Naturalne zbiory z rodzinnej pasieki
+            <div className="w-5 h-5 flex items-center justify-center rounded-full bg-amber-500/20">
+              <span className="text-[10px]">🍯</span>
+            </div> 
+            Naturalne zbiory z rodzinnej pasieki
           </div>
           
           <h1 className="font-serif text-6xl md:text-8xl font-bold text-transparent bg-clip-text bg-gradient-to-b from-white via-amber-100 to-amber-500 drop-shadow-sm leading-tight">
@@ -53,15 +57,15 @@ export default async function HomePage() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
             <a
               href="#produkty"
-              className="px-8 py-4 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-full font-bold hover:shadow-lg hover:shadow-amber-500/40 transition-all hover:-translate-y-1 w-full sm:w-auto"
+              className="px-8 py-4 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-full font-bold hover:shadow-lg hover:shadow-amber-500/40 transition-all hover:-translate-y-1 w-full sm:w-auto flex items-center justify-center gap-2"
             >
-              🍯 Zobacz produkty
+              <Droplets className="w-5 h-5" /> Zobacz produkty
             </a>
             <Link
               href="/historia"
-              className="px-8 py-4 bg-white/5 hover:bg-white/10 border border-white/10 backdrop-blur-md text-white rounded-full font-semibold transition-all hover:-translate-y-1 w-full sm:w-auto"
+              className="px-8 py-4 bg-white/5 hover:bg-white/10 border border-white/10 backdrop-blur-md text-white rounded-full font-semibold transition-all hover:-translate-y-1 w-full sm:w-auto flex items-center justify-center gap-2"
             >
-              📖 Poznaj naszą historię
+              <BookOpen className="w-5 h-5" /> Poznaj naszą historię
             </Link>
           </div>
         </div>
@@ -70,17 +74,23 @@ export default async function HomePage() {
       {/* Info cards */}
       <section className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-20">
         <div className="bg-[#111] border border-white/10 rounded-2xl p-6 text-center hover-lift hover-glow transition-all animate-fade-up animate-delay-100">
-          <div className="text-3xl mb-3 animate-bounce-in animate-delay-100">🌿</div>
+          <div className="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center mx-auto mb-4">
+            <Leaf className="w-6 h-6 text-amber-500" />
+          </div>
           <h3 className="font-serif text-lg font-bold text-white mb-2">100% Naturalny</h3>
           <p className="text-gray-400 text-sm">Bez cukru, bez konserwantów, bez sztucznych barwników. Czysty miód z naszych uli.</p>
         </div>
         <div className="bg-[#111] border border-white/10 rounded-2xl p-6 text-center hover-lift hover-glow transition-all animate-fade-up animate-delay-200">
-          <div className="text-3xl mb-3 animate-bounce-in animate-delay-200">📦</div>
+          <div className="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center mx-auto mb-4">
+            <Package className="w-6 h-6 text-amber-500" />
+          </div>
           <h3 className="font-serif text-lg font-bold text-white mb-2">Wysyłka 24h</h3>
           <p className="text-gray-400 text-sm">Pakujemy w ekologiczne materiały i wysyłamy następnego dnia roboczego.</p>
         </div>
         <div className="bg-[#111] border border-white/10 rounded-2xl p-6 text-center hover-lift hover-glow transition-all animate-fade-up animate-delay-300">
-          <div className="text-3xl mb-3 animate-bounce-in animate-delay-300">🏆</div>
+          <div className="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center mx-auto mb-4">
+            <Award className="w-6 h-6 text-amber-500" />
+          </div>
           <h3 className="font-serif text-lg font-bold text-white mb-2">Sprawdzona jakość</h3>
           <p className="text-gray-400 text-sm">Każda partia miodu przechodzi kontrolę jakości. Znamy historię każdej ramki.</p>
         </div>
@@ -90,7 +100,12 @@ export default async function HomePage() {
       <section id="produkty" className="scroll-mt-24">
         <div className="flex items-center justify-between mb-8 border-b border-white/10 pb-4">
           <div>
-            <h2 className="font-serif text-3xl font-bold text-white">🍯 Nasza oferta</h2>
+            <h2 className="font-serif text-3xl font-bold text-white flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center">
+                <Droplets className="w-5 h-5 text-amber-500" />
+              </div>
+              Nasza oferta
+            </h2>
             <p className="text-gray-400 text-sm mt-1">Kliknij na produkt, żeby zobaczyć szczegóły</p>
           </div>
           <Link href="/products" className="text-amber-500 hover:text-amber-400 text-sm font-semibold transition-colors">
@@ -135,7 +150,7 @@ export default async function HomePage() {
             </h2>
             
             <p className="text-gray-400 text-lg mb-10 leading-relaxed font-light">
-              Zainstaluj naszą dedykowaną aplikację na system macOS. Zamawiaj swoje ulubione słoiki prosto z pulpitu, bez konieczności otwierania przeglądarki. Bezpiecznie, stabilnie i w mgnieniu oka.
+              Zainstaluj naszą dedykowaną aplikację na macOS lub Windows. Zamawiaj swoje ulubione słoiki prosto z pulpitu, bez konieczności otwierania przeglądarki. Bezpiecznie, stabilnie i w mgnieniu oka.
             </p>
             
             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
@@ -145,8 +160,18 @@ export default async function HomePage() {
               >
                 <span className="absolute inset-0 bg-gradient-to-r from-amber-200 to-amber-400 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300" />
                 <span className="relative flex items-center gap-2 z-10 group-hover/btn:text-black">
-                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12c0-5.523-4.477-10-10-10z"/></svg>
-                  Pobierz dla macOS
+                  <Apple className="w-5 h-5" />
+                  macOS
+                </span>
+              </a>
+              <a 
+                href="/download#windows" 
+                className="group/btn relative px-8 py-4 bg-white text-black rounded-full font-bold transition-all hover:scale-105 hover:shadow-xl hover:shadow-white/10 w-full sm:w-auto flex items-center justify-center gap-2 overflow-hidden"
+              >
+                <span className="absolute inset-0 bg-gradient-to-r from-amber-200 to-amber-400 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300" />
+                <span className="relative flex items-center gap-2 z-10 group-hover/btn:text-black">
+                  <Monitor className="w-5 h-5" />
+                  Windows
                 </span>
               </a>
               <Link 

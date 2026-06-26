@@ -24,7 +24,7 @@ export default async function ProductsPage() {
     <div className="pt-32 pb-16 px-4 md:px-8 max-w-7xl mx-auto min-h-[80vh]">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 border-b border-white/10 pb-4 gap-4">
         <div>
-          <h1 className="font-serif text-4xl font-bold text-amber-500">🍯 Wszystkie produkty</h1>
+          <h1 className="font-serif text-4xl font-bold text-amber-500"> Wszystkie produkty</h1>
           <p className="text-gray-400 text-sm mt-1">Kliknij na produkt, żeby zobaczyć pełny opis i szczegóły</p>
         </div>
         <div className="text-sm text-gray-500">
@@ -34,7 +34,7 @@ export default async function ProductsPage() {
       
       {items.length === 0 ? (
         <div className="text-center py-20 text-gray-400">
-          <div className="text-4xl mb-4">📭</div>
+          <div className="text-4xl mb-4"></div>
           Brak produktów w bazie danych. Wróć tu niedługo — uzupełniamy asortyment!
         </div>
       ) : (
