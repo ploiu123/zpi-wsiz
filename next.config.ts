@@ -13,15 +13,17 @@ const nextConfig: NextConfig = {
       { protocol: "http", hostname: "**" },
     ],
   },
-  async rewrites() {
+  async redirects() {
     return [
       {
         source: '/ZloteMiody-macOS.dmg',
         destination: 'https://github.com/ploiu123/zpi-wsiz/releases/download/v1.0.0/ZloteMiody-macOS.dmg',
+        permanent: false,
       },
       {
         source: '/ZloteMiody-Windows.exe',
         destination: 'https://github.com/ploiu123/zpi-wsiz/releases/download/v1.0.0/zpi-wsiz-main.Setup.1.0.0.exe',
+        permanent: false,
       }
     ]
   }
