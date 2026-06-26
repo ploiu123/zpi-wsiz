@@ -52,14 +52,13 @@ export default function DownloadPage() {
         </p>
       </div>
 
-      <div className={`grid grid-cols-1 ${detectedOS === 'other' ? 'md:grid-cols-2' : 'max-w-md mx-auto'} gap-8 text-center`} id="download-links">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-center" id="download-links">
         
         {/* macOS */}
-        {(detectedOS === 'mac' || detectedOS === 'other') && (
-          <div className={`bg-[#111] border ${detectedOS === 'mac' ? 'border-amber-500' : 'border-white/10'} rounded-3xl p-10 hover:border-amber-500/50 transition-colors group relative`}>
+        <div className={`bg-[#111] border ${detectedOS === 'mac' ? 'border-amber-500' : 'border-white/10'} rounded-3xl p-10 hover:border-amber-500/50 transition-colors group relative`}>
             {detectedOS === 'mac' && (
               <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-amber-500 text-black text-xs font-bold px-4 py-1 rounded-full">
-                Wykryto Twój system
+                Zalecane dla Ciebie
               </div>
             )}
             <div className="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-4">
@@ -77,14 +76,12 @@ export default function DownloadPage() {
               <Download className="w-5 h-5" /> Pobierz (.dmg)
             </a>
           </div>
-        )}
-
+        
         {/* Windows */}
-        {(detectedOS === 'win' || detectedOS === 'other') && (
-          <div className={`bg-[#111] border ${detectedOS === 'win' ? 'border-amber-500' : 'border-white/10'} rounded-3xl p-10 hover:border-amber-500/50 transition-colors group relative`}>
+        <div className={`bg-[#111] border ${detectedOS === 'win' ? 'border-amber-500' : 'border-white/10'} rounded-3xl p-10 hover:border-amber-500/50 transition-colors group relative`}>
             {detectedOS === 'win' && (
               <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-amber-500 text-black text-xs font-bold px-4 py-1 rounded-full">
-                Wykryto Twój system
+                Zalecane dla Ciebie
               </div>
             )}
             <div className="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-4">
@@ -102,7 +99,6 @@ export default function DownloadPage() {
               <Download className="w-5 h-5" /> Pobierz (.exe)
             </a>
           </div>
-        )}
 
       </div>
 
