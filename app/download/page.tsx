@@ -13,7 +13,7 @@ export default function DownloadPage() {
     const ua = navigator.userAgent.toLowerCase()
     if (ua.includes('mac')) setDetectedOS('mac')
     else if (ua.includes('win')) setDetectedOS('win')
-    if (ua.includes('electron')) setIsElectron(true)
+    if (ua.includes('electron') || ua.includes('zlotemiodyapp')) setIsElectron(true)
   }, [])
 
   if (isElectron) {
@@ -52,53 +52,57 @@ export default function DownloadPage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-center" id="download-links">
+      <div className={`grid grid-cols-1 ${detectedOS === 'other' ? 'md:grid-cols-2' : 'max-w-md mx-auto'} gap-8 text-center`} id="download-links">
         
         {/* macOS */}
-        <div className={`bg-[#111] border ${detectedOS === 'mac' ? 'border-amber-500' : 'border-white/10'} rounded-3xl p-10 hover:border-amber-500/50 transition-colors group relative`}>
-          {detectedOS === 'mac' && (
-            <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-amber-500 text-black text-xs font-bold px-4 py-1 rounded-full">
-              Zalecane dla Ciebie
+        {(detectedOS === 'mac' || detectedOS === 'other') && (
+          <div className={`bg-[#111] border ${detectedOS === 'mac' ? 'border-amber-500' : 'border-white/10'} rounded-3xl p-10 hover:border-amber-500/50 transition-colors group relative`}>
+            {detectedOS === 'mac' && (
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-amber-500 text-black text-xs font-bold px-4 py-1 rounded-full">
+                Wykryto Twój system
+              </div>
+            )}
+            <div className="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <Apple className="w-8 h-8 text-white" />
             </div>
-          )}
-          <div className="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <Apple className="w-8 h-8 text-white" />
+            <h2 className="text-2xl font-bold text-white mb-2">Dla macOS</h2>
+            <p className="text-gray-400 text-sm mb-2">Apple Silicon (M1 / M2 / M3 / M4)</p>
+            <p className="text-gray-500 text-xs mb-8">Format: DMG • ~100 MB • v1.0.0</p>
+            <a
+              href="/ZloteMiody-macOS.dmg"
+              download="ZloteMiody-macOS.dmg"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-full font-bold hover:shadow-lg hover:shadow-amber-500/30 transition-all hover:-translate-y-0.5 w-full justify-center"
+              id="macos"
+            >
+              <Download className="w-5 h-5" /> Pobierz (.dmg)
+            </a>
           </div>
-          <h2 className="text-2xl font-bold text-white mb-2">Dla macOS</h2>
-          <p className="text-gray-400 text-sm mb-2">Apple Silicon (M1 / M2 / M3 / M4)</p>
-          <p className="text-gray-500 text-xs mb-8">Format: DMG • ~100 MB • v1.0.0</p>
-          <a
-            href="/ZloteMiody-macOS.dmg"
-            download="ZloteMiody-macOS.dmg"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-full font-bold hover:shadow-lg hover:shadow-amber-500/30 transition-all hover:-translate-y-0.5 w-full justify-center"
-            id="macos"
-          >
-            <Download className="w-5 h-5" /> Pobierz (.dmg)
-          </a>
-        </div>
+        )}
 
         {/* Windows */}
-        <div className={`bg-[#111] border ${detectedOS === 'win' ? 'border-amber-500' : 'border-white/10'} rounded-3xl p-10 hover:border-amber-500/50 transition-colors group relative`}>
-          {detectedOS === 'win' && (
-            <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-amber-500 text-black text-xs font-bold px-4 py-1 rounded-full">
-              Zalecane dla Ciebie
+        {(detectedOS === 'win' || detectedOS === 'other') && (
+          <div className={`bg-[#111] border ${detectedOS === 'win' ? 'border-amber-500' : 'border-white/10'} rounded-3xl p-10 hover:border-amber-500/50 transition-colors group relative`}>
+            {detectedOS === 'win' && (
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-amber-500 text-black text-xs font-bold px-4 py-1 rounded-full">
+                Wykryto Twój system
+              </div>
+            )}
+            <div className="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <Monitor className="w-8 h-8 text-white" />
             </div>
-          )}
-          <div className="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <Monitor className="w-8 h-8 text-white" />
+            <h2 className="text-2xl font-bold text-white mb-2">Dla Windows</h2>
+            <p className="text-gray-400 text-sm mb-2">Windows 10 / 11 (64-bit)</p>
+            <p className="text-gray-500 text-xs mb-8">Format: EXE • ~82 MB • v1.0.0</p>
+            <a
+              href="/ZloteMiody-Windows.exe"
+              download="ZloteMiody-Windows.exe"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-full font-bold hover:shadow-lg hover:shadow-amber-500/30 transition-all hover:-translate-y-0.5 w-full justify-center"
+              id="windows"
+            >
+              <Download className="w-5 h-5" /> Pobierz (.exe)
+            </a>
           </div>
-          <h2 className="text-2xl font-bold text-white mb-2">Dla Windows</h2>
-          <p className="text-gray-400 text-sm mb-2">Windows 10 / 11 (64-bit)</p>
-          <p className="text-gray-500 text-xs mb-8">Format: EXE • ~82 MB • v1.0.0</p>
-          <a
-            href="/ZloteMiody-Windows.exe"
-            download="ZloteMiody-Windows.exe"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-full font-bold hover:shadow-lg hover:shadow-amber-500/30 transition-all hover:-translate-y-0.5 w-full justify-center"
-            id="windows"
-          >
-            <Download className="w-5 h-5" /> Pobierz (.exe)
-          </a>
-        </div>
+        )}
 
       </div>
 

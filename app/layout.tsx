@@ -36,7 +36,7 @@ export default function RootLayout({
                 document.documentElement.classList.add('dark');
               }
             } catch(e) {}
-            if (typeof navigator !== 'undefined' && navigator.userAgent.toLowerCase().includes('electron')) {
+            if (typeof navigator !== 'undefined' && (navigator.userAgent.toLowerCase().includes('electron') || navigator.userAgent.toLowerCase().includes('zlotemiodyapp'))) {
               document.documentElement.classList.add('is-electron');
             }
           })();
