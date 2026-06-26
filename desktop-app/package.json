@@ -58,9 +58,6 @@
       "oneClick": true,
       "perMachine": false,
       "allowToChangeInstallationDirectory": false,
-      "installerIcon": "icon.png",
-      "uninstallerIcon": "icon.png",
-      "installerHeaderIcon": "icon.png",
       "shortcutName": "Złote Miody"
     }
   },
