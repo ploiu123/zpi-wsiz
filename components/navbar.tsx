@@ -70,7 +70,7 @@ export function Navbar() {
         {/* Logo — prostokątne zaokrąglone, nie okrągłe */}
         <Link href="/" className="flex items-center gap-3 group">
           <div className="relative w-11 h-11 rounded-xl overflow-hidden border-2 border-amber-500/30 group-hover:border-amber-500/70 transition-all duration-300 shadow-lg shadow-amber-500/10 group-hover:shadow-amber-500/25">
-            <img src={isDark ? '/logo-dark.png' : '/logo.png'} alt="Złote Miody" className="w-full h-full object-contain bg-black/10" onError={(e) => e.currentTarget.src='/logo.png'} />
+            <img src="/logo.png" alt="Złote Miody" className="w-full h-full object-contain bg-black/10" />
           </div>
           <span className="font-serif text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-amber-500 tracking-wide">
             Złote Miody

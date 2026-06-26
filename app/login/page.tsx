@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { r } from '@/lib/l'
+import { LogIn, UserPlus, Lock } from 'lucide-react'
 
 function LoginContent() {
   const [email, setEmail] = useState('')
@@ -57,7 +58,13 @@ function LoginContent() {
     <div className="pt-32 pb-16 px-4 flex items-center justify-center min-h-[80vh]">
       <div className="bg-[#111] border border-white/10 rounded-3xl p-8 md:p-12 w-full max-w-md shadow-2xl">
         <div className="text-center mb-8">
-          <div className="text-4xl mb-3">{isRegistering ? '<UserPlus className="w-8 h-8 text-amber-500" />' : '<LogIn className="w-8 h-8 text-amber-500" />'}</div>
+          <div className="mb-3 flex justify-center">
+            {isRegistering ? (
+              <UserPlus className="w-12 h-12 text-amber-500" />
+            ) : (
+              <LogIn className="w-12 h-12 text-amber-500" />
+            )}
+          </div>
           <h1 className="font-serif text-3xl font-bold text-amber-500 mb-2">
             {isRegistering ? 'Utwórz konto' : 'Zaloguj się'}
           </h1>
@@ -67,10 +74,13 @@ function LoginContent() {
               : 'Witaj z powrotem! Zaloguj się, by kontynuować.'}
           </p>
           {isAdminTarget && !isRegistering && (
-            <p className="mt-4 text-sm text-amber-200/90 bg-amber-500/10 border border-amber-500/25 rounded-xl px-4 py-3">
-              <Lock className="w-8 h-8 text-amber-500" /> Logujesz się do <span className="font-semibold">panelu administratora</span>. Konto musi mieć rolę{' '}
-              <code className="text-amber-400">admin</code> w tabeli{' '}
-              <code className="text-amber-400">profiles</code>.
+            <p className="mt-4 text-sm text-amber-200/90 bg-amber-500/10 border border-amber-500/25 rounded-xl px-4 py-3 flex items-center gap-2 text-left justify-start">
+              <Lock className="w-5 h-5 text-amber-500 shrink-0" />
+              <span>
+                Logujesz się do <span className="font-semibold">panelu administratora</span>. Konto musi mieć rolę{' '}
+                <code className="text-amber-400">admin</code> w tabeli{' '}
+                <code className="text-amber-400">profiles</code>.
+              </span>
             </p>
           )}
         </div>
@@ -109,9 +119,21 @@ function LoginContent() {
           <button 
             type="submit" 
             disabled={loading}
-            className="w-full bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-xl py-4 font-bold hover:shadow-lg hover:shadow-amber-500/30 transition-all hover:-translate-y-0.5 mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-xl py-4 font-bold hover:shadow-lg hover:shadow-amber-500/30 transition-all hover:-translate-y-0.5 mt-4 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
-            {loading ? '⏳ Przetwarzanie...' : (isRegistering ? '<UserPlus className="w-8 h-8 text-amber-500" /> Zarejestruj się' : '<LogIn className="w-8 h-8 text-amber-500" /> Zaloguj się')}
+            {loading ? (
+              <span>⏳ Przetwarzanie...</span>
+            ) : isRegistering ? (
+              <>
+                <UserPlus className="w-5 h-5" />
+                <span>Zarejestruj się</span>
+              </>
+            ) : (
+              <>
+                <LogIn className="w-5 h-5" />
+                <span>Zaloguj się</span>
+              </>
+            )}
           </button>
         </form>
 

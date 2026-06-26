@@ -235,9 +235,12 @@ DECLARE
   v_res record;
 BEGIN
   FOR v_res IN 
-    DELETE FROM public.cart_reservations
-    WHERE expires_at < now()
-    RETURNING product_id, quantity
+    WITH deleted AS (
+      DELETE FROM public.cart_reservations
+      WHERE expires_at < now()
+      RETURNING product_id, quantity
+    )
+    SELECT * FROM deleted
   LOOP
     UPDATE public.products
     SET stock = stock + v_res.quantity,
