@@ -68,7 +68,7 @@ export default function DownloadPage() {
             <p className="text-gray-400 text-sm mb-2">Apple Silicon (M1 / M2 / M3 / M4)</p>
             <p className="text-gray-500 text-xs mb-8">Format: DMG • ~100 MB • v1.0.0</p>
             <a
-              href="/ZloteMiody-macOS.dmg"
+              href="https://github.com/ploiu123/zpi-wsiz/releases/download/v1.0.0/ZloteMiody-macOS.dmg"
               download="ZloteMiody-macOS.dmg"
               className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-full font-bold hover:shadow-lg hover:shadow-amber-500/30 transition-all hover:-translate-y-0.5 w-full justify-center"
               id="macos"
@@ -91,7 +91,7 @@ export default function DownloadPage() {
             <p className="text-gray-400 text-sm mb-2">Windows 10 / 11 (64-bit)</p>
             <p className="text-gray-500 text-xs mb-8">Format: EXE • ~82 MB • v1.0.0</p>
             <a
-              href="/ZloteMiody-Windows.exe"
+              href="https://github.com/ploiu123/zpi-wsiz/releases/download/v1.0.0/ZloteMiody-Windows.exe"
               download="ZloteMiody-Windows.exe"
               className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-full font-bold hover:shadow-lg hover:shadow-amber-500/30 transition-all hover:-translate-y-0.5 w-full justify-center"
               id="windows"
