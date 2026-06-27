@@ -75,6 +75,8 @@ function createMainWindow() {
   // Otwieraj linki zewnętrzne w przeglądarce systemowej, z wyjątkiem logowania oraz domen lokalnych
   const ALLOWED_URLS = [
     SITE_URL,
+    'https://zlote-miody.pl',
+    'https://www.zlote-miody.pl',
     'http://localhost:3000',
     'http://127.0.0.1:3000'
   ];
@@ -87,6 +89,7 @@ function createMainWindow() {
     return url.includes('supabase.co') || 
            url.includes('accounts.google.com') || 
            url.includes('github.com/login') ||
+           url.includes('zlote-miody.pl') ||
            url.includes('auth');
   };
 
