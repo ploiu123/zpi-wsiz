@@ -5,9 +5,14 @@
   "main": "main.js",
   "author": "Złote Miody",
   "scripts": {
+    "obfuscate": "javascript-obfuscator src --output . --target node --compact true --control-flow-flattening true --dead-code-injection true --identifier-names-generator hexadecimal --rename-globals true --string-array true --string-array-encoding 'base64' --string-array-calls-transform true",
+    "prestart": "npm run obfuscate",
     "start": "electron .",
+    "prebuild:mac": "npm run obfuscate",
     "build:mac": "electron-builder --mac",
+    "prebuild:win": "npm run obfuscate",
     "build:win": "electron-builder --win",
+    "prebuild:all": "npm run obfuscate",
     "build:all": "electron-builder --mac --win"
   },
   "build": {
@@ -29,7 +34,9 @@
       "target": [
         {
           "target": "dmg",
-          "arch": ["universal"]
+          "arch": [
+            "universal"
+          ]
         }
       ],
       "darkModeSupport": true
@@ -38,8 +45,16 @@
       "title": "Złote Miody",
       "icon": "icon.png",
       "contents": [
-        { "x": 130, "y": 220 },
-        { "x": 410, "y": 220, "type": "link", "path": "/Applications" }
+        {
+          "x": 130,
+          "y": 220
+        },
+        {
+          "x": 410,
+          "y": 220,
+          "type": "link",
+          "path": "/Applications"
+        }
       ],
       "window": {
         "width": 540,
@@ -51,7 +66,9 @@
       "target": [
         {
           "target": "nsis",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         }
       ]
     },
@@ -64,6 +81,7 @@
   },
   "devDependencies": {
     "electron": "^33.0.0",
-    "electron-builder": "^25.1.8"
+    "electron-builder": "^25.1.8",
+    "javascript-obfuscator": "^5.4.3"
   }
 }
