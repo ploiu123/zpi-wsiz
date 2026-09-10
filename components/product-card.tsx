@@ -4,7 +4,7 @@ import { memo, useCallback, useState } from 'react'
 import { Product } from '@/lib/types'
 import { useCartStore } from '@/lib/store'
 import { useToast } from '@/components/toast'
-import { ShoppingCart, X, Package, Truck, Check } from 'lucide-react'
+import { ShoppingCart, X, Package, Truck, Check, PackageOpen, Info } from 'lucide-react'
 import Image from 'next/image'
 
 export const ProductCard = memo(function ProductCard({ product }: { product: Product }) {

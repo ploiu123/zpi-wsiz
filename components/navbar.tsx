@@ -22,6 +22,7 @@ export function Navbar() {
   const [isAdmin, setIsAdmin] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [isElectron, setIsElectron] = useState(false)
   const itemCount = useCartStore((s) => s.getItemCount())
 
   const [isDark, setIsDark] = useState(true)
@@ -40,6 +41,12 @@ export function Navbar() {
     // Read current theme from DOM (set by blocking script)
     const isCurrentlyLight = document.documentElement.classList.contains('light')
     setIsDark(!isCurrentlyLight)
+    
+    // Check if running in Electron
+    const ua = navigator.userAgent.toLowerCase()
+    if (ua.includes('electron') || ua.includes('zlotemiodyapp')) {
+      setIsElectron(true)
+    }
   }, [])
 
   const toggleTheme = useCallback(() => {
@@ -79,19 +86,22 @@ export function Navbar() {
 
         {/* Desktop nav */}
         <div className="hidden md:flex items-center gap-1">
-          {NAV_LINKS.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                pathname === link.href
-                  ? 'bg-amber-500/15 text-amber-400'
-                  : 'text-gray-400 hover:text-amber-400 hover:bg-white/5'
-              } ${link.href === '/download' ? 'hide-in-electron' : ''}`}
-            >
-              {link.label}
-            </Link>
-          ))}
+          {NAV_LINKS.map((link) => {
+            if (isElectron && link.href === '/download') return null;
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                  pathname === link.href
+                    ? 'bg-amber-500/15 text-amber-400'
+                    : 'text-gray-400 hover:text-amber-400 hover:bg-white/5'
+                }`}
+              >
+                {link.label}
+              </Link>
+            )
+          })}
           {isAdmin && (
             <Link href="/admin" className="px-4 py-2 rounded-full text-sm font-medium text-red-400 hover:bg-red-500/10 transition-all">
               Admin
@@ -155,12 +165,15 @@ export function Navbar() {
       {menuOpen && (
         <div className="md:hidden fixed inset-0 top-20 z-40 bg-[#0a0a0a]/95 backdrop-blur-xl border-t border-white/5 mobile-menu-overlay flex flex-col p-6">
           <div className="flex-1 space-y-4 mobile-menu-content">
-            {NAV_LINKS.map((link) => (
-              <Link key={link.href} href={link.href} onClick={() => setMenuOpen(false)}
-                className={`block px-4 py-4 rounded-xl text-lg font-medium text-gray-300 hover:bg-white/5 hover:text-amber-400 transition-all ${link.href === '/download' ? 'hide-in-electron' : ''}`}>
-                {link.label}
-              </Link>
-            ))}
+            {NAV_LINKS.map((link) => {
+              if (isElectron && link.href === '/download') return null;
+              return (
+                <Link key={link.href} href={link.href} onClick={() => setMenuOpen(false)}
+                  className={`block px-4 py-4 rounded-xl text-lg font-medium text-gray-300 hover:bg-white/5 hover:text-amber-400 transition-all`}>
+                  {link.label}
+                </Link>
+              )
+            })}
             
             <div className="h-px w-full bg-white/10 my-4"></div>
             
