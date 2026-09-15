@@ -1,7 +1,7 @@
-﻿export const ORDER_STATUS_OPTIONS = [
+export const ORDER_STATUS_OPTIONS = [
   { value: 'nowe', label: 'Nowe' },
   { value: 'w realizacji', label: 'W realizacji' },
-  { value: 'wysĹ‚ane', label: 'WysĹ‚ane' },
+  { value: 'wysłane', label: 'Wysłane' },
   { value: 'dostarczone', label: 'Dostarczone' },
   { value: 'anulowane', label: 'Anulowane' },
 ] as const
@@ -9,11 +9,11 @@
 export type OrderStatusValue = (typeof ORDER_STATUS_OPTIONS)[number]['value']
 
 const LEGACY_STATUS_MAP: Record<string, OrderStatusValue> = {
-  Nowe: 'nowe',
+  'Nowe': 'nowe',
   'W trakcie realizacji': 'w realizacji',
-  'WysĹ‚ane do kuriera': 'wysĹ‚ane',
-  ZakoĹ„czone: 'dostarczone',
-  Anulowane: 'anulowane',
+  'Wysłane do kuriera': 'wysłane',
+  'Zakończone': 'dostarczone',
+  'Anulowane': 'anulowane',
 }
 
 export function normalizeOrderStatus(value: string): OrderStatusValue {

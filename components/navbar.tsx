@@ -65,6 +65,7 @@ export function Navbar() {
 
   const handleLogout = useCallback(async () => {
     const supabase = createClient()
+    useCartStore.getState().clearCart()
     await supabase.auth.signOut()
     setUser(null)
     setIsAdmin(false)
