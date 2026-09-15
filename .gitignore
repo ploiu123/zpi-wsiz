@@ -13,8 +13,10 @@ dist/
 
 # Desktop app builds (Electron) — za duże dla GitHuba
 desktop-app/dist/
+desktop-app/release/
 desktop-app/node_modules/
 desktop-app/out/
+release/
 *.exe
 *.dmg
 *.pkg

@@ -1,3 +1,9 @@
+# Wygenerowane przez `npm run obfuscate` z katalogu src/.
+# Wzorce MUSZĄ być zakotwiczone ukośnikiem — bez niego ignorowały także
+# src/main.js i src/preload.js, czyli czytelne źródła aplikacji.
+/main.js
+/preload.js
 
-main.js
-preload.js
+node_modules/
+dist/
+release/
