@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
@@ -23,7 +23,7 @@ export function AdminProductCatalog({ initialProducts }: { initialProducts: Prod
   }, [initialProducts])
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Na pewno usunąć ten produkt z bazy?')) return
+    if (!confirm('Na pewno usunÄ…Ä‡ ten produkt z bazy?')) return
     setBusyId(id)
     setMsg(null)
     const supabase = createClient()
@@ -34,7 +34,7 @@ export function AdminProductCatalog({ initialProducts }: { initialProducts: Prod
       return
     }
     setProducts((prev) => prev.filter((p) => p.id !== id))
-    setMsg({ type: 'success', text: '🗑️ Produkt został usunięty.' })
+    setMsg({ type: 'success', text: 'đź—‘ď¸Ź Produkt zostaĹ‚ usuniÄ™ty.' })
     router.refresh()
   }
 
@@ -55,7 +55,7 @@ export function AdminProductCatalog({ initialProducts }: { initialProducts: Prod
           <table className="w-full text-left text-sm text-gray-400">
             <thead className="bg-white/5 text-gray-200">
               <tr>
-                <th className="px-6 py-4 font-medium">Zdjęcie / Nazwa</th>
+                <th className="px-6 py-4 font-medium">ZdjÄ™cie / Nazwa</th>
                 <th className="px-6 py-4 font-medium">Cena</th>
                 <th className="px-6 py-4 font-medium">Stan</th>
                 <th className="px-6 py-4 font-medium min-w-[220px]">Akcje</th>
@@ -65,7 +65,7 @@ export function AdminProductCatalog({ initialProducts }: { initialProducts: Prod
               {products.length === 0 ? (
                 <tr>
                   <td colSpan={4} className="px-6 py-8 text-center border-t border-white/5">
-                    Brak produktów. Dodaj pierwszy formularzem obok.
+                    Brak produktĂłw. Dodaj pierwszy formularzem obok.
                   </td>
                 </tr>
               ) : (
@@ -82,19 +82,19 @@ export function AdminProductCatalog({ initialProducts }: { initialProducts: Prod
                           />
                         ) : (
                           <div className="w-12 h-12 bg-white/5 rounded-lg border border-white/10 flex items-center justify-center shrink-0 text-lg">
-                            🍯
+                            đźŤŻ
                           </div>
                         )}
                         <div>
                           <div className="text-white font-bold">{product.name}</div>
                           {product.featured && (
                             <span className="inline-block mt-1 text-xs bg-amber-500/20 text-amber-500 px-2 py-0.5 rounded">
-                              ⭐ Wyróżniony
+                              â­ WyrĂłĹĽniony
                             </span>
                           )}
                           {product.old_price && (
                             <span className="inline-block mt-1 ml-1 text-xs bg-red-500/20 text-red-400 px-2 py-0.5 rounded">
-                              🏷️ Promocja
+                              đźŹ·ď¸Ź Promocja
                             </span>
                           )}
                         </div>
@@ -103,11 +103,11 @@ export function AdminProductCatalog({ initialProducts }: { initialProducts: Prod
                     <td className="px-6 py-4 whitespace-nowrap">
                       {product.old_price ? (
                         <div>
-                          <div className="text-red-400 line-through text-xs">{Number(product.old_price).toFixed(2)} zł</div>
-                          <div className="text-amber-500 font-bold">{Number(product.price).toFixed(2)} zł</div>
+                          <div className="text-red-400 line-through text-xs">{Number(product.old_price).toFixed(2)} zĹ‚</div>
+                          <div className="text-amber-500 font-bold">{Number(product.price).toFixed(2)} zĹ‚</div>
                         </div>
                       ) : (
-                        <div className="text-amber-500 font-bold">{Number(product.price).toFixed(2)} zł</div>
+                        <div className="text-amber-500 font-bold">{Number(product.price).toFixed(2)} zĹ‚</div>
                       )}
                     </td>
                     <td className="px-6 py-4">
@@ -126,7 +126,7 @@ export function AdminProductCatalog({ initialProducts }: { initialProducts: Prod
                           onClick={() => setEditingId((id) => (id === product.id ? null : product.id))}
                           className="px-3 py-1.5 rounded-lg bg-white/10 text-white text-xs font-bold hover:bg-amber-500/20"
                         >
-                          {editingId === product.id ? 'Zwiń' : '✏️ Edytuj'}
+                          {editingId === product.id ? 'ZwiĹ„' : 'âśŹď¸Ź Edytuj'}
                         </button>
                         <button
                           type="button"
@@ -134,7 +134,7 @@ export function AdminProductCatalog({ initialProducts }: { initialProducts: Prod
                           onClick={() => handleDelete(product.id)}
                           className="px-3 py-1.5 rounded-lg bg-red-500/10 text-red-400 text-xs font-bold hover:bg-red-500/20 disabled:opacity-50"
                         >
-                          {busyId === product.id ? '…' : '🗑️ Usuń'}
+                          {busyId === product.id ? 'â€¦' : 'đź—‘ď¸Ź UsuĹ„'}
                         </button>
                       </div>
                       {editingId === product.id && (
@@ -143,7 +143,7 @@ export function AdminProductCatalog({ initialProducts }: { initialProducts: Prod
                           onCancel={() => setEditingId(null)}
                           onSaved={() => {
                             setEditingId(null)
-                            setMsg({ type: 'success', text: '✅ Zapisano zmiany produktu.' })
+                            setMsg({ type: 'success', text: 'âś… Zapisano zmiany produktu.' })
                             router.refresh()
                           }}
                           onError={(text) => setMsg({ type: 'error', text })}
@@ -183,11 +183,9 @@ function ProductInlineEditor({
   const [featured, setFeatured] = useState(product.featured)
   const [loading, setLoading] = useState(false)
 
-  // Promotion
   const [isOnSale, setIsOnSale] = useState(!!product.old_price)
   const [oldPrice, setOldPrice] = useState(product.old_price ? String(product.old_price) : '')
 
-  // Local images & categories
   const [localImages, setLocalImages] = useState<LocalImage[]>([])
   const [showImagePicker, setShowImagePicker] = useState(false)
   const [existingCategories, setExistingCategories] = useState<string[]>([])
@@ -220,7 +218,7 @@ function ProductInlineEditor({
         description: desc,
         price: parseFloat(price),
         stock: parseInt(stock, 10),
-        category: finalCategory || 'miód',
+        category: finalCategory || 'miĂłd',
         image_url: image || '',
         featured,
         old_price: isOnSale && oldPrice ? parseFloat(oldPrice) : null,
@@ -259,7 +257,7 @@ function ProductInlineEditor({
       <div className="grid grid-cols-2 gap-3">
         <div>
           <label className="block text-[10px] uppercase tracking-wider text-gray-500 mb-1">
-            {isOnSale ? 'Cena promo (zł)' : 'Cena (zł)'}
+            {isOnSale ? 'Cena promo (zĹ‚)' : 'Cena (zĹ‚)'}
           </label>
           <input
             type="number"
@@ -282,15 +280,14 @@ function ProductInlineEditor({
         </div>
       </div>
 
-      {/* Promotion */}
       <div className="p-3 rounded-lg border border-white/10 bg-black/20 space-y-2">
         <label className="flex items-center gap-2 cursor-pointer">
           <input type="checkbox" checked={isOnSale} onChange={e => setIsOnSale(e.target.checked)} className="accent-amber-500" />
-          <span className="text-xs text-amber-400 font-semibold">🏷️ Promocja</span>
+          <span className="text-xs text-amber-400 font-semibold">đźŹ·ď¸Ź Promocja</span>
         </label>
         {isOnSale && (
           <div>
-            <label className="block text-[10px] uppercase tracking-wider text-gray-500 mb-1">Cena przed promocją</label>
+            <label className="block text-[10px] uppercase tracking-wider text-gray-500 mb-1">Cena przed promocjÄ…</label>
             <input
               type="number" step="0.01" required={isOnSale}
               value={oldPrice} onChange={e => setOldPrice(e.target.value)}
@@ -300,7 +297,6 @@ function ProductInlineEditor({
         )}
       </div>
 
-      {/* Category */}
       <div>
         <label className="block text-[10px] uppercase tracking-wider text-gray-500 mb-1">Kategoria</label>
         {!showNewCategory ? (
@@ -310,7 +306,7 @@ function ProductInlineEditor({
               onChange={e => setCategory(e.target.value)}
               className="flex-1 bg-black/50 border border-white/10 rounded-lg px-3 py-2 text-white text-sm"
             >
-              <option value="">— Wybierz —</option>
+              <option value="">â€” Wybierz â€”</option>
               {existingCategories.map(cat => (
                 <option key={cat} value={cat}>{cat}</option>
               ))}
@@ -334,12 +330,10 @@ function ProductInlineEditor({
         )}
       </div>
 
-      {/* Image */}
       <div>
-        <label className="block text-[10px] uppercase tracking-wider text-gray-500 mb-1">Zdjęcie</label>
+        <label className="block text-[10px] uppercase tracking-wider text-gray-500 mb-1">ZdjÄ™cie</label>
         {image && (
           <div className="flex items-center gap-2 mb-2 p-1.5 bg-black/30 rounded-lg border border-white/5">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={image} alt="" className="w-8 h-8 rounded object-cover" />
             <span className="text-xs text-gray-400 truncate flex-1">{image}</span>
             <button type="button" onClick={() => setImage('')} className="p-0.5 hover:text-red-400 text-gray-500">
@@ -361,7 +355,7 @@ function ProductInlineEditor({
         {showImagePicker && (
           <div className="mt-2 p-2 bg-black/40 border border-white/10 rounded-lg max-h-[200px] overflow-y-auto">
             {localImages.length === 0 ? (
-              <p className="text-xs text-gray-500 text-center py-2">Brak zdjęć w folderze</p>
+              <p className="text-xs text-gray-500 text-center py-2">Brak zdjÄ™Ä‡ w folderze</p>
             ) : (
               <div className="grid grid-cols-4 gap-1.5">
                 {localImages.map(img => (
@@ -371,7 +365,6 @@ function ProductInlineEditor({
                     onClick={() => { setImage(img.url); setShowImagePicker(false) }}
                     className={`rounded overflow-hidden border transition-all hover:border-amber-500/50 ${image === img.url ? 'border-amber-500' : 'border-white/10'}`}
                   >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={img.url} alt={img.filename} className="w-full aspect-square object-cover" />
                   </button>
                 ))}
@@ -383,7 +376,7 @@ function ProductInlineEditor({
 
       <label className="flex items-center gap-2 text-xs text-gray-300">
         <input type="checkbox" checked={featured} onChange={(e) => setFeatured(e.target.checked)} className="accent-amber-500" />
-        ⭐ Wyróżnij na stronie głównej
+        â­ WyrĂłĹĽnij na stronie gĹ‚Ăłwnej
       </label>
       <div className="flex gap-2 pt-2">
         <button
@@ -391,7 +384,7 @@ function ProductInlineEditor({
           disabled={loading}
           className="flex-1 bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 rounded-lg text-sm disabled:opacity-50"
         >
-          {loading ? '⏳ Zapisywanie…' : '💾 Zapisz'}
+          {loading ? 'âŹł Zapisywanieâ€¦' : 'đź’ľ Zapisz'}
         </button>
         <button type="button" onClick={onCancel} className="px-4 py-2 rounded-lg bg-white/10 text-sm font-bold text-white">
           Anuluj

@@ -1,6 +1,4 @@
-import type { OrderStatusValue } from '@/lib/order-status'
-
-// Typy bazy danych Złote Miody
+﻿import type { OrderStatusValue } from '@/lib/order-status'
 
 export interface Profile {
   id: string
@@ -10,7 +8,6 @@ export interface Profile {
   address: string
   city: string
   postal_code: string
-  /** W bazie często: `User` / `Admin` (initcap); w kodzie używaj `isAdminRole()`. */
   role: string
   created_at: string
   updated_at: string
@@ -21,7 +18,6 @@ export interface Product {
   name: string
   description: string
   price: number
-  /** When set, the product is on sale — `price` is the current (lower) price, `old_price` is the original. */
   old_price: number | null
   image_url: string
   stock: number

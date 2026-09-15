@@ -1,8 +1,4 @@
-/**
- * Jednoliterowe aliasy (mapowanie: docs/funkcje-1-litera.md).
- * Implementacje „długich” nazw zostają w modułach źródłowych — tu tylko cienka warstwa eksportu.
- */
-export function r(raw: string | null): string {
+﻿export function r(raw: string | null): string {
   if (!raw || !raw.startsWith('/') || raw.startsWith('//')) return '/'
   return raw
 }

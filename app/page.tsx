@@ -1,4 +1,4 @@
-import Link from 'next/link'
+﻿import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { ProductCard } from '@/components/product-card'
 import { Product } from '@/lib/types'
@@ -7,7 +7,6 @@ import { Leaf, Package, Award, Droplets, BookOpen, Download, Monitor, Apple } fr
 export default async function HomePage() {
   const supabase = await createClient()
   
-  // Pobranie produktów z bazy Supabase
   const { data: products, error } = await supabase
     .from('products')
     .select('*')
@@ -15,43 +14,40 @@ export default async function HomePage() {
     .order('created_at', { ascending: false })
 
   if (error) {
-    console.error('Błąd pobierania produktów:', error.message)
+    console.error('BĹ‚Ä…d pobierania produktĂłw:', error.message)
   }
 
   const items = (products as Product[]) || []
 
   return (
     <div className="pt-24 pb-16 px-4 md:px-8 max-w-7xl mx-auto">
-      {/* Hero Section */}
       <section className="relative w-full overflow-hidden rounded-[2.5rem] mb-24 min-h-[85vh] flex items-center justify-center border border-white/5 shadow-2xl shadow-amber-900/20">
-        {/* Tło graficzne z gradientem */}
         <div className="absolute inset-0 z-0">
           <img 
             src="/hero.png" 
-            alt="Pasieka tło" 
+            alt="Pasieka tĹ‚o" 
             className="w-full h-full object-cover opacity-40 scale-105"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/80 to-transparent" />
           <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/50 to-transparent" />
         </div>
 
-        {/* Zawartość */}
         <div className="relative z-10 text-center px-4 md:px-8 max-w-4xl mx-auto space-y-8 animate-fade-up">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-sm font-semibold mb-4 backdrop-blur-md">
             <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
             <div className="w-5 h-5 flex items-center justify-center rounded-full bg-amber-500/20">
-              <span className="text-[10px]">🍯</span>
+              <span className="text-[10px]">đźŤŻ</span>
             </div> 
             Naturalne zbiory z rodzinnej pasieki
           </div>
           
           <h1 className="font-serif text-6xl md:text-8xl font-bold text-transparent bg-clip-text bg-gradient-to-b from-white via-amber-100 to-amber-500 drop-shadow-sm leading-tight">
-            Prawdziwe Złoto <br /> z Naszej Pasieki
+            Prawdziwe ZĹ‚oto <br /> z Naszej Pasieki
           </h1>
           
           <p className="text-gray-300 max-w-2xl mx-auto text-lg md:text-xl leading-relaxed font-light">
-            Trzy pokolenia pszczelarzy, czyste lasy i zero chemii. Każdy słoik to gwarancja 
-            smaku, który pamiętasz z dzieciństwa — prosto od nas do Twojego stołu.
+            Trzy pokolenia pszczelarzy, czyste lasy i zero chemii. KaĹĽdy sĹ‚oik to gwarancja 
+            smaku, ktĂłry pamiÄ™tasz z dzieciĹ„stwa â€” prosto od nas do Twojego stoĹ‚u.
           </p>
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
@@ -65,38 +61,36 @@ export default async function HomePage() {
               href="/historia"
               className="px-8 py-4 bg-white/5 hover:bg-white/10 border border-white/10 backdrop-blur-md text-white rounded-full font-semibold transition-all hover:-translate-y-1 w-full sm:w-auto flex items-center justify-center gap-2"
             >
-              <BookOpen className="w-5 h-5" /> Poznaj naszą historię
+              <BookOpen className="w-5 h-5" /> Poznaj naszÄ… historiÄ™
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Info cards */}
       <section className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-20">
         <div className="bg-[#111] border border-white/10 rounded-2xl p-6 text-center hover-lift hover-glow transition-all animate-fade-up animate-delay-100">
           <div className="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center mx-auto mb-4">
             <Leaf className="w-6 h-6 text-amber-500" />
           </div>
           <h3 className="font-serif text-lg font-bold text-white mb-2">100% Naturalny</h3>
-          <p className="text-gray-400 text-sm">Bez cukru, bez konserwantów, bez sztucznych barwników. Czysty miód z naszych uli.</p>
+          <p className="text-gray-400 text-sm">Bez cukru, bez konserwantĂłw, bez sztucznych barwnikĂłw. Czysty miĂłd z naszych uli.</p>
         </div>
         <div className="bg-[#111] border border-white/10 rounded-2xl p-6 text-center hover-lift hover-glow transition-all animate-fade-up animate-delay-200">
           <div className="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center mx-auto mb-4">
             <Package className="w-6 h-6 text-amber-500" />
           </div>
-          <h3 className="font-serif text-lg font-bold text-white mb-2">Wysyłka 24h</h3>
-          <p className="text-gray-400 text-sm">Pakujemy w ekologiczne materiały i wysyłamy następnego dnia roboczego.</p>
+          <h3 className="font-serif text-lg font-bold text-white mb-2">WysyĹ‚ka 24h</h3>
+          <p className="text-gray-400 text-sm">Pakujemy w ekologiczne materiaĹ‚y i wysyĹ‚amy nastÄ™pnego dnia roboczego.</p>
         </div>
         <div className="bg-[#111] border border-white/10 rounded-2xl p-6 text-center hover-lift hover-glow transition-all animate-fade-up animate-delay-300">
           <div className="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center mx-auto mb-4">
             <Award className="w-6 h-6 text-amber-500" />
           </div>
-          <h3 className="font-serif text-lg font-bold text-white mb-2">Sprawdzona jakość</h3>
-          <p className="text-gray-400 text-sm">Każda partia miodu przechodzi kontrolę jakości. Znamy historię każdej ramki.</p>
+          <h3 className="font-serif text-lg font-bold text-white mb-2">Sprawdzona jakoĹ›Ä‡</h3>
+          <p className="text-gray-400 text-sm">KaĹĽda partia miodu przechodzi kontrolÄ™ jakoĹ›ci. Znamy historiÄ™ kaĹĽdej ramki.</p>
         </div>
       </section>
 
-      {/* Produkty */}
       <section id="produkty" className="scroll-mt-24">
         <div className="flex items-center justify-between mb-8 border-b border-white/10 pb-4">
           <div>
@@ -106,16 +100,16 @@ export default async function HomePage() {
               </div>
               Nasza oferta
             </h2>
-            <p className="text-gray-400 text-sm mt-1">Kliknij na produkt, żeby zobaczyć szczegóły</p>
+            <p className="text-gray-400 text-sm mt-1">Kliknij na produkt, ĹĽeby zobaczyÄ‡ szczegĂłĹ‚y</p>
           </div>
           <Link href="/products" className="text-amber-500 hover:text-amber-400 text-sm font-semibold transition-colors">
-            Wszystkie →
+            Wszystkie â†’
           </Link>
         </div>
         
         {items.length === 0 ? (
           <div className="text-center py-20 text-gray-400">
-            Brak produktów w bazie danych. Dodaj je przez panel administracyjny.
+            Brak produktĂłw w bazie danych. Dodaj je przez panel administracyjny.
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -126,13 +120,10 @@ export default async function HomePage() {
         )}
       </section>
 
-      {/* CTA Pobranie Aplikacji - Wersja Premium */}
       <section className="mt-32 mb-16 relative hide-in-electron group cursor-default">
-        {/* Animated Glow Border Wrapper */}
         <div className="absolute -inset-[1px] bg-gradient-to-r from-amber-500/30 via-amber-200/10 to-amber-500/30 rounded-[3rem] blur-sm group-hover:blur-md transition-all duration-500 opacity-70" />
         
         <div className="relative bg-[#080808] border border-white/10 rounded-[3rem] overflow-hidden p-10 md:p-16 lg:p-20 flex flex-col lg:flex-row items-center justify-between gap-12">
-          {/* Background Elements */}
           <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-amber-500/10 blur-[150px] rounded-full pointer-events-none translate-x-1/3 -translate-y-1/3" />
           <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-amber-500/5 blur-[100px] rounded-full pointer-events-none -translate-x-1/2 translate-y-1/2" />
           
@@ -142,7 +133,7 @@ export default async function HomePage() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
               </span>
-              Nowość
+              NowoĹ›Ä‡
             </div>
             
             <h2 className="font-serif text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
@@ -150,7 +141,7 @@ export default async function HomePage() {
             </h2>
             
             <p className="text-gray-400 text-lg mb-10 leading-relaxed font-light">
-              Zainstaluj naszą dedykowaną aplikację na macOS lub Windows. Zamawiaj swoje ulubione słoiki prosto z pulpitu, bez konieczności otwierania przeglądarki. Bezpiecznie, stabilnie i w mgnieniu oka.
+              Zainstaluj naszÄ… dedykowanÄ… aplikacjÄ™ na macOS lub Windows. Zamawiaj swoje ulubione sĹ‚oiki prosto z pulpitu, bez koniecznoĹ›ci otwierania przeglÄ…darki. Bezpiecznie, stabilnie i w mgnieniu oka.
             </p>
             
             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
@@ -178,15 +169,13 @@ export default async function HomePage() {
                 href="/download" 
                 className="px-8 py-4 bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/5 text-white rounded-full font-semibold transition-all w-full sm:w-auto flex items-center justify-center"
               >
-                Więcej informacji
+                WiÄ™cej informacji
               </Link>
             </div>
           </div>
           
-          {/* Mockup Illustration */}
           <div className="relative z-10 lg:w-1/3 w-full max-w-sm mx-auto lg:mx-0 aspect-[4/3] bg-gradient-to-br from-white/10 to-transparent border border-white/10 rounded-2xl p-2 shadow-2xl flex items-center justify-center group-hover:-translate-y-2 group-hover:rotate-1 transition-all duration-500">
             <div className="w-full h-full bg-[#0a0a0a] rounded-xl overflow-hidden relative border border-white/5 flex flex-col">
-              {/* Fake window header */}
               <div className="h-6 bg-white/5 border-b border-white/10 flex items-center px-3 gap-1.5">
                 <div className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
                 <div className="w-2.5 h-2.5 rounded-full bg-amber-500/80" />

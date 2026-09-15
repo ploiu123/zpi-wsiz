@@ -1,20 +1,18 @@
-/** Wartości zapisywane w kolumnie `orders.status` — muszą być spójne w całej aplikacji. */
-export const ORDER_STATUS_OPTIONS = [
+﻿export const ORDER_STATUS_OPTIONS = [
   { value: 'nowe', label: 'Nowe' },
   { value: 'w realizacji', label: 'W realizacji' },
-  { value: 'wysłane', label: 'Wysłane' },
+  { value: 'wysĹ‚ane', label: 'WysĹ‚ane' },
   { value: 'dostarczone', label: 'Dostarczone' },
   { value: 'anulowane', label: 'Anulowane' },
 ] as const
 
 export type OrderStatusValue = (typeof ORDER_STATUS_OPTIONS)[number]['value']
 
-/** Mapowanie starych etykiet z wcześniejszej wersji panelu na wartości w bazie. */
 const LEGACY_STATUS_MAP: Record<string, OrderStatusValue> = {
   Nowe: 'nowe',
   'W trakcie realizacji': 'w realizacji',
-  'Wysłane do kuriera': 'wysłane',
-  Zakończone: 'dostarczone',
+  'WysĹ‚ane do kuriera': 'wysĹ‚ane',
+  ZakoĹ„czone: 'dostarczone',
   Anulowane: 'anulowane',
 }
 

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/navbar";
@@ -10,8 +10,8 @@ const inter = Inter({ subsets: ["latin", "latin-ext"], variable: "--font-inter" 
 const playfair = Playfair_Display({ subsets: ["latin", "latin-ext"], variable: "--font-playfair" });
 
 export const metadata: Metadata = {
-  title: "Złote Miody — Naturalne miody prosto z pasieki",
-  description: "Sklep z naturalnymi miodami. Pyłek pszczeli, miód akacjowy, lipowy, faceliowy i więcej. Zamów online z dostawą.",
+  title: "ZĹ‚ote Miody â€” Naturalne miody prosto z pasieki",
+  description: "Sklep z naturalnymi miodami. PyĹ‚ek pszczeli, miĂłd akacjowy, lipowy, faceliowy i wiÄ™cej. ZamĂłw online z dostawÄ….",
 };
 
 export default function RootLayout({
@@ -23,7 +23,6 @@ export default function RootLayout({
     <html lang="pl" className="dark scroll-smooth" suppressHydrationWarning>
       <head>
         <meta name="color-scheme" content="dark light" />
-        {/* Blocking script: set theme class BEFORE first paint to prevent flash */}
         <script dangerouslySetInnerHTML={{ __html: `
           (function() {
             try {
@@ -46,7 +45,7 @@ export default function RootLayout({
         <ToastProvider>
           <RealtimeClientListener />
           <Navbar />
-          <main className="min-h-screen"><a href="#main-content" className="skip-link">Przejdź do treści</a>
+          <main className="min-h-screen"><a href="#main-content" className="skip-link">PrzejdĹş do treĹ›ci</a>
         <main id="main-content" role="main" className="page-enter flex-grow">
           {children}
         </main></main>

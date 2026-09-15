@@ -8,7 +8,6 @@ export default async function ProductDetailPage(props: { params: Promise<{ id: s
   const params = await props.params
   const supabase = await createClient()
 
-  // Pobierz produkt
   const { data: product } = await supabase
     .from('products')
     .select('*')
@@ -19,7 +18,6 @@ export default async function ProductDetailPage(props: { params: Promise<{ id: s
     notFound()
   }
 
-  // Pobierz podobne produkty
   const { data: similar } = await supabase
     .from('products')
     .select('id, name, image_url, price')
@@ -30,7 +28,6 @@ export default async function ProductDetailPage(props: { params: Promise<{ id: s
     <div className="pt-32 pb-16 px-4 md:px-8 max-w-6xl mx-auto">
       <div className="bg-[#111] border border-white/10 rounded-3xl overflow-hidden flex flex-col md:flex-row">
         
-        {/* Lewa strona - Obraz */}
         <div className="md:w-1/2 relative bg-white/5 aspect-square md:aspect-auto md:min-h-[500px]">
           {product.image_url ? (
             <Image 
@@ -47,7 +44,6 @@ export default async function ProductDetailPage(props: { params: Promise<{ id: s
           )}
         </div>
         
-        {/* Prawa strona - Opis */}
         <div className="md:w-1/2 p-8 md:p-12 flex flex-col justify-center">
            <div className="inline-block px-3 py-1 bg-amber-500/10 text-amber-500 text-xs font-bold rounded-full mb-4 uppercase tracking-wider w-max border border-amber-500/20">
              {product.category || '🐝 Miód'}

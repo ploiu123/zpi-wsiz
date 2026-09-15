@@ -24,11 +24,9 @@ export default function CheckoutPage() {
     const supabase = createClient()
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (!user) {
-        // Redirection for non-logged users
         router.push('/login?redirect=/checkout')
       } else {
         setUserId(user.id)
-        // Opcjonalnie załaduj z bazy (profiles) dane
         supabase.from('profiles').select('address, city, postal_code').eq('id', user.id).single()
           .then(({data}) => {
              if(data) {
@@ -60,7 +58,6 @@ export default function CheckoutPage() {
     const supabase = createClient()
 
     try {
-      // Użycie RPC dla zapewnienia atomowej zmiany stocku
       const orderItemsToInsert = items.map(item => ({
         product_id: item.product.id,
         product_name: item.product.name,
@@ -80,7 +77,6 @@ export default function CheckoutPage() {
 
       if (rpcError) throw new Error(rpcError.message)
 
-      // Sukces
       clearCart();
       router.push(`/dashboard?success=true&order_id=${orderId}`);
 

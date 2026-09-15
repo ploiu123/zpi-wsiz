@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+﻿import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string || 'sk_test_123', {
@@ -15,7 +15,6 @@ export async function POST(req: Request) {
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
-    // Przekształcamy elementy koszyka na typy Stripe (Line Items)
     const lineItems = items.map((item: any) => ({
       price_data: {
         currency: 'pln',
@@ -23,20 +22,19 @@ export async function POST(req: Request) {
           name: item.product.name,
           images: item.product.image_url ? [item.product.image_url] : [],
         },
-        unit_amount: Math.round(item.product.price * 100), // Stripe używa groszy
+        unit_amount: Math.round(item.product.price * 100),
       },
       quantity: item.quantity,
     }));
 
-    // Tworzenie sesji Checkout w Stripe
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card', 'blik'], // Wsparcie dla karty i np blika
+      payment_method_types: ['card', 'blik'],
       line_items: lineItems,
       mode: 'payment',
       success_url: `${appUrl}/dashboard?success=true&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${appUrl}/checkout?canceled=true`,
       metadata: {
-        orderId: orderId, // Pamiętamy ID zamówienia Supabase
+        orderId: orderId,
       },
     });
 
@@ -44,7 +42,7 @@ export async function POST(req: Request) {
   } catch (error: any) {
     console.error('Stripe error:', error);
     return NextResponse.json(
-      { error: 'Wystąpił błąd przy inicjalizacji płatności Stripe.' },
+      { error: 'WystÄ…piĹ‚ bĹ‚Ä…d przy inicjalizacji pĹ‚atnoĹ›ci Stripe.' },
       { status: 500 }
     );
   }

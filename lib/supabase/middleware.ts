@@ -1,4 +1,4 @@
-import { createServerClient } from '@supabase/ssr'
+﻿import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 import { isAdminRole } from '@/lib/roles'
 import { isAdminEmail } from '@/lib/admin-emails'
@@ -29,7 +29,6 @@ export async function updateSession(request: NextRequest) {
 
   const path = request.nextUrl.pathname
 
-  // Chroń ścieżki wymagające logowania
   const protectedPaths = ['/dashboard', '/checkout', '/admin']
   const isProtected = protectedPaths.some((p) => path.startsWith(p))
 
@@ -41,7 +40,6 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // Chroń admin — sprawdź rolę (najpierw sync profilu z bazy auth — naprawia brak wiersza / starą rolę)
   if (path.startsWith('/admin') && user) {
     const { error: rpcErr } = await supabase.rpc('sync_profile')
     if (rpcErr) {
