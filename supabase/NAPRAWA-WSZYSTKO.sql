@@ -327,7 +327,7 @@ IMMUTABLE
 AS $$
 BEGIN
   -- Poprawny polski tekst nie zawiera Ã, Ä, Ĺ ani â€ — zostawiamy bez zmian.
-  IF p IS NULL OR p !~ '(Ã|Ä|Ĺ|â€)' THEN
+  IF p IS NULL OR p !~ '[ÂĂÄĹâ]' THEN
     RETURN p;
   END IF;
   BEGIN
@@ -342,19 +342,19 @@ SET name        = public.fix_mojibake(name),
     description = public.fix_mojibake(description),
     category    = public.fix_mojibake(category),
     updated_at  = now()
-WHERE name ~ '(Ã|Ä|Ĺ|â€)' OR description ~ '(Ã|Ä|Ĺ|â€)' OR category ~ '(Ã|Ä|Ĺ|â€)';
+WHERE name ~ '[ÂĂÄĹâ]' OR description ~ '[ÂĂÄĹâ]' OR category ~ '[ÂĂÄĹâ]';
 
 -- order_items trzyma własną kopię nazwy z chwili złożenia zamówienia.
 UPDATE public.order_items
 SET product_name = public.fix_mojibake(product_name)
-WHERE product_name ~ '(Ã|Ä|Ĺ|â€)';
+WHERE product_name ~ '[ÂĂÄĹâ]';
 
 UPDATE public.profiles
 SET full_name = public.fix_mojibake(full_name),
     address   = public.fix_mojibake(address),
     city      = public.fix_mojibake(city),
     updated_at = now()
-WHERE full_name ~ '(Ã|Ä|Ĺ|â€)' OR address ~ '(Ã|Ä|Ĺ|â€)' OR city ~ '(Ã|Ä|Ĺ|â€)';
+WHERE full_name ~ '[ÂĂÄĹâ]' OR address ~ '[ÂĂÄĹâ]' OR city ~ '[ÂĂÄĹâ]';
 
 DROP FUNCTION public.fix_mojibake(text);
 
@@ -398,9 +398,9 @@ WHERE n.nspname = 'public'
 ORDER BY p.proname;
 
 -- 5c. Czy zostało zepsute kodowanie? Wszystko powinno być 0.
-SELECT count(*) FILTER (WHERE name ~ '(Ã|Ä|Ĺ|â€)')        AS zepsute_nazwy,
-       count(*) FILTER (WHERE description ~ '(Ã|Ä|Ĺ|â€)') AS zepsute_opisy,
-       count(*) FILTER (WHERE category ~ '(Ã|Ä|Ĺ|â€)')    AS zepsute_kategorie,
+SELECT count(*) FILTER (WHERE name ~ '[ÂĂÄĹâ]')        AS zepsute_nazwy,
+       count(*) FILTER (WHERE description ~ '[ÂĂÄĹâ]') AS zepsute_opisy,
+       count(*) FILTER (WHERE category ~ '[ÂĂÄĹâ]')    AS zepsute_kategorie,
        count(*)                                     AS wszystkich_produktow
 FROM public.products;
 
