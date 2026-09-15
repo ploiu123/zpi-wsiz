@@ -5,6 +5,7 @@ import { AdminProductCatalog } from './admin-product-catalog'
 import { AdminRealtimeListener } from './admin-realtime-listener'
 import type { Product } from '@/lib/types'
 import { isAdminRole } from '@/lib/roles'
+import { unstable_rethrow } from 'next/navigation'
 
 export default async function AdminPage() {
   try {
@@ -130,6 +131,9 @@ export default async function AdminPage() {
       </div>
     )
   } catch (error: any) {
+    // Bez tego try/catch połykał wewnętrzne wyjątki Next.js (DynamicServerError),
+    // co dawało pustą odpowiedź zamiast strony. To był pierwotny powód awarii panelu.
+    unstable_rethrow(error)
     return (
       <div className="p-8 max-w-3xl mx-auto mt-24 bg-red-500/10 border border-red-500/30 rounded-2xl text-red-400">
         <h2 className="text-xl font-bold mb-4">Wystąpił błąd podczas ładowania Panelu Admina:</h2>
