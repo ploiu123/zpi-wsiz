@@ -5,6 +5,7 @@ import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { ToastProvider } from "@/components/toast";
 import { RealtimeClientListener } from "@/components/realtime-client-listener";
+import { CartAuthSync } from "@/components/cart-auth-sync";
 
 const inter = Inter({ subsets: ["latin", "latin-ext"], variable: "--font-inter" });
 const playfair = Playfair_Display({ subsets: ["latin", "latin-ext"], variable: "--font-playfair" });
@@ -44,6 +45,7 @@ export default function RootLayout({
       <body className={`${inter.variable} ${playfair.variable} font-sans bg-[#0a0a0a] text-white antialiased`}>
         <ToastProvider>
           <RealtimeClientListener />
+          <CartAuthSync />
           <a href="#main-content" className="skip-link">Przejdź do treści</a>
           <Navbar />
           <main id="main-content" className="min-h-screen page-enter flex-grow">

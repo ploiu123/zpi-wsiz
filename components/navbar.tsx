@@ -6,6 +6,7 @@ import { useCartStore } from '@/lib/store'
 import { useCallback, useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { isAdminRole } from '@/lib/roles'
+import { logoutAndClearCart } from '@/lib/auth/logout'
 import { isAdminEmail } from '@/lib/admin-emails'
 import { ShoppingCart, User, Menu, X, LogOut, Moon, Sun, Settings, Download } from 'lucide-react'
 
@@ -64,9 +65,7 @@ export function Navbar() {
   }, [isDark])
 
   const handleLogout = useCallback(async () => {
-    const supabase = createClient()
-    useCartStore.getState().clearCart()
-    await supabase.auth.signOut()
+    await logoutAndClearCart()
     setUser(null)
     setIsAdmin(false)
     window.location.href = '/'

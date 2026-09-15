@@ -3,13 +3,26 @@ import { persist } from 'zustand/middleware'
 import { CartItem, Product } from '@/lib/types'
 import { createClient } from '@/lib/supabase/client'
 
-interface CartStore {
+/** Czas życia rezerwacji koszyka: 30 minut (zgodne z cleanup_expired_reservations w bazie). */
+export const RESERVATION_MS = 30 * 60 * 1000
+
+/** Kształt danych faktycznie trzymanych w localStorage — nigdy funkcje. */
+interface PersistedCart {
   cartId: string
+  ownerId: string | null
   items: CartItem[]
+  reservedUntil: number | null
+}
+
+interface CartStore extends PersistedCart {
   addItem: (product: Product, quantity?: number) => Promise<boolean>
   removeItem: (productId: string) => Promise<void>
   updateQuantity: (productId: string, quantity: number) => Promise<boolean>
   clearCart: () => Promise<void>
+  /** Wiąże koszyk z użytkownikiem. Czyści items, gdy zapisany ownerId jest inny. */
+  bindToUser: (userId: string | null) => void
+  /** Czyści koszyk, gdy rezerwacja wygasła. Zwraca true, jeśli coś wyczyszczono. */
+  pruneIfExpired: () => boolean
   getTotal: () => number
   getItemCount: () => number
   syncCart: () => Promise<string[]>
@@ -30,7 +43,9 @@ export const useCartStore = create<CartStore>()(
   persist(
     (set, get) => ({
       cartId: '',
+      ownerId: null,
       items: [],
+      reservedUntil: null,
 
       addItem: async (product, quantity = 1) => {
         let currentCartId = get().cartId
@@ -56,9 +71,11 @@ export const useCartStore = create<CartStore>()(
           }
 
           set((state) => {
+            const reservedUntil = Date.now() + RESERVATION_MS
             const hasExisting = state.items.some((i) => i.product.id === product.id)
             if (hasExisting) {
               return {
+                reservedUntil,
                 items: state.items.map((i) =>
                   i.product.id === product.id
                     ? { ...i, quantity: i.quantity + quantity }
@@ -66,7 +83,7 @@ export const useCartStore = create<CartStore>()(
                 ),
               }
             }
-            return { items: [...state.items, { product, quantity }] }
+            return { reservedUntil, items: [...state.items, { product, quantity }] }
           })
           return true
         } catch (err) {
@@ -90,9 +107,10 @@ export const useCartStore = create<CartStore>()(
           }
         }
 
-        set((state) => ({
-          items: state.items.filter((i) => i.product.id !== productId),
-        }))
+        set((state) => {
+          const items = state.items.filter((i) => i.product.id !== productId)
+          return { items, reservedUntil: items.length > 0 ? state.reservedUntil : null }
+        })
       },
 
       updateQuantity: async (productId, quantity) => {
@@ -118,6 +136,7 @@ export const useCartStore = create<CartStore>()(
           }
 
           set((state) => ({
+            reservedUntil: Date.now() + RESERVATION_MS,
             items: state.items.map((i) =>
               i.product.id === productId ? { ...i, quantity } : i
             ),
@@ -146,7 +165,25 @@ export const useCartStore = create<CartStore>()(
             }
           }
         }
-        set({ items: [] })
+        set({ items: [], reservedUntil: null })
+      },
+
+      bindToUser: (userId) => {
+        const { ownerId } = get()
+        if (ownerId === userId) return
+        // Inny właściciel niż zapisany — porzucamy koszyk poprzedniego konta.
+        // Czyścimy wyłącznie lokalnie: rezerwacji konta A i tak nie usuniemy
+        // będąc zalogowanym jako B (RLS), wygasną same po 30 minutach.
+        set({ ownerId: userId, items: [], reservedUntil: null, cartId: '' })
+      },
+
+      pruneIfExpired: () => {
+        const { reservedUntil, items } = get()
+        if (reservedUntil !== null && items.length > 0 && Date.now() > reservedUntil) {
+          set({ items: [], reservedUntil: null })
+          return true
+        }
+        return false
       },
 
       syncCart: async () => {
@@ -235,6 +272,26 @@ export const useCartStore = create<CartStore>()(
     }),
     {
       name: 'zlote-miody-cart',
+      version: 2,
+      // Do localStorage trafiają wyłącznie dane — nigdy funkcje ze store'u.
+      partialize: (state): PersistedCart => ({
+        cartId: state.cartId,
+        ownerId: state.ownerId,
+        items: state.items,
+        reservedUntil: state.reservedUntil,
+      }),
+      // Koszyk zapisany przed wprowadzeniem ownerId nie ma przypisanego właściciela,
+      // więc mógłby wyciec na cudze konto — porzucamy go.
+      migrate: (persisted: unknown, version: number) => {
+        const prev = (persisted ?? {}) as Partial<PersistedCart>
+        if (version < 2 || prev.ownerId === undefined) {
+          return { cartId: '', ownerId: null, items: [], reservedUntil: null } as PersistedCart
+        }
+        return prev as PersistedCart
+      },
+      onRehydrateStorage: () => (state) => {
+        state?.pruneIfExpired()
+      },
     }
   )
 )

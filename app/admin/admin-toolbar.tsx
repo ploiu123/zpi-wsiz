@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/client'
+import { logoutAndClearCart } from '@/lib/auth/logout'
 import { useRouter } from 'next/navigation'
 import { LogOut, Store } from 'lucide-react'
 
@@ -9,8 +9,7 @@ export function AdminToolbar({ email }: { email: string }) {
   const router = useRouter()
 
   const logout = async () => {
-    const supabase = createClient()
-    await supabase.auth.signOut()
+    await logoutAndClearCart()
     router.push('/')
     router.refresh()
   }
