@@ -2,28 +2,34 @@
 
 import { useState, useEffect } from 'react'
 import { Settings, Moon, Sun, Monitor, Globe, Info, Mail } from 'lucide-react'
+import {
+  applyTheme,
+  readStoredTheme,
+  storeTheme,
+  LIGHT_SCHEME_QUERY,
+  type Theme,
+} from '@/lib/theme'
 
 export default function SettingsPage() {
-  const [theme, setTheme] = useState('system')
+  const [theme, setTheme] = useState<Theme>('system')
 
   useEffect(() => {
-    const saved = localStorage.getItem('theme') || 'system'
-    setTheme(saved)
+    setTheme(readStoredTheme())
   }, [])
 
-  const handleThemeChange = (newTheme) => {
+  // Przy motywie systemowym reagujemy na zmianę ustawień systemu w locie.
+  useEffect(() => {
+    if (theme !== 'system') return
+    const media = window.matchMedia(LIGHT_SCHEME_QUERY)
+    const onChange = () => applyTheme('system')
+    media.addEventListener('change', onChange)
+    return () => media.removeEventListener('change', onChange)
+  }, [theme])
+
+  const handleThemeChange = (newTheme: Theme) => {
     setTheme(newTheme)
-    localStorage.setItem('theme', newTheme)
-    const root = document.documentElement
-    if (newTheme === 'dark') {
-      root.classList.add('dark')
-      root.classList.remove('light')
-    } else if (newTheme === 'light') {
-      root.classList.add('light')
-      root.classList.remove('dark')
-    } else {
-      root.classList.remove('light', 'dark')
-    }
+    storeTheme(newTheme)
+    applyTheme(newTheme)
   }
 
   return (

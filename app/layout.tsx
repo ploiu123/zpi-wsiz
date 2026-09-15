@@ -1,4 +1,4 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/navbar";
@@ -10,8 +10,8 @@ const inter = Inter({ subsets: ["latin", "latin-ext"], variable: "--font-inter" 
 const playfair = Playfair_Display({ subsets: ["latin", "latin-ext"], variable: "--font-playfair" });
 
 export const metadata: Metadata = {
-  title: "ZĹ‚ote Miody â€” Naturalne miody prosto z pasieki",
-  description: "Sklep z naturalnymi miodami. PyĹ‚ek pszczeli, miĂłd akacjowy, lipowy, faceliowy i wiÄ™cej. ZamĂłw online z dostawÄ….",
+  title: "Złote Miody — Naturalne miody prosto z pasieki",
+  description: "Sklep z naturalnymi miodami. Pyłek pszczeli, miód akacjowy, lipowy, faceliowy i więcej. Zamów online z dostawą.",
 };
 
 export default function RootLayout({
@@ -23,17 +23,17 @@ export default function RootLayout({
     <html lang="pl" className="dark scroll-smooth" suppressHydrationWarning>
       <head>
         <meta name="color-scheme" content="dark light" />
+        {/* Blocking script: set theme class BEFORE first paint to prevent flash.
+            Musi być inline (bez importów) — logika lustrzana do lib/theme.ts. */}
         <script dangerouslySetInnerHTML={{ __html: `
           (function() {
             try {
               var t = localStorage.getItem('theme');
-              if (t === 'light') {
-                document.documentElement.classList.remove('dark');
-                document.documentElement.classList.add('light');
-              } else {
-                document.documentElement.classList.remove('light');
-                document.documentElement.classList.add('dark');
+              if (t !== 'light' && t !== 'dark') {
+                t = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
               }
+              document.documentElement.classList.toggle('light', t === 'light');
+              document.documentElement.classList.toggle('dark', t === 'dark');
             } catch(e) {}
             if (typeof navigator !== 'undefined' && (navigator.userAgent.toLowerCase().includes('electron') || navigator.userAgent.toLowerCase().includes('zlotemiodyapp'))) {
               document.documentElement.classList.add('is-electron');
@@ -44,11 +44,11 @@ export default function RootLayout({
       <body className={`${inter.variable} ${playfair.variable} font-sans bg-[#0a0a0a] text-white antialiased`}>
         <ToastProvider>
           <RealtimeClientListener />
+          <a href="#main-content" className="skip-link">Przejdź do treści</a>
           <Navbar />
-          <main className="min-h-screen"><a href="#main-content" className="skip-link">PrzejdĹş do treĹ›ci</a>
-        <main id="main-content" role="main" className="page-enter flex-grow">
-          {children}
-        </main></main>
+          <main id="main-content" className="min-h-screen page-enter flex-grow">
+            {children}
+          </main>
           <Footer />
         </ToastProvider>
       </body>
