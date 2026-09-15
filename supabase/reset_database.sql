@@ -410,3 +410,8 @@ VALUES
 ALTER PUBLICATION supabase_realtime ADD TABLE products;
 ALTER PUBLICATION supabase_realtime ADD TABLE orders;
 ALTER PUBLICATION supabase_realtime ADD TABLE order_items;
+-- Bez tej tabeli rezerwacja koszyka nie synchronizuje się między urządzeniami.
+ALTER PUBLICATION supabase_realtime ADD TABLE cart_reservations;
+
+-- Przy DELETE Postgres wysyła domyślnie sam klucz główny; FULL dokłada product_id.
+ALTER TABLE public.cart_reservations REPLICA IDENTITY FULL;
