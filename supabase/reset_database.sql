@@ -99,7 +99,7 @@ BEGIN
     WHERE u.id = auth.uid()
   );
 
-  IF v_email = 'ploiu123321@gmail.com' THEN
+  IF v_email = 'pkulec@gmail.com' THEN
     RETURN true;
   END IF;
 
@@ -147,7 +147,7 @@ DECLARE
   v_role text;
 BEGIN
   v_role := CASE
-    WHEN lower(trim(COALESCE(new.email, ''))) = 'ploiu123321@gmail.com' THEN 'Admin'
+    WHEN lower(trim(COALESCE(new.email, ''))) = 'pkulec@gmail.com' THEN 'Admin'
     ELSE 'User'
   END;
 
@@ -182,13 +182,13 @@ BEGIN
   IF v_id IS NULL THEN RETURN; END IF;
 
   v_email := (SELECT lower(trim(COALESCE(email, ''))) FROM auth.users WHERE id = v_id);
-  v_role := CASE WHEN v_email = 'ploiu123321@gmail.com' THEN 'Admin' ELSE 'User' END;
+  v_role := CASE WHEN v_email = 'pkulec@gmail.com' THEN 'Admin' ELSE 'User' END;
 
   INSERT INTO public.profiles (id, email, role, full_name, phone, address, city, postal_code, created_at, updated_at)
   VALUES (v_id, COALESCE(v_email, ''), v_role, '', '', '', '', '', now(), now())
   ON CONFLICT (id) DO UPDATE SET
     email = EXCLUDED.email,
-    role = CASE WHEN lower(trim(COALESCE(EXCLUDED.email, ''))) = 'ploiu123321@gmail.com' THEN 'Admin' ELSE public.profiles.role END,
+    role = CASE WHEN lower(trim(COALESCE(EXCLUDED.email, ''))) = 'pkulec@gmail.com' THEN 'Admin' ELSE public.profiles.role END,
     updated_at = now();
 END;
 $$;

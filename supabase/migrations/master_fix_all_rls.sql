@@ -26,7 +26,7 @@ BEGIN
   );
 
   -- Admin po mailu
-  IF v_email = 'ploiu123321@gmail.com' THEN
+  IF v_email = 'pkulec@gmail.com' THEN
     RETURN true;
   END IF;
 
@@ -50,7 +50,7 @@ CREATE POLICY "profiles_select_self_or_admin" ON public.profiles FOR SELECT TO a
   OR EXISTS (
     SELECT 1 FROM auth.users u
     WHERE u.id = auth.uid()
-      AND lower(trim(COALESCE(u.email, ''))) = 'ploiu123321@gmail.com'
+      AND lower(trim(COALESCE(u.email, ''))) = 'pkulec@gmail.com'
   )
 );
 
