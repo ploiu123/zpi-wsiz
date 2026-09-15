@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { createClient } from '@/lib/supabase/client'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -86,9 +86,9 @@ function DashboardContent() {
     }).eq('id', user.id)
 
     if (error) {
-       setSaveStatus({ success: false, msg: 'WystÄ…piĹ‚ bĹ‚Ä…d podczas zapisywania: ' + error.message })
+       setSaveStatus({ success: false, msg: 'Wystąpił błąd podczas zapisywania: ' + error.message })
     } else {
-       setSaveStatus({ success: true, msg: 'PomyĹ›lnie zaktualizowano dane profilowe.' })
+       setSaveStatus({ success: true, msg: 'Pomyślnie zaktualizowano dane profilowe.' })
     }
   }
 
@@ -100,17 +100,17 @@ function DashboardContent() {
       {isSuccess && (
         <div className="bg-green-500/10 border border-green-500/30 text-green-400 p-6 rounded-2xl mb-8 flex items-center justify-center text-center">
           <div>
-            <h2 className="font-bold text-xl mb-2">DziÄ™kujemy za zamĂłwienie!</h2>
-            <p>ZostaĹ‚o ono poprawnie zapisane w naszym systemie.</p>
+            <h2 className="font-bold text-xl mb-2">Dziękujemy za zamówienie!</h2>
+            <p>Zostało ono poprawnie zapisane w naszym systemie.</p>
           </div>
         </div>
       )}
 
       {notice === 'admin_only' && (
         <div className="bg-amber-500/10 border border-amber-500/30 text-amber-200 p-6 rounded-2xl mb-8 text-center">
-          <h2 className="font-bold text-lg mb-1">DostÄ™p wyĹ‚Ä…cznie dla administratora</h2>
+          <h2 className="font-bold text-lg mb-1">Dostęp wyłącznie dla administratora</h2>
           <p className="text-sm text-gray-400">
-            Adres <span className="text-gray-200">/admin</span> jest zarezerwowany dla kont z rolÄ… administratora. JeĹ›li prowadzisz sklep, nadaj rolÄ™ w panelu Supabase (tabela{' '}
+            Adres <span className="text-gray-200">/admin</span> jest zarezerwowany dla kont z rolą administratora. Jeśli prowadzisz sklep, nadaj rolę w panelu Supabase (tabela{' '}
             <code className="text-amber-400/90">profiles</code>).
           </p>
         </div>
@@ -119,7 +119,7 @@ function DashboardContent() {
       <div className="flex justify-between items-end mb-8 border-b border-white/10 pb-4">
         <div>
           <h1 className="font-serif text-3xl font-bold text-amber-500 mb-2">Moje konto</h1>
-          <p className="text-gray-400">ZarzÄ…dzaj swoimi danymi do wysyĹ‚ki oraz przeglÄ…daj historiÄ™ zakupĂłw.</p>
+          <p className="text-gray-400">Zarządzaj swoimi danymi do wysyłki oraz przeglądaj historię zakupów.</p>
         </div>
       </div>
 
@@ -142,7 +142,7 @@ function DashboardContent() {
               </div>
               
               <div>
-                <label className="block text-xs font-medium text-gray-400 mb-1">ImiÄ™ i nazwisko</label>
+                <label className="block text-xs font-medium text-gray-400 mb-1">Imię i nazwisko</label>
                 <input required value={fullName} onChange={e => setFullName(e.target.value)} className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-2 text-white focus:outline-none focus:border-amber-500" />
               </div>
 
@@ -152,7 +152,7 @@ function DashboardContent() {
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-gray-400 mb-1">Adres wysyĹ‚ki (ulica, nr)</label>
+                <label className="block text-xs font-medium text-gray-400 mb-1">Adres wysyłki (ulica, nr)</label>
                 <input required value={address} onChange={e => setAddress(e.target.value)} className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-2 text-white focus:outline-none focus:border-amber-500" />
               </div>
 
@@ -175,11 +175,11 @@ function DashboardContent() {
         </div>
 
         <div className="lg:col-span-7 space-y-6">
-          <h2 className="font-bold text-white text-2xl px-2">Historia zamĂłwieĹ„</h2>
+          <h2 className="font-bold text-white text-2xl px-2">Historia zamówień</h2>
           
           {orders.length === 0 ? (
             <div className="bg-[#111] border border-white/10 rounded-2xl p-12 text-center text-gray-400">
-              Nie masz jeszcze ĹĽadnych zĹ‚oĹĽonych zamĂłwieĹ„.
+              Nie masz jeszcze żadnych złożonych zamówień.
             </div>
           ) : (
             <div className="space-y-6">
@@ -187,11 +187,11 @@ function DashboardContent() {
                 <div key={order.id} className="bg-[#111] border border-white/10 rounded-2xl p-6">
                   <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-4 pb-4 border-b border-white/10">
                     <div>
-                      <div className="text-sm text-gray-400">ZamĂłwienie w trakcie realizacji</div>
+                      <div className="text-sm text-gray-400">Zamówienie w trakcie realizacji</div>
                       <div className="text-xs text-gray-500 font-mono mt-1">Stworzono: {new Date(order.created_at).toLocaleDateString('pl-PL')}</div>
                     </div>
                     <div className="text-right">
-                      <div className="text-amber-500 font-bold text-xl">{order.total_amount.toFixed(2)} zĹ‚</div>
+                      <div className="text-amber-500 font-bold text-xl">{order.total_amount.toFixed(2)} zł</div>
                       <div className="inline-block px-3 py-1 bg-amber-500/10 text-amber-500 text-xs font-bold rounded-full mt-2 uppercase tracking-wider">
                         {e(order.status)}
                       </div>
@@ -206,7 +206,7 @@ function DashboardContent() {
                           {item.product_name}
                         </div>
                         <div className="font-medium text-gray-300">
-                          {(item.price * item.quantity).toFixed(2)} zĹ‚
+                          {(item.price * item.quantity).toFixed(2)} zł
                         </div>
                       </div>
                     ))}

@@ -1,4 +1,4 @@
-﻿import { NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string || 'sk_test_123', {
@@ -42,7 +42,7 @@ export async function POST(req: Request) {
   } catch (error: any) {
     console.error('Stripe error:', error);
     return NextResponse.json(
-      { error: 'WystÄ…piĹ‚ bĹ‚Ä…d przy inicjalizacji pĹ‚atnoĹ›ci Stripe.' },
+      { error: 'Wystąpił błąd przy inicjalizacji płatności Stripe.' },
       { status: 500 }
     );
   }

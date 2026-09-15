@@ -1,4 +1,4 @@
-﻿
+
 CREATE TABLE IF NOT EXISTS public.cart_reservations (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   cart_id text NOT NULL,
@@ -90,7 +90,7 @@ BEGIN
 
   IF v_diff > 0 THEN
     IF v_current_stock < v_diff THEN
-      RAISE EXCEPTION 'NiewystarczajÄ…ca iloĹ›Ä‡ w magazynie. DostÄ™pne: %', v_current_stock;
+      RAISE EXCEPTION 'Niewystarczająca ilość w magazynie. Dostępne: %', v_current_stock;
     END IF;
 
     UPDATE public.products

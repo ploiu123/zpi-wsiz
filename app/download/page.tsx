@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useEffect, useState } from 'react'
 import { Monitor, Download, Apple, Shield, Zap, HardDrive, RefreshCw, ArrowRight, Check, Laptop } from 'lucide-react'
@@ -9,7 +9,7 @@ export default function DownloadPage() {
   const [isElectron, setIsElectron] = useState(false)
   
   useEffect(() => {
-    document.title = 'Pobierz aplikacjÄ™ desktopowÄ… | ZĹ‚ote Miody'
+    document.title = 'Pobierz aplikację desktopową | Złote Miody'
     const ua = navigator.userAgent.toLowerCase()
     if (ua.includes('mac')) setDetectedOS('mac')
     else if (ua.includes('win')) setDetectedOS('win')
@@ -27,10 +27,10 @@ export default function DownloadPage() {
             Aplikacja uruchomiona
           </h1>
           <p className="text-gray-400 text-sm leading-relaxed mb-8">
-            Korzystasz juĹĽ z oficjalnej aplikacji desktopowej ZĹ‚ote Miody. Masz zainstalowanÄ… najnowszÄ… wersjÄ™.
+            Korzystasz już z oficjalnej aplikacji desktopowej Złote Miody. Masz zainstalowaną najnowszą wersję.
           </p>
           <Link href="/" className="inline-flex items-center gap-2 px-8 py-3.5 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-full font-bold hover:shadow-lg hover:shadow-amber-500/30 transition-all hover:-translate-y-0.5 w-full justify-center">
-            PrzejdĹş do sklepu
+            Przejdź do sklepu
           </Link>
         </div>
       </div>
@@ -44,11 +44,11 @@ export default function DownloadPage() {
            <Laptop className="w-10 h-10 text-amber-500" />
         </div>
         <h1 className="font-serif text-4xl md:text-6xl font-bold text-amber-500 mb-6">
-          Miody na wyciÄ…gniÄ™cie rÄ™ki
+          Miody na wyciągnięcie ręki
         </h1>
         <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-          Aplikacja desktopowa dla miĹ‚oĹ›nikĂłw naszego miodu â€” szybkie powtĂłrne zamĂłwienia, 
-          historia zakupĂłw i peĹ‚ny sklep bez otwierania przeglÄ…darki.
+          Aplikacja desktopowa dla miłośników naszego miodu — szybkie powtórne zamówienia, 
+          historia zakupów i pełny sklep bez otwierania przeglądarki.
         </p>
       </div>
 
@@ -65,7 +65,7 @@ export default function DownloadPage() {
             </div>
             <h2 className="text-2xl font-bold text-white mb-2">Dla macOS</h2>
             <p className="text-gray-400 text-sm mb-2">Apple Silicon (M1 / M2 / M3 / M4)</p>
-            <p className="text-gray-500 text-xs mb-8">Format: DMG â€˘ ~100 MB â€˘ v1.0.0</p>
+            <p className="text-gray-500 text-xs mb-8">Format: DMG • ~100 MB • v1.0.0</p>
             <a
               href="/api/download/macos"
               download="ZloteMiody-macOS.dmg"
@@ -87,7 +87,7 @@ export default function DownloadPage() {
             </div>
             <h2 className="text-2xl font-bold text-white mb-2">Dla Windows</h2>
             <p className="text-gray-400 text-sm mb-2">Windows 10 / 11 (64-bit)</p>
-            <p className="text-gray-500 text-xs mb-8">Format: EXE â€˘ ~82 MB â€˘ v1.0.0</p>
+            <p className="text-gray-500 text-xs mb-8">Format: EXE • ~82 MB • v1.0.0</p>
             <a
               href="/api/download/windows"
               download="ZloteMiody-Windows.exe"
@@ -102,25 +102,25 @@ export default function DownloadPage() {
 
       <div className="mt-12 bg-amber-500/5 border border-amber-500/10 rounded-2xl p-6 md:p-8 text-left max-w-3xl mx-auto shadow-xl">
         <h3 className="text-amber-500 font-bold text-lg mb-3 flex items-center gap-2">
-          đź’ˇ WaĹĽna informacja przed instalacjÄ…
+          💡 Ważna informacja przed instalacją
         </h3>
         <p className="text-gray-400 text-sm mb-6 leading-relaxed">
-          PoniewaĹĽ aplikacja nie przechodzi procesu pĹ‚atnej notyfikacji w sklepach Apple/Microsoft (jest to niekomercyjny projekt akademicki), system operacyjny moĹĽe wyĹ›wietliÄ‡ ostrzeĹĽenie przed jej uruchomieniem.
+          Ponieważ aplikacja nie przechodzi procesu płatnej notyfikacji w sklepach Apple/Microsoft (jest to niekomercyjny projekt akademicki), system operacyjny może wyświetlić ostrzeżenie przed jej uruchomieniem.
         </p>
         <div className="space-y-4">
           <div className="text-sm">
-            <span className="font-semibold text-white block mb-1">đźŤŽ Dla macOS (komunikat o â€žuszkodzonejâ€ť aplikacji):</span>
+            <span className="font-semibold text-white block mb-1">🍎 Dla macOS (komunikat o „uszkodzonej” aplikacji):</span>
             <p className="text-gray-500 leading-relaxed">
-              JeĹ›li system macOS wyĹ›wietli komunikat o uszkodzeniu pliku i braku moĹĽliwoĹ›ci jego otwarcia, oznacza to, ĹĽe aplikacja nie jest podpisana cyfrowo. OtwĂłrz systemowy <strong>Terminal</strong> i uruchom nastÄ™pujÄ…cÄ… komendÄ™, aby zdjÄ…Ä‡ blokadÄ™:
+              Jeśli system macOS wyświetli komunikat o uszkodzeniu pliku i braku możliwości jego otwarcia, oznacza to, że aplikacja nie jest podpisana cyfrowo. Otwórz systemowy <strong>Terminal</strong> i uruchom następującą komendę, aby zdjąć blokadę:
               <code className="block bg-black/40 text-amber-400 p-3 rounded-lg mt-2 font-mono text-xs select-all border border-white/5">
-                xattr -cr /Applications/ZĹ‚ote\ Miody.app
+                xattr -cr /Applications/Złote\ Miody.app
               </code>
             </p>
           </div>
           <div className="text-sm border-t border-white/5 pt-4">
-            <span className="font-semibold text-white block mb-1">đź’» Dla Windows (SmartScreen):</span>
+            <span className="font-semibold text-white block mb-1">💻 Dla Windows (SmartScreen):</span>
             <p className="text-gray-500 leading-relaxed">
-              Gdy system Windows wyĹ›wietli niebieski filtr SmartScreen z informacjÄ… o ochronieniu komputera przed nieznanÄ… aplikacjÄ…, kliknij odnoĹ›nik <strong>â€žWiÄ™cej informacjiâ€ť</strong>, a nastÄ™pnie wybierz przycisk <strong>â€žUruchom mimo toâ€ť</strong>.
+              Gdy system Windows wyświetli niebieski filtr SmartScreen z informacją o ochronieniu komputera przed nieznaną aplikacją, kliknij odnośnik <strong>„Więcej informacji”</strong>, a następnie wybierz przycisk <strong>„Uruchom mimo to”</strong>.
             </p>
           </div>
         </div>
@@ -132,14 +132,14 @@ export default function DownloadPage() {
             <Zap className="w-6 h-6 text-amber-500" />
           </div>
           <h3 className="text-white font-bold mb-2">Szybkie zamawianie</h3>
-          <p className="text-gray-500 text-sm">Miody na wyciÄ…gniÄ™cie rÄ™ki bez otwierania przeglÄ…darki</p>
+          <p className="text-gray-500 text-sm">Miody na wyciągnięcie ręki bez otwierania przeglądarki</p>
         </div>
         <div className="bg-[#111] border border-white/5 rounded-2xl p-6 text-center">
           <div className="w-12 h-12 bg-amber-500/10 rounded-xl flex items-center justify-center mx-auto mb-4">
             <Shield className="w-6 h-6 text-amber-500" />
           </div>
-          <h3 className="text-white font-bold mb-2">BezpieczeĹ„stwo</h3>
-          <p className="text-gray-500 text-sm">W peĹ‚ni szyfrowane poĹ‚Ä…czenie i autoryzacja OAuth</p>
+          <h3 className="text-white font-bold mb-2">Bezpieczeństwo</h3>
+          <p className="text-gray-500 text-sm">W pełni szyfrowane połączenie i autoryzacja OAuth</p>
         </div>
         <div className="bg-[#111] border border-white/5 rounded-2xl p-6 text-center">
           <div className="w-12 h-12 bg-amber-500/10 rounded-xl flex items-center justify-center mx-auto mb-4">

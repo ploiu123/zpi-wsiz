@@ -1,4 +1,4 @@
-﻿CREATE OR REPLACE FUNCTION public.place_order_with_stock(
+CREATE OR REPLACE FUNCTION public.place_order_with_stock(
   p_user_id uuid,
   p_total_amount numeric,
   p_address text,
@@ -41,7 +41,7 @@ BEGIN
     END IF;
 
     IF v_current_stock < v_qty THEN
-      RAISE EXCEPTION 'NiewystarczajÄ…ca iloĹ›Ä‡ produktu % w magazynie. DostÄ™pne: %', v_name, v_current_stock;
+      RAISE EXCEPTION 'Niewystarczająca ilość produktu % w magazynie. Dostępne: %', v_name, v_current_stock;
     END IF;
 
     UPDATE public.products

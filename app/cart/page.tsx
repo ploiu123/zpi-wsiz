@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useCartStore } from '@/lib/store'
 import Image from 'next/image'
@@ -60,7 +60,7 @@ export default function CartPage() {
         if (prev === null || prev <= 1) {
           clearInterval(timer)
           clearCart().then(() => {
-            addToast('error', 'Rezerwacja wygasĹ‚a. Produkty wrĂłciĹ‚y do sklepu, a koszyk zostaĹ‚ oprĂłĹĽniony.')
+            addToast('error', 'Rezerwacja wygasła. Produkty wróciły do sklepu, a koszyk został opróżniony.')
           })
           return 0
         }
@@ -76,17 +76,17 @@ export default function CartPage() {
   if (items.length === 0) {
     return (
       <div className="pt-32 pb-16 px-4 max-w-4xl mx-auto text-center">
-        <h1 className="font-serif text-3xl font-bold text-white mb-6">đź›’ Koszyk</h1>
+        <h1 className="font-serif text-3xl font-bold text-white mb-6">🛒 Koszyk</h1>
         <div className="bg-[#111] border border-white/10 rounded-2xl p-12">
-          <div className="text-5xl mb-4">đź“­</div>
+          <div className="text-5xl mb-4">📭</div>
           <p className="text-gray-400 mb-8 max-w-md mx-auto text-lg">
-            TwĂłj koszyk jest pusty. SprawdĹş naszÄ… ofertÄ™ i dodaj swoje ulubione miody!
+            Twój koszyk jest pusty. Sprawdź naszą ofertę i dodaj swoje ulubione miody!
           </p>
           <Link 
             href="/#produkty" 
             className="inline-flex py-3 px-8 bg-amber-500 text-white rounded-full font-bold hover:shadow-lg hover:shadow-amber-500/30 transition-all hover:-translate-y-0.5"
           >
-            đźŤŻ PrzejdĹş do produktĂłw
+            🍯 Przejdź do produktów
           </Link>
         </div>
       </div>
@@ -101,13 +101,13 @@ export default function CartPage() {
 
   return (
     <div className="pt-32 pb-16 px-4 md:px-8 max-w-5xl mx-auto animate-fade-in">
-      <h1 className="font-serif text-3xl font-bold text-white mb-6 border-b border-white/10 pb-4">đź›’ TwĂłj koszyk</h1>
+      <h1 className="font-serif text-3xl font-bold text-white mb-6 border-b border-white/10 pb-4">🛒 Twój koszyk</h1>
       
       {timeLeft !== null && timeLeft > 0 && (
         <div className="mb-6 p-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex items-center gap-3 animate-pulse-glow">
           <Clock className="w-5 h-5 text-amber-500 shrink-0" />
           <div className="text-sm md:text-base text-gray-300">
-            Wybrane produkty zostaĹ‚y zarezerwowane specjalnie dla Ciebie na:{' '}
+            Wybrane produkty zostały zarezerwowane specjalnie dla Ciebie na:{' '}
             <span className="font-mono font-bold text-amber-400 text-lg bg-black/40 px-2 py-0.5 rounded border border-amber-500/20 ml-1">
               {formatTime(timeLeft)}
             </span>
@@ -134,7 +134,7 @@ export default function CartPage() {
                 {product.image_url ? (
                   <Image src={product.image_url} alt={product.name} fill className="object-cover" sizes="96px" />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-amber-500 text-2xl">đźŤŻ</div>
+                  <div className="w-full h-full flex items-center justify-center text-amber-500 text-2xl">🍯</div>
                 )}
               </div>
               
@@ -142,14 +142,14 @@ export default function CartPage() {
                 <Link href={`/product/${product.id}`} className="font-serif text-lg font-bold text-white hover:text-amber-500 transition-colors line-clamp-1">
                   {product.name}
                 </Link>
-                <div className="text-amber-400 font-bold mt-1">{product.price.toFixed(2)} zĹ‚</div>
+                <div className="text-amber-400 font-bold mt-1">{product.price.toFixed(2)} zł</div>
               </div>
 
               <div className="flex items-center gap-3 bg-black/50 p-2 rounded-xl border border-white/5">
                 <button 
                   onClick={async () => {
                     const success = await updateQuantity(product.id, quantity - 1)
-                    if (!success) addToast('error', 'Brak wystarczajÄ…cej iloĹ›ci produktu w magazynie.')
+                    if (!success) addToast('error', 'Brak wystarczającej ilości produktu w magazynie.')
                   }}
                   className="p-1 hover:text-amber-500 transition-colors"
                 >
@@ -159,7 +159,7 @@ export default function CartPage() {
                 <button 
                   onClick={async () => {
                     const success = await updateQuantity(product.id, quantity + 1)
-                    if (!success) addToast('error', 'Brak wystarczajÄ…cej iloĹ›ci produktu w magazynie.')
+                    if (!success) addToast('error', 'Brak wystarczającej ilości produktu w magazynie.')
                   }}
                   className="p-1 hover:text-amber-500 transition-colors"
                 >
@@ -171,7 +171,7 @@ export default function CartPage() {
                 <button 
                   onClick={() => removeItem(product.id)}
                   className="p-2 text-gray-400 hover:text-red-500 bg-black/30 rounded-xl hover:bg-black/50 transition-colors"
-                  title="UsuĹ„ z koszyka"
+                  title="Usuń z koszyka"
                 >
                   <Trash2 className="w-5 h-5" />
                 </button>
@@ -182,33 +182,33 @@ export default function CartPage() {
 
         <div className="lg:col-span-1">
           <div className="bg-[#111] border border-white/10 rounded-2xl p-6 sticky top-24">
-            <h2 className="font-serif text-xl font-bold text-white mb-6 pb-4 border-b border-white/10">đź“‹ Podsumowanie</h2>
+            <h2 className="font-serif text-xl font-bold text-white mb-6 pb-4 border-b border-white/10">📋 Podsumowanie</h2>
             
             <div className="space-y-4 mb-6">
               <div className="flex justify-between text-gray-400">
-                <span>WartoĹ›Ä‡ koszyka</span>
-                <span>{getTotal().toFixed(2)} zĹ‚</span>
+                <span>Wartość koszyka</span>
+                <span>{getTotal().toFixed(2)} zł</span>
               </div>
               <div className="flex justify-between flex-wrap text-green-400 text-sm">
-                <span>đź“¦ Koszt dostawy (obliczany w kasie)</span>
+                <span>📦 Koszt dostawy (obliczany w kasie)</span>
               </div>
             </div>
 
             <div className="flex justify-between text-xl font-bold text-white mb-8 pt-4 border-t border-white/10">
               <span>Suma</span>
-              <span className="text-amber-400">{getTotal().toFixed(2)} zĹ‚</span>
+              <span className="text-amber-400">{getTotal().toFixed(2)} zł</span>
             </div>
 
             <Link 
               href="/checkout"
               className="w-full bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-xl py-4 flex items-center justify-center gap-2 font-bold hover:shadow-lg hover:shadow-amber-500/30 transition-all hover:-translate-y-0.5"
             >
-              PrzejdĹş do kasy
+              Przejdź do kasy
               <ArrowRight className="w-5 h-5" />
             </Link>
             
             <Link href="/" className="block w-full text-center mt-4 text-sm text-gray-400 hover:text-white transition-colors">
-              â† Kontynuuj zakupy
+              ← Kontynuuj zakupy
             </Link>
           </div>
         </div>

@@ -1,4 +1,4 @@
-﻿import type { OrderStatusValue } from '@/lib/order-status'
+import type { OrderStatusValue } from '@/lib/order-status'
 
 export interface Profile {
   id: string

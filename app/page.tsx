@@ -1,4 +1,4 @@
-﻿import Link from 'next/link'
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { ProductCard } from '@/components/product-card'
 import { Product } from '@/lib/types'
@@ -14,7 +14,7 @@ export default async function HomePage() {
     .order('created_at', { ascending: false })
 
   if (error) {
-    console.error('BĹ‚Ä…d pobierania produktĂłw:', error.message)
+    console.error('Błąd pobierania produktów:', error.message)
   }
 
   const items = (products as Product[]) || []
@@ -25,7 +25,7 @@ export default async function HomePage() {
         <div className="absolute inset-0 z-0">
           <img 
             src="/hero.png" 
-            alt="Pasieka tĹ‚o" 
+            alt="Pasieka tło" 
             className="w-full h-full object-cover opacity-40 scale-105"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/80 to-transparent" />
@@ -36,18 +36,18 @@ export default async function HomePage() {
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-sm font-semibold mb-4 backdrop-blur-md">
             <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
             <div className="w-5 h-5 flex items-center justify-center rounded-full bg-amber-500/20">
-              <span className="text-[10px]">đźŤŻ</span>
+              <span className="text-[10px]">🍯</span>
             </div> 
             Naturalne zbiory z rodzinnej pasieki
           </div>
           
           <h1 className="font-serif text-6xl md:text-8xl font-bold text-transparent bg-clip-text bg-gradient-to-b from-white via-amber-100 to-amber-500 drop-shadow-sm leading-tight">
-            Prawdziwe ZĹ‚oto <br /> z Naszej Pasieki
+            Prawdziwe Złoto <br /> z Naszej Pasieki
           </h1>
           
           <p className="text-gray-300 max-w-2xl mx-auto text-lg md:text-xl leading-relaxed font-light">
-            Trzy pokolenia pszczelarzy, czyste lasy i zero chemii. KaĹĽdy sĹ‚oik to gwarancja 
-            smaku, ktĂłry pamiÄ™tasz z dzieciĹ„stwa â€” prosto od nas do Twojego stoĹ‚u.
+            Trzy pokolenia pszczelarzy, czyste lasy i zero chemii. Każdy słoik to gwarancja 
+            smaku, który pamiętasz z dzieciństwa — prosto od nas do Twojego stołu.
           </p>
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
@@ -61,7 +61,7 @@ export default async function HomePage() {
               href="/historia"
               className="px-8 py-4 bg-white/5 hover:bg-white/10 border border-white/10 backdrop-blur-md text-white rounded-full font-semibold transition-all hover:-translate-y-1 w-full sm:w-auto flex items-center justify-center gap-2"
             >
-              <BookOpen className="w-5 h-5" /> Poznaj naszÄ… historiÄ™
+              <BookOpen className="w-5 h-5" /> Poznaj naszą historię
             </Link>
           </div>
         </div>
@@ -73,21 +73,21 @@ export default async function HomePage() {
             <Leaf className="w-6 h-6 text-amber-500" />
           </div>
           <h3 className="font-serif text-lg font-bold text-white mb-2">100% Naturalny</h3>
-          <p className="text-gray-400 text-sm">Bez cukru, bez konserwantĂłw, bez sztucznych barwnikĂłw. Czysty miĂłd z naszych uli.</p>
+          <p className="text-gray-400 text-sm">Bez cukru, bez konserwantów, bez sztucznych barwników. Czysty miód z naszych uli.</p>
         </div>
         <div className="bg-[#111] border border-white/10 rounded-2xl p-6 text-center hover-lift hover-glow transition-all animate-fade-up animate-delay-200">
           <div className="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center mx-auto mb-4">
             <Package className="w-6 h-6 text-amber-500" />
           </div>
-          <h3 className="font-serif text-lg font-bold text-white mb-2">WysyĹ‚ka 24h</h3>
-          <p className="text-gray-400 text-sm">Pakujemy w ekologiczne materiaĹ‚y i wysyĹ‚amy nastÄ™pnego dnia roboczego.</p>
+          <h3 className="font-serif text-lg font-bold text-white mb-2">Wysyłka 24h</h3>
+          <p className="text-gray-400 text-sm">Pakujemy w ekologiczne materiały i wysyłamy następnego dnia roboczego.</p>
         </div>
         <div className="bg-[#111] border border-white/10 rounded-2xl p-6 text-center hover-lift hover-glow transition-all animate-fade-up animate-delay-300">
           <div className="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center mx-auto mb-4">
             <Award className="w-6 h-6 text-amber-500" />
           </div>
-          <h3 className="font-serif text-lg font-bold text-white mb-2">Sprawdzona jakoĹ›Ä‡</h3>
-          <p className="text-gray-400 text-sm">KaĹĽda partia miodu przechodzi kontrolÄ™ jakoĹ›ci. Znamy historiÄ™ kaĹĽdej ramki.</p>
+          <h3 className="font-serif text-lg font-bold text-white mb-2">Sprawdzona jakość</h3>
+          <p className="text-gray-400 text-sm">Każda partia miodu przechodzi kontrolę jakości. Znamy historię każdej ramki.</p>
         </div>
       </section>
 
@@ -100,16 +100,16 @@ export default async function HomePage() {
               </div>
               Nasza oferta
             </h2>
-            <p className="text-gray-400 text-sm mt-1">Kliknij na produkt, ĹĽeby zobaczyÄ‡ szczegĂłĹ‚y</p>
+            <p className="text-gray-400 text-sm mt-1">Kliknij na produkt, żeby zobaczyć szczegóły</p>
           </div>
           <Link href="/products" className="text-amber-500 hover:text-amber-400 text-sm font-semibold transition-colors">
-            Wszystkie â†’
+            Wszystkie →
           </Link>
         </div>
         
         {items.length === 0 ? (
           <div className="text-center py-20 text-gray-400">
-            Brak produktĂłw w bazie danych. Dodaj je przez panel administracyjny.
+            Brak produktów w bazie danych. Dodaj je przez panel administracyjny.
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -133,7 +133,7 @@ export default async function HomePage() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
               </span>
-              NowoĹ›Ä‡
+              Nowość
             </div>
             
             <h2 className="font-serif text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
@@ -141,7 +141,7 @@ export default async function HomePage() {
             </h2>
             
             <p className="text-gray-400 text-lg mb-10 leading-relaxed font-light">
-              Zainstaluj naszÄ… dedykowanÄ… aplikacjÄ™ na macOS lub Windows. Zamawiaj swoje ulubione sĹ‚oiki prosto z pulpitu, bez koniecznoĹ›ci otwierania przeglÄ…darki. Bezpiecznie, stabilnie i w mgnieniu oka.
+              Zainstaluj naszą dedykowaną aplikację na macOS lub Windows. Zamawiaj swoje ulubione słoiki prosto z pulpitu, bez konieczności otwierania przeglądarki. Bezpiecznie, stabilnie i w mgnieniu oka.
             </p>
             
             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
@@ -169,7 +169,7 @@ export default async function HomePage() {
                 href="/download" 
                 className="px-8 py-4 bg-transparent border border-white/20 hover:border-white/40 hover:bg-white/5 text-white rounded-full font-semibold transition-all w-full sm:w-auto flex items-center justify-center"
               >
-                WiÄ™cej informacji
+                Więcej informacji
               </Link>
             </div>
           </div>

@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
@@ -55,7 +55,7 @@ export function useAdminRealtimeOrders() {
   useRealtimeTable(
     'orders',
     (payload) => {
-      addToast('info', `đź”” Nowe zamĂłwienie! WartoĹ›Ä‡: ${payload.new.total_amount} zĹ‚`)
+      addToast('info', `🔔 Nowe zamówienie! Wartość: ${payload.new.total_amount} zł`)
     }
   )
 }
@@ -83,7 +83,7 @@ export function useClientRealtimeOrderStatus(userId: string) {
         { event: 'UPDATE', schema: 'public', table: 'orders', filter: `user_id=eq.${userId}` },
         (payload) => {
           if (payload.old.status !== payload.new.status) {
-            addToast('success', `Status Twojego zamĂłwienia zmieniĹ‚ siÄ™ na: ${payload.new.status}`)
+            addToast('success', `Status Twojego zamówienia zmienił się na: ${payload.new.status}`)
           }
         }
       )

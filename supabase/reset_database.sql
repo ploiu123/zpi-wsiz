@@ -1,4 +1,4 @@
-﻿
+
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users CASCADE;
 DROP FUNCTION IF EXISTS public.handle_new_user() CASCADE;
 DROP FUNCTION IF EXISTS public.sync_profile() CASCADE;
@@ -33,7 +33,7 @@ CREATE TABLE public.products (
   description text NOT NULL DEFAULT '',
   price numeric(10, 2) NOT NULL CHECK (price >= 0),
   stock integer NOT NULL DEFAULT 0 CHECK (stock >= 0),
-  category text NOT NULL DEFAULT 'miĂłd',
+  category text NOT NULL DEFAULT 'miód',
   image_url text NOT NULL DEFAULT '',
   featured boolean NOT NULL DEFAULT false,
   created_at timestamptz NOT NULL DEFAULT now(),
@@ -270,7 +270,7 @@ BEGIN
 
   IF v_diff > 0 THEN
     IF v_current_stock < v_diff THEN
-      RAISE EXCEPTION 'NiewystarczajÄ…ca iloĹ›Ä‡ w magazynie. DostÄ™pne: %', v_current_stock;
+      RAISE EXCEPTION 'Niewystarczająca ilość w magazynie. Dostępne: %', v_current_stock;
     END IF;
 
     UPDATE public.products
@@ -373,7 +373,7 @@ BEGIN
 
     IF v_needed_qty > 0 THEN
       IF v_current_stock < v_needed_qty THEN
-        RAISE EXCEPTION 'NiewystarczajÄ…ca iloĹ›Ä‡ produktu % w magazynie. DostÄ™pne: %', v_name, v_current_stock;
+        RAISE EXCEPTION 'Niewystarczająca ilość produktu % w magazynie. Dostępne: %', v_name, v_current_stock;
       END IF;
 
       UPDATE public.products
@@ -399,13 +399,13 @@ GRANT EXECUTE ON FUNCTION public.place_order_with_stock TO authenticated;
 
 INSERT INTO public.products (id, name, description, price, stock, category, image_url, featured)
 VALUES
-  ('a1000000-0000-4000-8000-000000000001', 'MiĂłd wielokwiatowy leĹ›ny', 'Klasyczny miĂłd z naszej pasieki zebrany na skraju lasu.', 42.9, 60, 'miĂłd', 'https://images.unsplash.com/photo-1587049352846-4a222e784d38', true),
-  ('a1000000-0000-4000-8000-000000000002', 'MiĂłd akacjowy kremowany', 'Puszysty kremowany miĂłd akacjowy, idealny do kanapek.', 48.5, 45, 'miĂłd', 'https://images.unsplash.com/photo-1471943311424-64660e07a2e3', true),
-  ('a1000000-0000-4000-8000-000000000003', 'MiĂłd lipowy', 'MiĂłd o wyrazistym, miÄ™towym aromacie z bieszczadzkich lip.', 52.0, 32, 'miĂłd', 'https://images.unsplash.com/photo-1558642452-9d2a7deb7f62', false),
-  ('a1000000-0000-4000-8000-000000000004', 'PyĹ‚ek pszczeli Ĺ›wieĹĽy', 'ĹšwieĹĽy pyĹ‚ek pszczeli o bogatych wĹ‚aĹ›ciwoĹ›ciach odĹĽywczych.', 36.0, 28, 'pyĹ‚ek', 'https://images.unsplash.com/photo-1509440159596-0249088772ff', false),
-  ('a1000000-0000-4000-8000-000000000005', 'MiĂłd wrzosowy szlachetny', 'Rzadki i niezwykle ceniony miĂłd o galaretowatej konsystencji i wyrazistym smaku wrzosowisk.', 65.0, 15, 'miĂłd', 'https://images.unsplash.com/photo-1563227812-0ea4c22e6cc8', true),
-  ('a1000000-0000-4000-8000-000000000006', 'MiĂłd gryczany leĹ›ny', 'Ciemny miĂłd o silnym aromacie kwiatĂłw gryki, idealny do pieczenia.', 44.9, 20, 'miĂłd', 'https://images.unsplash.com/photo-1563227812-0ea4c22e6cc8', false),
-  ('a1000000-0000-4000-8000-000000000007', 'MiĂłd malinowy z pasieki', 'Niezwykle delikatny, o lekko kwaskowatym smaku dzikich leĹ›nych malin.', 49.0, 25, 'miĂłd', 'https://images.unsplash.com/photo-1558642452-9d2a7deb7f62', false);
+  ('a1000000-0000-4000-8000-000000000001', 'Miód wielokwiatowy leśny', 'Klasyczny miód z naszej pasieki zebrany na skraju lasu.', 42.9, 60, 'miód', 'https://images.unsplash.com/photo-1587049352846-4a222e784d38', true),
+  ('a1000000-0000-4000-8000-000000000002', 'Miód akacjowy kremowany', 'Puszysty kremowany miód akacjowy, idealny do kanapek.', 48.5, 45, 'miód', 'https://images.unsplash.com/photo-1471943311424-64660e07a2e3', true),
+  ('a1000000-0000-4000-8000-000000000003', 'Miód lipowy', 'Miód o wyrazistym, miętowym aromacie z bieszczadzkich lip.', 52.0, 32, 'miód', 'https://images.unsplash.com/photo-1558642452-9d2a7deb7f62', false),
+  ('a1000000-0000-4000-8000-000000000004', 'Pyłek pszczeli świeży', 'Świeży pyłek pszczeli o bogatych właściwościach odżywczych.', 36.0, 28, 'pyłek', 'https://images.unsplash.com/photo-1509440159596-0249088772ff', false),
+  ('a1000000-0000-4000-8000-000000000005', 'Miód wrzosowy szlachetny', 'Rzadki i niezwykle ceniony miód o galaretowatej konsystencji i wyrazistym smaku wrzosowisk.', 65.0, 15, 'miód', 'https://images.unsplash.com/photo-1563227812-0ea4c22e6cc8', true),
+  ('a1000000-0000-4000-8000-000000000006', 'Miód gryczany leśny', 'Ciemny miód o silnym aromacie kwiatów gryki, idealny do pieczenia.', 44.9, 20, 'miód', 'https://images.unsplash.com/photo-1563227812-0ea4c22e6cc8', false),
+  ('a1000000-0000-4000-8000-000000000007', 'Miód malinowy z pasieki', 'Niezwykle delikatny, o lekko kwaskowatym smaku dzikich leśnych malin.', 49.0, 25, 'miód', 'https://images.unsplash.com/photo-1558642452-9d2a7deb7f62', false);
 
 ALTER PUBLICATION supabase_realtime ADD TABLE products;
 ALTER PUBLICATION supabase_realtime ADD TABLE orders;
