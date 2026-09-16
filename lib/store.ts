@@ -3,10 +3,8 @@ import { persist } from 'zustand/middleware'
 import { CartItem, Product } from '@/lib/types'
 import { createClient } from '@/lib/supabase/client'
 
-/** Czas życia rezerwacji koszyka: 30 minut (zgodne z cleanup_expired_reservations w bazie). */
 export const RESERVATION_MS = 30 * 60 * 1000
 
-/** Kształt danych faktycznie trzymanych w localStorage — nigdy funkcje. */
 interface PersistedCart {
   cartId: string
   ownerId: string | null
@@ -19,9 +17,7 @@ interface CartStore extends PersistedCart {
   removeItem: (productId: string) => Promise<void>
   updateQuantity: (productId: string, quantity: number) => Promise<boolean>
   clearCart: () => Promise<void>
-  /** Wiąże koszyk z użytkownikiem. Czyści items, gdy zapisany ownerId jest inny. */
   bindToUser: (userId: string | null) => void
-  /** Czyści koszyk, gdy rezerwacja wygasła. Zwraca true, jeśli coś wyczyszczono. */
   pruneIfExpired: () => boolean
   getTotal: () => number
   getItemCount: () => number
@@ -171,9 +167,6 @@ export const useCartStore = create<CartStore>()(
       bindToUser: (userId) => {
         const { ownerId } = get()
         if (ownerId === userId) return
-        // Inny właściciel niż zapisany — porzucamy koszyk poprzedniego konta.
-        // Czyścimy wyłącznie lokalnie: rezerwacji konta A i tak nie usuniemy
-        // będąc zalogowanym jako B (RLS), wygasną same po 30 minutach.
         set({ ownerId: userId, items: [], reservedUntil: null, cartId: '' })
       },
 
@@ -273,15 +266,12 @@ export const useCartStore = create<CartStore>()(
     {
       name: 'zlote-miody-cart',
       version: 2,
-      // Do localStorage trafiają wyłącznie dane — nigdy funkcje ze store'u.
       partialize: (state): PersistedCart => ({
         cartId: state.cartId,
         ownerId: state.ownerId,
         items: state.items,
         reservedUntil: state.reservedUntil,
       }),
-      // Koszyk zapisany przed wprowadzeniem ownerId nie ma przypisanego właściciela,
-      // więc mógłby wyciec na cudze konto — porzucamy go.
       migrate: (persisted: unknown, version: number) => {
         const prev = (persisted ?? {}) as Partial<PersistedCart>
         if (version < 2 || prev.ownerId === undefined) {

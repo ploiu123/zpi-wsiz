@@ -1,16 +1,9 @@
-# Konfiguracja electron-builder dla aplikacji desktopowej "Złote Miody".
-# Jedyne źródło prawdy — klucz "build" został usunięty z package.json,
-# żeby nie było dwóch konkurujących konfiguracji.
-
 appId: pl.zlotemiody.sklep
 productName: Złote Miody
 
 directories:
   output: release
 
-# Dokładnie to, co leży w katalogu i jest potrzebne w czasie działania.
-# main.js i preload.js w katalogu głównym to wynik `npm run obfuscate`
-# (źródła: src/main.js, src/preload.js). Zły wpis tutaj = biały ekran po starcie.
 files:
   - main.js
   - preload.js
@@ -20,7 +13,7 @@ files:
 mac:
   category: public.app-category.shopping
   icon: icon.png
-  identity: null          # bez podpisu — build lokalny i CI bez certyfikatu
+  identity: null
   darkModeSupport: true
   target:
     - target: dmg

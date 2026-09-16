@@ -39,11 +39,9 @@ export function Navbar() {
       if (isAdminRole(data?.role) || isAdminEmail(user.email)) setIsAdmin(true)
     })
 
-    // Read current theme from DOM (set by blocking script)
     const isCurrentlyLight = document.documentElement.classList.contains('light')
     setIsDark(!isCurrentlyLight)
     
-    // Check if running in Electron
     const ua = navigator.userAgent.toLowerCase()
     if (ua.includes('electron') || ua.includes('zlotemiodyapp')) {
       setIsElectron(true)
@@ -74,7 +72,6 @@ export function Navbar() {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-[#0a0a0a]/60 backdrop-blur-2xl border-b border-white/5 transition-all duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-20">
-        {/* Logo — prostokątne zaokrąglone, nie okrągłe */}
         <Link href="/" className="flex items-center gap-3 group">
           <div className="relative w-11 h-11 rounded-xl overflow-hidden border-2 border-amber-500/30 group-hover:border-amber-500/70 transition-all duration-300 shadow-lg shadow-amber-500/10 group-hover:shadow-amber-500/25">
             <img src="/logo.png" alt="Złote Miody" className="w-full h-full object-contain bg-black/10" />
@@ -84,7 +81,6 @@ export function Navbar() {
           </span>
         </Link>
 
-        {/* Desktop nav */}
         <div className="hidden md:flex items-center gap-1">
           {NAV_LINKS.map((link) => {
             if (isElectron && link.href === '/download') return null;
@@ -109,9 +105,7 @@ export function Navbar() {
           )}
         </div>
 
-        {/* Right side */}
         <div className="flex items-center gap-3">
-          {/* Theme toggle */}
           <button
             onClick={toggleTheme}
             className="relative p-2.5 rounded-full hover:bg-white/5 transition-all group/theme"
@@ -154,14 +148,12 @@ export function Navbar() {
             </Link>
           )}
 
-          {/* Mobile menu */}
           <button onClick={() => setMenuOpen(!menuOpen)} className="md:hidden p-2 rounded-full hover:bg-white/5">
             {menuOpen ? <X className="w-5 h-5 text-gray-300" /> : <Menu className="w-5 h-5 text-gray-300" />}
           </button>
         </div>
       </div>
 
-      {/* Mobile menu dropdown / overlay */}
       {menuOpen && (
         <div className="md:hidden fixed inset-0 top-20 z-40 bg-[#0a0a0a]/95 backdrop-blur-xl border-t border-white/5 mobile-menu-overlay flex flex-col p-6">
           <div className="flex-1 space-y-4 mobile-menu-content">

@@ -24,8 +24,6 @@ export default function RootLayout({
     <html lang="pl" className="dark scroll-smooth" suppressHydrationWarning>
       <head>
         <meta name="color-scheme" content="dark light" />
-        {/* Blocking script: set theme class BEFORE first paint to prevent flash.
-            Musi być inline (bez importów) — logika lustrzana do lib/theme.ts. */}
         <script dangerouslySetInnerHTML={{ __html: `
           (function() {
             try {

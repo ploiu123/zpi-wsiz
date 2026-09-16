@@ -12,9 +12,6 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   let profile: Profile | null = null
   let problem: string | null = null
 
-  // UWAGA: redirect() działa przez rzucenie wyjątku NEXT_REDIRECT, więc NIE MOŻE
-  // znaleźć się wewnątrz try/catch — catch połknąłby przekierowanie. Dlatego tutaj
-  // wyłącznie pobieramy dane, a decyzje podejmujemy niżej.
   try {
     const supabase = await createClient()
 
@@ -27,7 +24,6 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     }
 
     if (userId) {
-      // Błąd tej procedury nie może blokować wejścia do panelu.
       const { error: rpcErr } = await supabase.rpc('sync_profile')
       if (rpcErr) {
         console.error('[admin layout] sync_profile:', rpcErr.message)
@@ -40,23 +36,17 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         .maybeSingle()
 
       if (profileErr) {
-        // Nie przerywamy — o dostępie może jeszcze zdecydować adres e-mail.
         console.error('[admin layout] profiles:', profileErr.message)
       } else {
         profile = data as Profile | null
       }
     }
   } catch (err) {
-    // KRYTYCZNE: Next.js sygnalizuje przejście w tryb dynamiczny i przekierowania
-    // przez rzucanie wyjątków (DynamicServerError, NEXT_REDIRECT). Połknięcie ich
-    // rozwala renderowanie i kończy się pustą odpowiedzią 500 w przeglądarce.
-    // unstable_rethrow przepuszcza wyjątki frameworka dalej, a zatrzymuje nasze.
     unstable_rethrow(err)
     problem = err instanceof Error ? err.message : String(err)
     console.error('[admin layout] wyjątek:', err)
   }
 
-  // Od tego miejsca żadnego try/catch — redirect() musi móc rzucić swobodnie.
   if (problem) {
     return (
       <div className="pt-32 px-4 max-w-3xl mx-auto">

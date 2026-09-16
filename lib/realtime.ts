@@ -5,23 +5,6 @@ import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/components/toast'
 import { useRouter } from 'next/navigation'
 
-/**
- * Nasłuch zmian w tabeli przez Supabase Realtime.
- *
- * Dwie rzeczy są tu krytyczne i obie były wcześniej źle zrobione:
- *
- * 1. Callbacki trafiają do ref-a, a efekt zależy wyłącznie od nazwy tabeli.
- *    Wcześniej figurowały w tablicy zależności, a wywołania przekazują funkcje
- *    tworzone w locie — nowa tożsamość przy każdym renderze kazała efektowi
- *    subskrybować kanał od nowa w kółko.
- *
- * 2. Nazwa kanału jest unikalna dla każdego zamontowania komponentu.
- *    supabase.channel(nazwa) zwraca ISTNIEJĄCY kanał o tej nazwie, a ponieważ
- *    removeChannel działa asynchronicznie, ponowne uruchomienie efektu trafiało
- *    na kanał już zasubskrybowany. Dopięcie do niego nasłuchu kończyło się
- *    błędem "cannot add postgres_changes callbacks after subscribe()", który
- *    wywracał cały panel administratora.
- */
 export function useRealtimeTable(
   table: string,
   onInsert?: (payload: any) => void,

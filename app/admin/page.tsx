@@ -131,8 +131,6 @@ export default async function AdminPage() {
       </div>
     )
   } catch (error: any) {
-    // Bez tego try/catch połykał wewnętrzne wyjątki Next.js (DynamicServerError),
-    // co dawało pustą odpowiedź zamiast strony. To był pierwotny powód awarii panelu.
     unstable_rethrow(error)
     return (
       <div className="p-8 max-w-3xl mx-auto mt-24 bg-red-500/10 border border-red-500/30 rounded-2xl text-red-400">

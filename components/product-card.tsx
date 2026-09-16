@@ -37,7 +37,6 @@ export const ProductCard = memo(function ProductCard({ product }: { product: Pro
 
   return (
     <>
-      {/* Card */}
       <div
         onClick={() => setShowModal(true)}
         className="bg-[#111]/80 backdrop-blur-md border border-white/10 rounded-[2rem] overflow-hidden hover:border-amber-500/30 hover:shadow-2xl hover:shadow-amber-500/10 transition-all duration-500 group flex flex-col cursor-pointer"
@@ -57,7 +56,6 @@ export const ProductCard = memo(function ProductCard({ product }: { product: Pro
               <PackageOpen className="w-12 h-12 text-amber-500/50" />
             </div>
           )}
-          {/* Stock badge */}
           <div className="absolute top-3 right-3 z-20">
             {product.stock > 0 ? (
               <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-green-500/20 text-green-400 backdrop-blur-md border border-green-500/20">
@@ -90,7 +88,6 @@ export const ProductCard = memo(function ProductCard({ product }: { product: Pro
             {product.description}
           </p>
 
-          {/* Stock info */}
           <div className="flex items-center gap-2 text-xs text-gray-500 mb-4">
             <Package className="w-3.5 h-3.5" />
             <span>{product.stock > 0 ? `${product.stock} szt. dostępnych` : 'Brak w magazynie'}</span>
@@ -108,21 +105,17 @@ export const ProductCard = memo(function ProductCard({ product }: { product: Pro
         </div>
       </div>
 
-      {/* Quick-view Modal */}
       {showModal && (
         <div
           className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6"
           onClick={() => setShowModal(false)}
         >
-          {/* Backdrop */}
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
           
-          {/* Modal content */}
           <div
             onClick={(e) => e.stopPropagation()}
             className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto bg-[#111] border border-white/10 rounded-3xl shadow-2xl shadow-black/50 animate-fade-up"
           >
-            {/* Close button */}
             <button
               onClick={() => setShowModal(false)}
               className="absolute top-4 right-4 z-20 p-2 rounded-full bg-black/50 hover:bg-black/70 text-white transition-colors backdrop-blur-md"
@@ -132,7 +125,6 @@ export const ProductCard = memo(function ProductCard({ product }: { product: Pro
             </button>
 
             <div className="flex flex-col md:flex-row">
-              {/* Image */}
               <div className="md:w-1/2 relative aspect-square md:aspect-auto md:min-h-[400px] bg-white/5 rounded-t-3xl md:rounded-l-3xl md:rounded-tr-none overflow-hidden">
                 {product.image_url ? (
                   <Image
@@ -149,9 +141,7 @@ export const ProductCard = memo(function ProductCard({ product }: { product: Pro
                 )}
               </div>
 
-              {/* Details */}
               <div className="md:w-1/2 p-6 md:p-8 flex flex-col">
-                {/* Category */}
                 <div className="inline-block px-3 py-1 bg-amber-500/10 text-amber-500 text-xs font-bold rounded-full mb-3 uppercase tracking-wider w-max border border-amber-500/20">
                   {product.category || 'Miód naturalny'}
                 </div>
@@ -172,12 +162,10 @@ export const ProductCard = memo(function ProductCard({ product }: { product: Pro
                   )}
                 </div>
 
-                {/* Description — full, no line clamp */}
                 <p className="text-gray-400 text-sm md:text-base mb-6 leading-relaxed whitespace-pre-line flex-1">
                   {product.description || 'Naturalny miód z naszej rodzinnej pasieki. Zbierany z dbałością o najwyższą jakość i smak.'}
                 </p>
 
-                {/* Stock & shipping info */}
                 <div className="space-y-3 py-4 border-t border-white/10 mb-6">
                   <div className="flex items-center gap-2.5 text-sm">
                     <Package className="w-4 h-4 text-amber-500 shrink-0" />
@@ -201,7 +189,6 @@ export const ProductCard = memo(function ProductCard({ product }: { product: Pro
                   )}
                 </div>
 
-                {/* Add to cart button */}
                 <button
                   onClick={handleAddFromModal}
                   disabled={product.stock <= 0}

@@ -1,10 +1,8 @@
 import { beforeEach, describe, expect, it, vi, afterEach } from 'vitest'
 import type { CartItem, Product } from '@/lib/types'
 
-// localStorage w pamięci podstawia tests/setup.ts (musi być przed importem store'u).
 const storage = globalThis.localStorage
 
-/** Supabase jest zaślepiony — testujemy logikę koszyka, nie sieć. */
 vi.mock('@/lib/supabase/client', () => ({
   createClient: () => ({
     rpc: async () => ({ data: null, error: null }),
@@ -56,7 +54,6 @@ describe('izolacja koszyka między kontami', () => {
     seedCart('user-A')
     const clearCartSpy = vi.spyOn(useCartStore.getState(), 'clearCart')
 
-    // dokładnie to, co robi CartAuthSync przy zdarzeniu innym niż SIGNED_OUT
     const session = { user: { id: 'user-B' } }
     useCartStore.getState().bindToUser(session?.user?.id ?? null)
 

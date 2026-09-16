@@ -2,13 +2,6 @@
 
 import { useEffect } from 'react'
 
-/**
- * Granica błędu dla /admin.
- *
- * Bez niej wyjątek w layoucie lub stronie kończył się pustą odpowiedzią 500,
- * którą przeglądarka pokazuje jako "This page couldn't load" — bez żadnej
- * informacji, co się właściwie stało.
- */
 export default function AdminError({
   error,
   reset,

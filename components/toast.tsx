@@ -50,7 +50,6 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     const id = Math.random().toString(36).slice(2, 9)
     setToasts((prev) => [...prev, { id, type, message }])
 
-    // Auto-dismiss after 3s
     setTimeout(() => {
       setToasts((prev) =>
         prev.map((t) => (t.id === id ? { ...t, exiting: true } : t))

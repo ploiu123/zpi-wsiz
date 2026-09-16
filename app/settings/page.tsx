@@ -17,7 +17,6 @@ export default function SettingsPage() {
     setTheme(readStoredTheme())
   }, [])
 
-  // Przy motywie systemowym reagujemy na zmianę ustawień systemu w locie.
   useEffect(() => {
     if (theme !== 'system') return
     const media = window.matchMedia(LIGHT_SCHEME_QUERY)

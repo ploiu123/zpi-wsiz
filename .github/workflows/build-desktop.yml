@@ -8,8 +8,6 @@ on:
   workflow_dispatch:
 
 jobs:
-  # Aplikacja desktopowa jest cienkim wrapperem — ładuje żywą stronę przez loadURL,
-  # nie pakuje builda Next.js. Każdy system buduje własny artefakt na własnym runnerze.
   desktop:
     name: Desktop (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
@@ -50,8 +48,6 @@ jobs:
       - name: Budowa aplikacji
         working-directory: desktop-app
         env:
-          # Bez tego electron-builder na macOS szuka certyfikatu w pęku kluczy
-          # i przerywa build, gdy go nie znajdzie. Artefakty są niepodpisane.
           CSC_IDENTITY_AUTO_DISCOVERY: false
         run: npx electron-builder ${{ matrix.flag }} --publish never
 
@@ -62,8 +58,6 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
-  # Osobne zadanie: sprawdza, że sklep Next.js w ogóle się buduje, zanim Vercel
-  # to wykryje. Tu — i tylko tu — potrzebne są klucze Supabase.
   web:
     name: Build sklepu (Next.js)
     runs-on: ubuntu-latest

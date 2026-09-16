@@ -14,8 +14,11 @@
     "build:win": "electron-builder --win",
     "prebuild:all": "npm run obfuscate",
     "build:all": "electron-builder --mac --win",
+    "predist:mac": "npm run obfuscate",
     "dist:mac": "electron-builder --mac",
+    "predist:win": "npm run obfuscate",
     "dist:win": "electron-builder --win",
+    "predist:linux": "npm run obfuscate",
     "dist:linux": "electron-builder --linux"
   },
   "devDependencies": {

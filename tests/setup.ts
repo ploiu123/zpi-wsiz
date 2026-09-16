@@ -1,10 +1,3 @@
-/**
- * Musi wykonać się ZANIM zaimportowany zostanie lib/store.ts.
- *
- * zustand/persist sięga po `window.localStorage` w momencie tworzenia store'u.
- * W środowisku Node nie ma ani `window`, ani `localStorage`, więc dostęp rzuca
- * wyjątek, a middleware po cichu wyłącza utrwalanie razem z całym API `.persist`.
- */
 class MemoryStorage implements Storage {
   private map = new Map<string, string>()
   get length() { return this.map.size }
@@ -16,6 +9,4 @@ class MemoryStorage implements Storage {
 }
 
 globalThis.localStorage = new MemoryStorage()
-// Minimalne `window` wskazujące na globalThis — daje zustandowi window.localStorage,
-// a kodowi store'u window.crypto.randomUUID z Node'a.
 ;(globalThis as Record<string, unknown>).window = globalThis
