@@ -32,6 +32,7 @@ CREATE TABLE public.products (
   name text NOT NULL,
   description text NOT NULL DEFAULT '',
   price numeric(10, 2) NOT NULL CHECK (price >= 0),
+  old_price numeric(10, 2) DEFAULT NULL,
   stock integer NOT NULL DEFAULT 0 CHECK (stock >= 0),
   category text NOT NULL DEFAULT 'miód',
   image_url text NOT NULL DEFAULT '',
