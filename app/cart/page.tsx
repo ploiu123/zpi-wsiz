@@ -9,6 +9,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/components/toast'
 import { useIsClient } from '@/lib/client-info'
 import { isRemoteImage } from '@/lib/product-display'
+import { fetchCartReservations } from '@/lib/cart-reservations'
 
 export default function CartPage() {
   const mounted = useIsClient()
@@ -28,8 +29,8 @@ export default function CartPage() {
     const supabase = createClient()
     const fetchExpiration = async () => {
       if (!cartId) return
-      const { data } = await supabase.rpc('get_cart_reservations', { p_cart_id: cartId })
-      const first = (data as { expires_at: string }[] | null)?.[0]
+      const { data } = await fetchCartReservations(supabase, cartId)
+      const first = data?.[0]
 
       if (first?.expires_at) {
         const expiresTime = new Date(first.expires_at).getTime()

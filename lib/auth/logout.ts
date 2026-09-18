@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/client'
 import { useCartStore } from '@/lib/store'
+import { fetchCartReservations } from '@/lib/cart-reservations'
 
 export async function logoutAndClearCart(): Promise<void> {
   const supabase = createClient()
@@ -11,7 +12,7 @@ export async function logoutAndClearCart(): Promise<void> {
   const { cartId } = useCartStore.getState()
   if (cartId) {
     try {
-      const { data: rows, error } = await supabase.rpc('get_cart_reservations', { p_cart_id: cartId })
+      const { data: rows, error } = await fetchCartReservations(supabase, cartId)
 
       if (error) {
         console.error('Nie udało się pobrać rezerwacji do zwolnienia:', error.message)

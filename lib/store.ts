@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { CartItem, Product } from '@/lib/types'
 import { createClient } from '@/lib/supabase/client'
+import { fetchCartReservations } from '@/lib/cart-reservations'
 
 export const RESERVATION_MS = 30 * 60 * 1000
 
@@ -196,9 +197,7 @@ export const useCartStore = create<CartStore>()(
 
         await supabase.rpc('cleanup_expired_reservations')
 
-        const { data: dbRes, error } = await supabase.rpc('get_cart_reservations', {
-          p_cart_id: currentCartId,
-        })
+        const { data: dbRes, error } = await fetchCartReservations(supabase, currentCartId)
 
         if (error) {
           console.error('Błąd pobierania rezerwacji do synchronizacji:', error.message)
@@ -214,9 +213,7 @@ export const useCartStore = create<CartStore>()(
           ((freshProducts ?? []) as Product[]).map((product) => [product.id, product])
         )
 
-        const activeResMap = new Map<string, number>(
-          ((dbRes ?? []) as { product_id: string; quantity: number }[]).map((r) => [r.product_id, r.quantity])
-        )
+        const activeResMap = new Map<string, number>((dbRes ?? []).map((r) => [r.product_id, r.quantity]))
 
         for (const current of items) {
           const fresh = freshMap.get(current.product.id)
