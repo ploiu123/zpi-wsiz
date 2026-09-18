@@ -59,10 +59,10 @@ export default function HistoriaPage() {
         Rodzinna pasieka z sercem i tradycją — od 1960 roku
       </h1>
       <p className="text-gray-400 text-lg leading-relaxed mb-14">
-        „Złote Miody" to nie marka wymyślona w agencji reklamowej. To nasza codzienność — wczesne 
+        „Złote Miody” to nie marka wymyślona w agencji reklamowej. To nasza codzienność — wczesne 
         wstawanie, zapach wosku i propolisu, bzyczenie uli po deszczu i satysfakcja, gdy ktoś pierwszy 
         raz otwiera nasz słoik i mówi:{' '}
-        <span className="text-gray-200 italic">„Tak pamiętam miód od mojej babci."</span>
+        <span className="text-gray-200 italic">„Tak pamiętam miód od mojej babci.”</span>
       </p>
 
       <div className="space-y-10 mb-16">

@@ -1,21 +1,30 @@
 'use client'
 
 import { useEffect, useId, useRef } from 'react'
+import type {
+  RealtimePostgresDeletePayload,
+  RealtimePostgresInsertPayload,
+  RealtimePostgresUpdatePayload,
+} from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/components/toast'
 import { useRouter } from 'next/navigation'
 
+type Row = Record<string, unknown>
+
 export function useRealtimeTable(
   table: string,
-  onInsert?: (payload: any) => void,
-  onUpdate?: (payload: any) => void,
-  onDelete?: (payload: any) => void
+  onInsert?: (payload: RealtimePostgresInsertPayload<Row>) => void,
+  onUpdate?: (payload: RealtimePostgresUpdatePayload<Row>) => void,
+  onDelete?: (payload: RealtimePostgresDeletePayload<Row>) => void
 ) {
   const router = useRouter()
   const instanceId = useId()
 
   const handlers = useRef({ onInsert, onUpdate, onDelete })
-  handlers.current = { onInsert, onUpdate, onDelete }
+  useEffect(() => {
+    handlers.current = { onInsert, onUpdate, onDelete }
+  })
 
   useEffect(() => {
     const supabase = createClient()
@@ -58,7 +67,7 @@ export function useRealtimeTable(
 export function useAdminRealtimeOrders() {
   const { addToast } = useToast()
   useRealtimeTable('orders', (payload) => {
-    addToast('info', `🔔 Nowe zamówienie! Wartość: ${payload.new.total_amount} zł`)
+    addToast('info', `🔔 Nowe zamówienie! Wartość: ${Number(payload.new.total_amount ?? 0).toFixed(2)} zł`)
   })
 }
 
@@ -70,7 +79,9 @@ export function useClientRealtimeOrderStatus(userId: string) {
   const { addToast } = useToast()
   const instanceId = useId()
   const notify = useRef(addToast)
-  notify.current = addToast
+  useEffect(() => {
+    notify.current = addToast
+  })
 
   useEffect(() => {
     if (!userId) return

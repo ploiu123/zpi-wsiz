@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import type { Product } from '@/lib/types'
+import { oldPriceOf, validateProductNumbers } from '@/lib/product-display'
 import { ImageIcon, X } from 'lucide-react'
 
 interface LocalImage {
@@ -92,16 +93,21 @@ export function AdminProductCatalog({ initialProducts }: { initialProducts: Prod
                               ⭐ Wyróżniony
                             </span>
                           )}
-                          {product.old_price && (
+                          {oldPriceOf(product) !== null && (
                             <span className="inline-block mt-1 ml-1 text-xs bg-red-500/20 text-red-400 px-2 py-0.5 rounded">
                               🏷️ Promocja
+                            </span>
+                          )}
+                          {product.old_price != null && oldPriceOf(product) === null && (
+                            <span className="inline-block mt-1 ml-1 text-xs bg-yellow-500/20 text-yellow-400 px-2 py-0.5 rounded">
+                              ⚠️ Cena przed promocją nie jest wyższa od ceny
                             </span>
                           )}
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      {product.old_price ? (
+                      {oldPriceOf(product) !== null ? (
                         <div>
                           <div className="text-red-400 line-through text-xs">{Number(product.old_price).toFixed(2)} zł</div>
                           <div className="text-amber-500 font-bold">{Number(product.price).toFixed(2)} zł</div>
@@ -210,18 +216,28 @@ function ProductInlineEditor({
     setLoading(true)
     const supabase = createClient()
     const finalCategory = showNewCategory ? newCategory : category
+    const priceValue = Number(price)
+    const stockValue = Number(stock)
+    const oldPriceValue = isOnSale && oldPrice ? Number(oldPrice) : null
+
+    const validationError = validateProductNumbers(priceValue, stockValue, oldPriceValue)
+    if (validationError) {
+      setLoading(false)
+      onError(validationError)
+      return
+    }
 
     const { error } = await supabase
       .from('products')
       .update({
         name,
         description: desc,
-        price: parseFloat(price),
-        stock: parseInt(stock, 10),
+        price: priceValue,
+        stock: stockValue,
         category: finalCategory || 'miód',
         image_url: image || '',
         featured,
-        old_price: isOnSale && oldPrice ? parseFloat(oldPrice) : null,
+        old_price: oldPriceValue,
         updated_at: new Date().toISOString(),
       })
       .eq('id', product.id)
@@ -262,6 +278,7 @@ function ProductInlineEditor({
           <input
             type="number"
             step="0.01"
+            min="0"
             required
             value={price}
             onChange={(e) => setPrice(e.target.value)}
@@ -272,6 +289,8 @@ function ProductInlineEditor({
           <label className="block text-[10px] uppercase tracking-wider text-gray-500 mb-1">Stan</label>
           <input
             type="number"
+            step="1"
+            min="0"
             required
             value={stock}
             onChange={(e) => setStock(e.target.value)}
@@ -289,7 +308,7 @@ function ProductInlineEditor({
           <div>
             <label className="block text-[10px] uppercase tracking-wider text-gray-500 mb-1">Cena przed promocją</label>
             <input
-              type="number" step="0.01" required={isOnSale}
+              type="number" step="0.01" min="0" required={isOnSale}
               value={oldPrice} onChange={e => setOldPrice(e.target.value)}
               className="w-full bg-black/50 border border-white/10 rounded-lg px-3 py-2 text-white text-sm"
             />

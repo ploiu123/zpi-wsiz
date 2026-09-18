@@ -1,8 +1,49 @@
 const { app, BrowserWindow, shell, Menu, nativeTheme, session, ipcMain, Notification } = require('electron');
 const path = require('path');
 
-const SITE_URL = 'https://zpi-wsiz.vercel.app';
+const SITE_URL = 'https://zlote-miody.pl';
 const APP_NAME = 'Złote Miody';
+
+const ALLOWED_ORIGINS = new Set([
+  SITE_URL,
+  'https://www.zlote-miody.pl',
+  'https://zpi-wsiz.vercel.app',
+  'http://localhost:3000',
+  'http://127.0.0.1:3000',
+]);
+
+const EXTERNAL_PROTOCOLS = new Set(['https:', 'http:', 'mailto:']);
+
+function parseUrl(url) {
+  try {
+    return new URL(url);
+  } catch {
+    return null;
+  }
+}
+
+function isSiteUrl(url) {
+  const parsed = parseUrl(url);
+  return parsed !== null && ALLOWED_ORIGINS.has(parsed.origin);
+}
+
+function isAuthUrl(url) {
+  const parsed = parseUrl(url);
+  if (!parsed || parsed.protocol !== 'https:') return false;
+  const host = parsed.hostname;
+  return (
+    host.endsWith('.supabase.co') ||
+    host === 'accounts.google.com' ||
+    (host === 'github.com' && parsed.pathname.startsWith('/login'))
+  );
+}
+
+function openExternal(url) {
+  const parsed = parseUrl(url);
+  if (parsed && EXTERNAL_PROTOCOLS.has(parsed.protocol)) {
+    shell.openExternal(parsed.href);
+  }
+}
 
 let mainWindow = null;
 let splashWindow = null;
@@ -65,26 +106,6 @@ function createMainWindow() {
     }, 5000);
   });
 
-  const ALLOWED_URLS = [
-    SITE_URL,
-    'https://zlote-miody.pl',
-    'https://www.zlote-miody.pl',
-    'http://localhost:3000',
-    'http://127.0.0.1:3000'
-  ];
-
-  const isSiteUrl = (url) => {
-    return ALLOWED_URLS.some(allowed => url.startsWith(allowed));
-  };
-
-  const isAuthUrl = (url) => {
-    return url.includes('supabase.co') || 
-           url.includes('accounts.google.com') || 
-           url.includes('github.com/login') ||
-           url.includes('zlote-miody.pl') ||
-           url.includes('auth');
-  };
-
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
     if (isAuthUrl(url)) {
       const authWindow = new BrowserWindow({
@@ -116,16 +137,16 @@ function createMainWindow() {
     }
 
     if (!isSiteUrl(url)) {
-      shell.openExternal(url);
+      openExternal(url);
       return { action: 'deny' };
     }
     return { action: 'allow' };
   });
 
   mainWindow.webContents.on('will-navigate', (event, url) => {
-    if (!isSiteUrl(url) && !url.startsWith('about:') && !isAuthUrl(url)) {
+    if (!isSiteUrl(url) && !isAuthUrl(url)) {
       event.preventDefault();
-      shell.openExternal(url);
+      openExternal(url);
     }
   });
 }
@@ -223,6 +244,10 @@ function setupOptimizations() {
 setupOptimizations();
 
 app.whenReady().then(() => {
+  session.defaultSession.setPermissionRequestHandler((webContents, permission, callback) => {
+    callback(permission === 'notifications' && isSiteUrl(webContents.getURL()));
+  });
+
   buildMenu();
   createSplashWindow();
   createMainWindow();
@@ -244,8 +269,11 @@ app.on('window-all-closed', () => {
 app.on('before-quit', () => {
 });
 
-ipcMain.on('show-notification', (_, { title, body }) => {
-  if (Notification.isSupported()) {
+ipcMain.on('show-notification', (event, payload) => {
+  if (!isSiteUrl(event.senderFrame?.url ?? '')) return;
+  const title = typeof payload?.title === 'string' ? payload.title.slice(0, 120) : '';
+  const body = typeof payload?.body === 'string' ? payload.body.slice(0, 500) : '';
+  if (title && Notification.isSupported()) {
     new Notification({ title, body, icon: path.join(__dirname, 'icon.png') }).show();
   }
 });

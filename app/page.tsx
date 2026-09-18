@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { ProductCard } from '@/components/product-card'
 import { Product } from '@/lib/types'
-import { Leaf, Package, Award, Droplets, BookOpen, Download, Monitor, Apple } from 'lucide-react'
+import { Leaf, Package, Award, Droplets, BookOpen, Monitor, Apple } from 'lucide-react'
 
 export default async function HomePage() {
   const supabase = await createClient()

@@ -2,8 +2,7 @@
 
 import { useState, Suspense } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { useRouter, useSearchParams } from 'next/navigation'
-import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { r } from '@/lib/l'
 import { LogIn, UserPlus, Lock } from 'lucide-react'
 
@@ -14,7 +13,6 @@ function LoginContent() {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   
-  const router = useRouter()
   const searchParams = useSearchParams()
   const redirectParams = r(searchParams.get('redirect'))
   const isAdminTarget = redirectParams.startsWith('/admin')
@@ -46,8 +44,8 @@ function LoginContent() {
         await supabase.rpc('sync_profile')
         window.location.href = redirectParams
       }
-    } catch (err: any) {
-      setError(err.message || 'Wystąpił błąd podczas uwierzytelniania.')
+    } catch (err) {
+      setError(err instanceof Error && err.message ? err.message : 'Wystąpił błąd podczas uwierzytelniania.')
     } finally {
       setLoading(false)
     }

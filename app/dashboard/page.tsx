@@ -3,7 +3,7 @@
 import { createClient } from '@/lib/supabase/client'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState, Suspense } from 'react'
-import { OrderWithItems, Profile } from '@/lib/types'
+import { OrderWithItems } from '@/lib/types'
 import { e } from '@/lib/l'
 import { ClientRealtimeListener } from './client-realtime-listener'
 
@@ -14,7 +14,6 @@ function DashboardContent() {
   const notice = searchParams.get('notice')
   
   const [user, setUser] = useState<{ id: string; email: string } | null>(null)
-  const [profile, setProfile] = useState<Profile | null>(null)
   const [orders, setOrders] = useState<OrderWithItems[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -45,7 +44,6 @@ function DashboardContent() {
         .single()
         
       if (profileData) {
-        setProfile(profileData)
         setFullName(profileData.full_name || '')
         setPhone(profileData.phone || '')
         setAddress(profileData.address || '')

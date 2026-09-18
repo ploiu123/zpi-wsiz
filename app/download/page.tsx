@@ -1,19 +1,16 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { Monitor, Download, Apple, Shield, Zap, HardDrive, RefreshCw, ArrowRight, Check, Laptop } from 'lucide-react'
+import { useEffect } from 'react'
+import { Monitor, Download, Apple, Shield, Zap, HardDrive, RefreshCw, Check, Laptop } from 'lucide-react'
 import Link from 'next/link'
+import { useDesktopOS, useIsElectron } from '@/lib/client-info'
 
 export default function DownloadPage() {
-  const [detectedOS, setDetectedOS] = useState<'mac' | 'win' | 'other'>('other')
-  const [isElectron, setIsElectron] = useState(false)
-  
+  const detectedOS = useDesktopOS()
+  const isElectron = useIsElectron()
+
   useEffect(() => {
     document.title = 'Pobierz aplikację desktopową | Złote Miody'
-    const ua = navigator.userAgent.toLowerCase()
-    if (ua.includes('mac')) setDetectedOS('mac')
-    else if (ua.includes('win')) setDetectedOS('win')
-    if (ua.includes('electron') || ua.includes('zlotemiodyapp')) setIsElectron(true)
   }, [])
 
   if (isElectron) {

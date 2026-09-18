@@ -4,6 +4,8 @@ export const THEME_STORAGE_KEY = 'theme'
 
 export const LIGHT_SCHEME_QUERY = '(prefers-color-scheme: light)'
 
+const THEME_CHANGE_EVENT = 'zlote-miody-theme-change'
+
 export function isTheme(value: string | null): value is Theme {
   return value === 'light' || value === 'dark' || value === 'system'
 }
@@ -35,4 +37,24 @@ export function storeTheme(theme: Theme) {
     localStorage.setItem(THEME_STORAGE_KEY, theme)
   } catch {
   }
+  window.dispatchEvent(new Event(THEME_CHANGE_EVENT))
+}
+
+export function subscribeStoredTheme(onChange: () => void) {
+  window.addEventListener('storage', onChange)
+  window.addEventListener(THEME_CHANGE_EVENT, onChange)
+  return () => {
+    window.removeEventListener('storage', onChange)
+    window.removeEventListener(THEME_CHANGE_EVENT, onChange)
+  }
+}
+
+export function readResolvedTheme(): 'light' | 'dark' {
+  return document.documentElement.classList.contains('light') ? 'light' : 'dark'
+}
+
+export function subscribeResolvedTheme(onChange: () => void) {
+  const observer = new MutationObserver(onChange)
+  observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
+  return () => observer.disconnect()
 }

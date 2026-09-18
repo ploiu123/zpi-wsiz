@@ -6,6 +6,7 @@ import { useCartStore } from '@/lib/store'
 import { useToast } from '@/components/toast'
 import { ShoppingCart, X, Package, Truck, Check, PackageOpen, Info } from 'lucide-react'
 import Image from 'next/image'
+import { isRemoteImage, oldPriceOf } from '@/lib/product-display'
 
 export const ProductCard = memo(function ProductCard({ product }: { product: Product }) {
   const addItem = useCartStore((state) => state.addItem)
@@ -23,6 +24,7 @@ export const ProductCard = memo(function ProductCard({ product }: { product: Pro
 
   const [showModal, setShowModal] = useState(false)
   const [addedToCart, setAddedToCart] = useState(false)
+  const oldPrice = oldPriceOf(product)
 
   const handleAddFromModal = useCallback(async () => {
     const success = await addItem(product)
@@ -50,6 +52,7 @@ export const ProductCard = memo(function ProductCard({ product }: { product: Pro
               fill 
               className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              unoptimized={isRemoteImage(product.image_url)}
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-amber-500/50 font-serif text-2xl">
@@ -73,9 +76,9 @@ export const ProductCard = memo(function ProductCard({ product }: { product: Pro
           <div className="flex justify-between items-start mb-3 gap-2">
             <h3 className="font-serif text-xl font-bold text-white group-hover:text-amber-400 transition-colors leading-tight">{product.name}</h3>
             <div className="flex flex-col items-end gap-1 shrink-0">
-              {product.old_price ? (
+              {oldPrice !== null ? (
                 <>
-                  <span className="text-red-400/70 line-through text-[10px] uppercase tracking-wider">{product.old_price.toFixed(2)} zł</span>
+                  <span className="text-red-400/70 line-through text-[10px] uppercase tracking-wider">{oldPrice.toFixed(2)} zł</span>
                   <span className="text-amber-400 font-bold whitespace-nowrap bg-red-500/10 px-2.5 py-0.5 rounded-md text-sm border border-red-500/20">{product.price.toFixed(2)} zł</span>
                 </>
               ) : (
@@ -133,6 +136,7 @@ export const ProductCard = memo(function ProductCard({ product }: { product: Pro
                     fill
                     className="object-cover"
                     sizes="(max-width: 768px) 100vw, 50vw"
+                    unoptimized={isRemoteImage(product.image_url)}
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-amber-500 font-serif text-4xl">
@@ -151,10 +155,10 @@ export const ProductCard = memo(function ProductCard({ product }: { product: Pro
                 </h2>
 
                 <div className="text-2xl font-bold text-amber-400 mb-4">
-                  {product.old_price ? (
+                  {oldPrice !== null ? (
                     <div className="flex items-center gap-3">
                       <span>{product.price.toFixed(2)} zł</span>
-                      <span className="text-red-400/70 line-through text-base">{product.old_price.toFixed(2)} zł</span>
+                      <span className="text-red-400/70 line-through text-base">{oldPrice.toFixed(2)} zł</span>
                       <span className="text-xs bg-red-500/20 text-red-400 px-2 py-0.5 rounded-full font-semibold">Promocja</span>
                     </div>
                   ) : (
@@ -181,7 +185,7 @@ export const ProductCard = memo(function ProductCard({ product }: { product: Pro
                     <Truck className="w-4 h-4 text-amber-500/60 shrink-0" />
                     <span>Wysyłka w 24h, ekologiczne opakowanie</span>
                   </div>
-                  {product.old_price && (
+                  {oldPrice !== null && (
                     <div className="flex items-center gap-2.5 text-xs text-gray-500">
                       <span><Info className="w-5 h-5 text-amber-500" /></span>
                       <span>Najniższa cena z ostatnich 30 dni: <span className="text-amber-400 font-semibold">{product.price.toFixed(2)} zł</span></span>

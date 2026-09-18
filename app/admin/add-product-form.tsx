@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { ImageIcon, X } from 'lucide-react'
+import { validateProductNumbers } from '@/lib/product-display'
 
 interface LocalImage {
   filename: string
@@ -58,16 +59,26 @@ export function AddProductForm() {
     const supabase = createClient()
 
     const finalCategory = showNewCategory ? newCategory : category
+    const priceValue = Number(price)
+    const stockValue = Number(stock)
+    const oldPriceValue = isOnSale && oldPrice ? Number(oldPrice) : null
 
-    const insertData: Record<string, any> = {
+    const validationError = validateProductNumbers(priceValue, stockValue, oldPriceValue)
+    if (validationError) {
+      setMsg({ type: 'error', text: validationError })
+      setLoading(false)
+      return
+    }
+
+    const insertData = {
       name,
       description: desc,
-      price: parseFloat(price),
-      stock: parseInt(stock),
+      price: priceValue,
+      stock: stockValue,
       category: finalCategory || 'miód',
       image_url: image || '',
       featured,
-      old_price: isOnSale && oldPrice ? parseFloat(oldPrice) : null,
+      old_price: oldPriceValue,
     }
 
     const { error } = await supabase.from('products').insert(insertData)
@@ -108,11 +119,11 @@ export function AddProductForm() {
             <label className="block text-xs font-medium text-gray-400 mb-1">
               {isOnSale ? 'Cena promocyjna (zł) *' : 'Cena (zł) *'}
             </label>
-            <input type="number" step="0.01" required value={price} onChange={e => setPrice(e.target.value)} className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-2 text-white focus:outline-none focus:border-amber-500" />
+            <input type="number" step="0.01" min="0" required value={price} onChange={e => setPrice(e.target.value)} className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-2 text-white focus:outline-none focus:border-amber-500" />
            </div>
            <div>
             <label className="block text-xs font-medium text-gray-400 mb-1">Ilość w magazynie *</label>
-            <input type="number" required value={stock} onChange={e => setStock(e.target.value)} className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-2 text-white focus:outline-none focus:border-amber-500" />
+            <input type="number" step="1" min="0" required value={stock} onChange={e => setStock(e.target.value)} className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-2 text-white focus:outline-none focus:border-amber-500" />
            </div>
         </div>
 
@@ -124,7 +135,7 @@ export function AddProductForm() {
           {isOnSale && (
             <div>
               <label className="block text-xs font-medium text-gray-400 mb-1">Cena przed promocją (zł) *</label>
-              <input type="number" step="0.01" required={isOnSale} value={oldPrice} onChange={e => setOldPrice(e.target.value)} className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-2 text-white focus:outline-none focus:border-amber-500" placeholder="np. 45.00" />
+              <input type="number" step="0.01" min="0" required={isOnSale} value={oldPrice} onChange={e => setOldPrice(e.target.value)} className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-2 text-white focus:outline-none focus:border-amber-500" placeholder="np. 45.00" />
               <p className="text-xs text-gray-500 mt-1">Wyświetli się jako przekreślona cena + informacja Omnibus o najniższej cenie z 30 dni.</p>
             </div>
           )}

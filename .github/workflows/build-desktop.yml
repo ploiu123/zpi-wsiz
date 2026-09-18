@@ -29,9 +29,9 @@ jobs:
             files: desktop-app/release/*.AppImage
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: npm
@@ -51,7 +51,7 @@ jobs:
           CSC_IDENTITY_AUTO_DISCOVERY: false
         run: npx electron-builder ${{ matrix.flag }} --publish never
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: ${{ matrix.artifact }}
           path: ${{ matrix.files }}
@@ -62,16 +62,19 @@ jobs:
     name: Build sklepu (Next.js)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: npm
 
       - run: npm ci
 
-      - name: Testy koszyka
+      - name: Analiza statyczna (ESLint)
+        run: npm run lint
+
+      - name: Testy jednostkowe
         run: npm test
 
       - name: Build produkcyjny

@@ -4,12 +4,13 @@ import { useCartStore } from '@/lib/store'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import { useIsClient } from '@/lib/client-info'
 
 export default function CheckoutPage() {
   const router = useRouter()
-  const { items, getTotal, clearCart, cartId } = useCartStore()
-  
-  const [mounted, setMounted] = useState(false)
+  const { items, getTotal, clearCart, cartId, syncCart } = useCartStore()
+
+  const mounted = useIsClient()
   const [userId, setUserId] = useState<string | null>(null)
   
   const [address, setAddress] = useState('')
@@ -18,9 +19,15 @@ export default function CheckoutPage() {
   
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [notices, setNotices] = useState<string[]>([])
 
   useEffect(() => {
-    setMounted(true)
+    syncCart().then((warnings) => {
+      if (warnings.length > 0) setNotices(warnings)
+    })
+  }, [syncCart])
+
+  useEffect(() => {
     const supabase = createClient()
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (!user) {
@@ -58,11 +65,11 @@ export default function CheckoutPage() {
     const supabase = createClient()
 
     try {
-      const orderItemsToInsert = items.map(item => ({
+      const orderItems = items.map(item => ({
         product_id: item.product.id,
         product_name: item.product.name,
         quantity: item.quantity,
-        price: item.product.price
+        price: item.product.price,
       }))
 
       const { data: orderId, error: rpcError } = await supabase.rpc('place_order_with_stock', {
@@ -71,18 +78,17 @@ export default function CheckoutPage() {
         p_address: address,
         p_city: city,
         p_postal: postal,
-        p_items: orderItemsToInsert,
+        p_items: orderItems,
         p_cart_id: cartId
       })
 
       if (rpcError) throw new Error(rpcError.message)
 
-      clearCart();
-      router.push(`/dashboard?success=true&order_id=${orderId}`);
-
-    } catch (err: any) {
+      await clearCart()
+      router.push(`/dashboard?success=true&order_id=${orderId}`)
+    } catch (err) {
       console.error(err)
-      setError(err.message || 'Wystąpił problem ze złożeniem zamówienia.')
+      setError(err instanceof Error && err.message ? err.message : 'Wystąpił problem ze złożeniem zamówienia.')
       setLoading(false)
     }
   }
@@ -97,6 +103,14 @@ export default function CheckoutPage() {
         {error && (
           <div className="bg-red-500/10 text-red-400 p-4 rounded-xl mb-6">
             {error}
+          </div>
+        )}
+
+        {notices.length > 0 && (
+          <div className="bg-amber-500/10 text-amber-400 p-4 rounded-xl mb-6 space-y-1 text-sm">
+            {notices.map((notice) => (
+              <div key={notice}>{notice}</div>
+            ))}
           </div>
         )}
 

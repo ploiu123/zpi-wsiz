@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 export const runtime = 'edge';
 
 export async function GET() {
-  const fileUrl = 'https://github.com/ploiu123/zpi-wsiz/releases/download/v1.0.0/zpi-wsiz-main.Setup.1.0.0.exe';
+  const fileUrl = 'https://github.com/ploiu123/zpi-wsiz/releases/download/v1.0.0/ZloteMiody-Windows.exe';
   
   try {
     const response = await fetch(fileUrl);

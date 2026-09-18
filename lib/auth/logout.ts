@@ -11,10 +11,7 @@ export async function logoutAndClearCart(): Promise<void> {
   const { cartId } = useCartStore.getState()
   if (cartId) {
     try {
-      const { data: rows, error } = await supabase
-        .from('cart_reservations')
-        .select('product_id')
-        .eq('cart_id', cartId)
+      const { data: rows, error } = await supabase.rpc('get_cart_reservations', { p_cart_id: cartId })
 
       if (error) {
         console.error('Nie udało się pobrać rezerwacji do zwolnienia:', error.message)

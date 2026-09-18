@@ -7,9 +7,11 @@ import { Trash2, Plus, Minus, ArrowRight, Clock, AlertTriangle } from 'lucide-re
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/components/toast'
+import { useIsClient } from '@/lib/client-info'
+import { isRemoteImage } from '@/lib/product-display'
 
 export default function CartPage() {
-  const [mounted, setMounted] = useState(false)
+  const mounted = useIsClient()
   const { items, removeItem, updateQuantity, getTotal, cartId, syncCart, clearCart } = useCartStore()
   const { addToast } = useToast()
 
@@ -17,8 +19,6 @@ export default function CartPage() {
   const [warnings, setWarnings] = useState<string[]>([])
 
   useEffect(() => {
-    setMounted(true)
-
     syncCart().then((syncWarnings) => {
       if (syncWarnings && syncWarnings.length > 0) {
         setWarnings(syncWarnings)
@@ -28,16 +28,11 @@ export default function CartPage() {
     const supabase = createClient()
     const fetchExpiration = async () => {
       if (!cartId) return
-      const { data } = await supabase
-        .from('cart_reservations')
-        .select('expires_at')
-        .eq('cart_id', cartId)
-        .order('expires_at', { ascending: true })
-        .limit(1)
-        .maybeSingle()
+      const { data } = await supabase.rpc('get_cart_reservations', { p_cart_id: cartId })
+      const first = (data as { expires_at: string }[] | null)?.[0]
 
-      if (data && data.expires_at) {
-        const expiresTime = new Date(data.expires_at).getTime()
+      if (first?.expires_at) {
+        const expiresTime = new Date(first.expires_at).getTime()
         const now = Date.now()
         const diff = Math.max(0, Math.floor((expiresTime - now) / 1000))
         setTimeLeft(diff)
@@ -132,7 +127,7 @@ export default function CartPage() {
             <div key={product.id} className="bg-[#111] border border-white/10 rounded-2xl p-4 flex gap-4 md:gap-6 items-center">
               <div className="relative w-20 h-20 md:w-24 md:h-24 rounded-xl overflow-hidden bg-white/5 flex-shrink-0">
                 {product.image_url ? (
-                  <Image src={product.image_url} alt={product.name} fill className="object-cover" sizes="96px" />
+                  <Image src={product.image_url} alt={product.name} fill className="object-cover" sizes="96px" unoptimized={isRemoteImage(product.image_url)} />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-amber-500 text-2xl">🍯</div>
                 )}
@@ -190,7 +185,7 @@ export default function CartPage() {
                 <span>{getTotal().toFixed(2)} zł</span>
               </div>
               <div className="flex justify-between flex-wrap text-green-400 text-sm">
-                <span>📦 Koszt dostawy (obliczany w kasie)</span>
+                <span>📦 Dostawa z płatnością przy odbiorze</span>
               </div>
             </div>
 

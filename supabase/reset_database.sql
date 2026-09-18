@@ -4,7 +4,9 @@ DROP FUNCTION IF EXISTS public.handle_new_user() CASCADE;
 DROP FUNCTION IF EXISTS public.sync_profile() CASCADE;
 DROP FUNCTION IF EXISTS public.is_admin() CASCADE;
 DROP FUNCTION IF EXISTS public.cleanup_expired_reservations() CASCADE;
-DROP FUNCTION IF EXISTS public.update_cart_reservation() CASCADE;
+DROP FUNCTION IF EXISTS public.update_cart_reservation(text, uuid, integer) CASCADE;
+DROP FUNCTION IF EXISTS public.get_cart_reservations(text) CASCADE;
+DROP FUNCTION IF EXISTS public.validate_product_prices() CASCADE;
 DROP FUNCTION IF EXISTS public.place_order_with_stock(uuid, numeric, text, text, text, jsonb, text) CASCADE;
 DROP FUNCTION IF EXISTS public.place_order_with_stock(uuid, numeric, text, text, text, jsonb) CASCADE;
 
@@ -136,7 +138,7 @@ CREATE POLICY "order_items_insert_own_order" ON public.order_items FOR INSERT TO
   EXISTS (SELECT 1 FROM public.orders o WHERE o.id = order_items.order_id AND o.user_id = auth.uid())
 );
 
-CREATE POLICY "cart_reservations_allow_all" ON public.cart_reservations FOR ALL USING (true) WITH CHECK (true);
+REVOKE ALL ON TABLE public.cart_reservations FROM anon, authenticated;
 
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger
@@ -222,6 +224,8 @@ BEGIN
 END;
 $$;
 
+GRANT EXECUTE ON FUNCTION public.cleanup_expired_reservations() TO anon, authenticated;
+
 CREATE OR REPLACE FUNCTION public.update_cart_reservation(
   p_cart_id text,
   p_product_id uuid,
@@ -233,83 +237,83 @@ SECURITY DEFINER
 SET search_path = public
 AS $$
 DECLARE
-  v_current_reserved integer := 0;
+  v_current_reserved integer;
   v_diff integer;
   v_current_stock integer;
   v_expires_at timestamptz;
 BEGIN
+  IF p_cart_id IS NULL OR length(p_cart_id) NOT BETWEEN 8 AND 64 THEN
+    RAISE EXCEPTION 'Nieprawidłowy identyfikator koszyka.';
+  END IF;
+
+  IF p_target_qty IS NULL OR p_target_qty < 0 THEN
+    RAISE EXCEPTION 'Nieprawidłowa ilość produktu.';
+  END IF;
+
   PERFORM public.cleanup_expired_reservations();
-
-  SELECT quantity INTO v_current_reserved
-  FROM public.cart_reservations
-  WHERE cart_id = p_cart_id AND product_id = p_product_id;
-
-  IF v_current_reserved IS NULL THEN
-    v_current_reserved := 0;
-  END IF;
-
-  v_diff := p_target_qty - v_current_reserved;
-
-  IF v_diff = 0 THEN
-    v_expires_at := now() + interval '30 minutes';
-    UPDATE public.cart_reservations
-    SET expires_at = v_expires_at
-    WHERE cart_id = p_cart_id AND product_id = p_product_id;
-    
-    RETURN jsonb_build_object('success', true, 'expires_at', v_expires_at);
-  END IF;
 
   SELECT stock INTO v_current_stock
   FROM public.products
   WHERE id = p_product_id
   FOR UPDATE;
 
-  IF v_current_stock IS NULL THEN
+  IF NOT FOUND THEN
+    IF p_target_qty = 0 THEN
+      DELETE FROM public.cart_reservations
+      WHERE cart_id = p_cart_id AND product_id = p_product_id;
+      RETURN jsonb_build_object('success', true, 'expires_at', NULL);
+    END IF;
     RAISE EXCEPTION 'Produkt nie istnieje.';
   END IF;
 
-  IF v_diff > 0 THEN
-    IF v_current_stock < v_diff THEN
-      RAISE EXCEPTION 'Niewystarczająca ilość w magazynie. Dostępne: %', v_current_stock;
-    END IF;
+  SELECT quantity INTO v_current_reserved
+  FROM public.cart_reservations
+  WHERE cart_id = p_cart_id AND product_id = p_product_id
+  FOR UPDATE;
 
+  v_current_reserved := COALESCE(v_current_reserved, 0);
+  v_diff := p_target_qty - v_current_reserved;
+
+  IF v_diff > 0 AND v_current_stock < v_diff THEN
+    RAISE EXCEPTION 'Niewystarczająca ilość w magazynie. Dostępne: %', v_current_stock;
+  END IF;
+
+  IF v_diff <> 0 THEN
     UPDATE public.products
     SET stock = stock - v_diff,
         updated_at = now()
     WHERE id = p_product_id;
-
-    v_expires_at := now() + interval '30 minutes';
-    INSERT INTO public.cart_reservations (cart_id, product_id, quantity, expires_at)
-    VALUES (p_cart_id, p_product_id, p_target_qty, v_expires_at)
-    ON CONFLICT (cart_id, product_id) DO UPDATE SET
-      quantity = EXCLUDED.quantity,
-      expires_at = EXCLUDED.expires_at;
-
-  ELSE
-    UPDATE public.products
-    SET stock = stock + abs(v_diff),
-        updated_at = now()
-    WHERE id = p_product_id;
-
-    IF p_target_qty > 0 THEN
-      v_expires_at := now() + interval '30 minutes';
-      UPDATE public.cart_reservations
-      SET quantity = p_target_qty,
-          expires_at = v_expires_at
-      WHERE cart_id = p_cart_id AND product_id = p_product_id;
-    ELSE
-      DELETE FROM public.cart_reservations
-      WHERE cart_id = p_cart_id AND product_id = p_product_id;
-      v_expires_at := NULL;
-    END IF;
   END IF;
+
+  IF p_target_qty = 0 THEN
+    DELETE FROM public.cart_reservations
+    WHERE cart_id = p_cart_id AND product_id = p_product_id;
+    RETURN jsonb_build_object('success', true, 'expires_at', NULL);
+  END IF;
+
+  v_expires_at := now() + interval '30 minutes';
+  INSERT INTO public.cart_reservations (cart_id, product_id, quantity, expires_at)
+  VALUES (p_cart_id, p_product_id, p_target_qty, v_expires_at)
+  ON CONFLICT (cart_id, product_id) DO UPDATE SET
+    quantity = EXCLUDED.quantity,
+    expires_at = EXCLUDED.expires_at;
 
   RETURN jsonb_build_object('success', true, 'expires_at', v_expires_at);
 END;
 $$;
 
-GRANT EXECUTE ON FUNCTION public.cleanup_expired_reservations() TO anon, authenticated;
-GRANT EXECUTE ON FUNCTION public.update_cart_reservation(text, uuid, integer) TO anon, authenticated;
+CREATE OR REPLACE FUNCTION public.get_cart_reservations(p_cart_id text)
+RETURNS TABLE (product_id uuid, quantity integer, expires_at timestamptz)
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT r.product_id, r.quantity, r.expires_at
+  FROM public.cart_reservations r
+  WHERE r.cart_id = p_cart_id
+  ORDER BY r.expires_at;
+$$;
 
 CREATE OR REPLACE FUNCTION public.place_order_with_stock(
   p_user_id uuid,
@@ -327,75 +331,131 @@ SET search_path = public
 AS $$
 DECLARE
   v_order_id uuid;
-  v_item jsonb;
-  v_product_id uuid;
-  v_qty integer;
-  v_price numeric;
-  v_name text;
-  v_current_stock integer;
-  v_reserved_qty integer := 0;
-  v_needed_qty integer := 0;
+  v_line record;
+  v_total numeric(12, 2);
+  v_reserved_qty integer;
+  v_needed_qty integer;
 BEGIN
+  IF auth.uid() IS NULL OR p_user_id IS DISTINCT FROM auth.uid() THEN
+    RAISE EXCEPTION 'Zaloguj się, aby złożyć zamówienie.';
+  END IF;
+
+  IF p_items IS NULL OR jsonb_typeof(p_items) <> 'array' OR jsonb_array_length(p_items) = 0 THEN
+    RAISE EXCEPTION 'Koszyk jest pusty.';
+  END IF;
+
+  IF COALESCE(btrim(p_address), '') = '' OR COALESCE(btrim(p_city), '') = '' OR COALESCE(btrim(p_postal), '') = '' THEN
+    RAISE EXCEPTION 'Uzupełnij adres dostawy.';
+  END IF;
+
+  IF EXISTS (
+    SELECT 1 FROM jsonb_array_elements(p_items) i
+    WHERE COALESCE((i->>'quantity')::integer, 0) <= 0
+  ) THEN
+    RAISE EXCEPTION 'Nieprawidłowa ilość produktu.';
+  END IF;
+
   PERFORM public.cleanup_expired_reservations();
 
+  PERFORM 1
+  FROM public.products
+  WHERE id IN (SELECT (i->>'product_id')::uuid FROM jsonb_array_elements(p_items) i)
+  ORDER BY id
+  FOR UPDATE;
+
+  IF (SELECT count(DISTINCT (i->>'product_id')::uuid) FROM jsonb_array_elements(p_items) i)
+     <> (SELECT count(*) FROM public.products
+         WHERE id IN (SELECT (i->>'product_id')::uuid FROM jsonb_array_elements(p_items) i)) THEN
+    RAISE EXCEPTION 'Jeden z produktów w koszyku nie jest już dostępny.';
+  END IF;
+
+  SELECT COALESCE(sum(p.price * l.quantity), 0) INTO v_total
+  FROM (
+    SELECT (i->>'product_id')::uuid AS product_id, sum((i->>'quantity')::integer) AS quantity
+    FROM jsonb_array_elements(p_items) i
+    GROUP BY 1
+  ) l
+  JOIN public.products p ON p.id = l.product_id;
+
+  IF p_total_amount IS NOT NULL AND abs(p_total_amount - v_total) >= 0.01 THEN
+    RAISE EXCEPTION 'Ceny w koszyku uległy zmianie. Odśwież koszyk i spróbuj ponownie.';
+  END IF;
+
   INSERT INTO public.orders (user_id, total_amount, status, shipping_address, shipping_city, shipping_postal_code)
-  VALUES (p_user_id, p_total_amount, 'nowe', p_address, p_city, p_postal)
+  VALUES (p_user_id, v_total, 'nowe', btrim(p_address), btrim(p_city), btrim(p_postal))
   RETURNING id INTO v_order_id;
 
-  FOR v_item IN SELECT * FROM jsonb_array_elements(p_items)
+  FOR v_line IN
+    SELECT l.product_id, l.quantity, p.name, p.price, p.stock
+    FROM (
+      SELECT (i->>'product_id')::uuid AS product_id, sum((i->>'quantity')::integer)::integer AS quantity
+      FROM jsonb_array_elements(p_items) i
+      GROUP BY 1
+    ) l
+    JOIN public.products p ON p.id = l.product_id
+    ORDER BY l.product_id
   LOOP
-    v_product_id := (v_item->>'product_id')::uuid;
-    v_qty := (v_item->>'quantity')::integer;
-    v_price := (v_item->>'price')::numeric;
-    v_name := v_item->>'product_name';
-
-    v_reserved_qty := 0;
+    v_reserved_qty := NULL;
     IF p_cart_id IS NOT NULL THEN
       SELECT quantity INTO v_reserved_qty
       FROM public.cart_reservations
-      WHERE cart_id = p_cart_id AND product_id = v_product_id;
-      
-      IF v_reserved_qty IS NULL THEN
-        v_reserved_qty := 0;
-      END IF;
+      WHERE cart_id = p_cart_id AND product_id = v_line.product_id
+      FOR UPDATE;
+    END IF;
+    v_reserved_qty := COALESCE(v_reserved_qty, 0);
+
+    v_needed_qty := v_line.quantity - v_reserved_qty;
+
+    IF v_needed_qty > 0 AND v_line.stock < v_needed_qty THEN
+      RAISE EXCEPTION 'Niewystarczająca ilość produktu % w magazynie. Dostępne: %', v_line.name, v_line.stock;
     END IF;
 
-    v_needed_qty := v_qty - v_reserved_qty;
-
-    SELECT stock INTO v_current_stock
-    FROM public.products
-    WHERE id = v_product_id
-    FOR UPDATE;
-
-    IF v_current_stock IS NULL THEN
-      RAISE EXCEPTION 'Produkt % nie istnieje.', v_name;
-    END IF;
-
-    IF v_needed_qty > 0 THEN
-      IF v_current_stock < v_needed_qty THEN
-        RAISE EXCEPTION 'Niewystarczająca ilość produktu % w magazynie. Dostępne: %', v_name, v_current_stock;
-      END IF;
-
+    IF v_needed_qty <> 0 THEN
       UPDATE public.products
       SET stock = stock - v_needed_qty,
           updated_at = now()
-      WHERE id = v_product_id;
+      WHERE id = v_line.product_id;
     END IF;
 
     IF v_reserved_qty > 0 THEN
       DELETE FROM public.cart_reservations
-      WHERE cart_id = p_cart_id AND product_id = v_product_id;
+      WHERE cart_id = p_cart_id AND product_id = v_line.product_id;
     END IF;
 
     INSERT INTO public.order_items (order_id, product_id, product_name, quantity, price)
-    VALUES (v_order_id, v_product_id, v_name, v_qty, v_price);
+    VALUES (v_order_id, v_line.product_id, v_line.name, v_line.quantity, v_line.price);
   END LOOP;
 
   RETURN v_order_id;
 END;
 $$;
 
-GRANT EXECUTE ON FUNCTION public.place_order_with_stock TO authenticated;
+CREATE OR REPLACE FUNCTION public.validate_product_prices()
+RETURNS trigger
+LANGUAGE plpgsql
+SET search_path = public
+AS $$
+BEGIN
+  IF NEW.old_price IS NOT NULL AND NEW.old_price <= NEW.price THEN
+    RAISE EXCEPTION 'Cena przed promocją musi być wyższa od ceny promocyjnej.';
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS products_validate_prices ON public.products;
+CREATE TRIGGER products_validate_prices
+  BEFORE INSERT OR UPDATE OF price, old_price ON public.products
+  FOR EACH ROW EXECUTE FUNCTION public.validate_product_prices();
+
+REVOKE ALL ON FUNCTION public.update_cart_reservation(text, uuid, integer) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.update_cart_reservation(text, uuid, integer) TO anon, authenticated;
+
+REVOKE ALL ON FUNCTION public.get_cart_reservations(text) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.get_cart_reservations(text) TO anon, authenticated;
+
+REVOKE ALL ON FUNCTION public.place_order_with_stock(uuid, numeric, text, text, text, jsonb, text) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.place_order_with_stock(uuid, numeric, text, text, text, jsonb, text) TO authenticated;
 
 INSERT INTO public.products (id, name, description, price, stock, category, image_url, featured)
 VALUES
@@ -410,6 +470,3 @@ VALUES
 ALTER PUBLICATION supabase_realtime ADD TABLE products;
 ALTER PUBLICATION supabase_realtime ADD TABLE orders;
 ALTER PUBLICATION supabase_realtime ADD TABLE order_items;
-ALTER PUBLICATION supabase_realtime ADD TABLE cart_reservations;
-
-ALTER TABLE public.cart_reservations REPLICA IDENTITY FULL;

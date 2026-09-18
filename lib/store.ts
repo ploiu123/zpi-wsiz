@@ -184,31 +184,52 @@ export const useCartStore = create<CartStore>()(
         if (!currentCartId) {
           currentCartId = generateUUID()
           set({ cartId: currentCartId })
-          return []
         }
 
         const items = get().items
         if (items.length === 0) return []
 
         const supabase = createClient()
-        const updatedItems = []
-        const warnings = []
+        const updatedItems: CartItem[] = []
+        const warnings: string[] = []
+        let renewed = false
 
         await supabase.rpc('cleanup_expired_reservations')
 
-        const { data: dbRes, error } = await supabase
-          .from('cart_reservations')
-          .select('product_id, quantity')
-          .eq('cart_id', currentCartId)
+        const { data: dbRes, error } = await supabase.rpc('get_cart_reservations', {
+          p_cart_id: currentCartId,
+        })
 
         if (error) {
           console.error('Błąd pobierania rezerwacji do synchronizacji:', error.message)
           return []
         }
 
-        const activeResMap = new Map(dbRes?.map((r) => [r.product_id, r.quantity]) || [])
+        const { data: freshProducts, error: productsError } = await supabase
+          .from('products')
+          .select('*')
+          .in('id', items.map((item) => item.product.id))
 
-        for (const item of items) {
+        const freshMap = new Map<string, Product>(
+          ((freshProducts ?? []) as Product[]).map((product) => [product.id, product])
+        )
+
+        const activeResMap = new Map<string, number>(
+          ((dbRes ?? []) as { product_id: string; quantity: number }[]).map((r) => [r.product_id, r.quantity])
+        )
+
+        for (const current of items) {
+          const fresh = freshMap.get(current.product.id)
+          if (!productsError && !fresh) {
+            warnings.push(`Produkt "${current.product.name}" nie jest już dostępny i został usunięty z koszyka.`)
+            continue
+          }
+
+          const item: CartItem = fresh ? { ...current, product: fresh } : current
+          if (fresh && Number(fresh.price) !== Number(current.product.price)) {
+            warnings.push(`Cena produktu "${fresh.name}" zmieniła się na ${Number(fresh.price).toFixed(2)} zł.`)
+          }
+
           const activeQty = activeResMap.get(item.product.id)
 
           if (activeQty === undefined || activeQty === null) {
@@ -227,17 +248,19 @@ export const useCartStore = create<CartStore>()(
 
               const available = prod?.stock || 0
               if (available > 0) {
-                await supabase.rpc('update_cart_reservation', {
+                const { error: retryError } = await supabase.rpc('update_cart_reservation', {
                   p_cart_id: currentCartId,
                   p_product_id: item.product.id,
                   p_target_qty: available
                 })
+                if (!retryError) renewed = true
                 updatedItems.push({ ...item, quantity: available })
                 warnings.push(`Zmniejszono ilość produktu "${item.product.name}" do ${available} sztuk z powodu braku zapasów.`)
               } else {
                 warnings.push(`Produkt "${item.product.name}" nie jest już dostępny w magazynie i został usunięty z koszyka.`)
               }
             } else {
+              renewed = true
               updatedItems.push(item)
             }
           } else if (activeQty !== item.quantity) {
@@ -248,7 +271,11 @@ export const useCartStore = create<CartStore>()(
           }
         }
 
-        set({ items: updatedItems })
+        set((state) => ({
+          items: updatedItems,
+          reservedUntil:
+            updatedItems.length === 0 ? null : renewed ? Date.now() + RESERVATION_MS : state.reservedUntil,
+        }))
         return warnings
       },
 

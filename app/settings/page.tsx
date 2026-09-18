@@ -1,21 +1,18 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useEffect, useSyncExternalStore } from 'react'
 import { Settings, Moon, Sun, Monitor, Globe, Info, Mail } from 'lucide-react'
 import {
   applyTheme,
   readStoredTheme,
   storeTheme,
+  subscribeStoredTheme,
   LIGHT_SCHEME_QUERY,
   type Theme,
 } from '@/lib/theme'
 
 export default function SettingsPage() {
-  const [theme, setTheme] = useState<Theme>('system')
-
-  useEffect(() => {
-    setTheme(readStoredTheme())
-  }, [])
+  const theme = useSyncExternalStore<Theme>(subscribeStoredTheme, readStoredTheme, () => 'system')
 
   useEffect(() => {
     if (theme !== 'system') return
@@ -26,7 +23,6 @@ export default function SettingsPage() {
   }, [theme])
 
   const handleThemeChange = (newTheme: Theme) => {
-    setTheme(newTheme)
     storeTheme(newTheme)
     applyTheme(newTheme)
   }

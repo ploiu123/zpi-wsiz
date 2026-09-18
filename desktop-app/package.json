@@ -5,7 +5,7 @@
   "main": "main.js",
   "author": "Złote Miody",
   "scripts": {
-    "obfuscate": "javascript-obfuscator src --output . --target node --compact true --control-flow-flattening true --dead-code-injection true --identifier-names-generator hexadecimal --rename-globals true --string-array true --string-array-encoding 'base64' --string-array-calls-transform true",
+    "obfuscate": "javascript-obfuscator src --output . --target node --compact true --control-flow-flattening true --dead-code-injection true --identifier-names-generator hexadecimal --rename-globals true --string-array true --string-array-encoding base64 --string-array-calls-transform true",
     "prestart": "npm run obfuscate",
     "start": "electron .",
     "prebuild:mac": "npm run obfuscate",
@@ -22,8 +22,8 @@
     "dist:linux": "electron-builder --linux"
   },
   "devDependencies": {
-    "electron": "^33.0.0",
-    "electron-builder": "^25.1.8",
+    "electron": "44.4.1",
+    "electron-builder": "26.15.3",
     "javascript-obfuscator": "^5.4.3"
   }
 }

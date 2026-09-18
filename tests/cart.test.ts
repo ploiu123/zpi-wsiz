@@ -3,11 +3,22 @@ import type { CartItem, Product } from '@/lib/types'
 
 const storage = globalThis.localStorage
 
+const db = vi.hoisted(() => ({
+  reservations: [] as { product_id: string; quantity: number; expires_at: string }[],
+  products: [] as unknown[],
+}))
+
 vi.mock('@/lib/supabase/client', () => ({
   createClient: () => ({
-    rpc: async () => ({ data: null, error: null }),
+    rpc: async (name: string) =>
+      name === 'get_cart_reservations'
+        ? { data: db.reservations, error: null }
+        : { data: null, error: null },
     from: () => ({
-      select: () => ({ eq: async () => ({ data: [], error: null }) }),
+      select: () => ({
+        eq: () => ({ maybeSingle: async () => ({ data: null, error: null }) }),
+        in: async () => ({ data: db.products, error: null }),
+      }),
       delete: () => ({ eq: async () => ({ data: null, error: null }) }),
     }),
     auth: {
@@ -33,6 +44,8 @@ function seedCart(ownerId: string | null, reservedUntil: number | null = Date.no
 }
 
 beforeEach(() => {
+  db.reservations = []
+  db.products = []
   storage.clear()
   useCartStore.setState({ cartId: '', ownerId: null, items: [], reservedUntil: null })
 })
@@ -149,5 +162,42 @@ describe('zawartość localStorage', () => {
 
     expect(useCartStore.getState().items).toEqual([])
     expect(useCartStore.getState().ownerId).toBeNull()
+  })
+})
+
+describe('synchronizacja koszyka z bazą', () => {
+  it('aktualizuje cenę produktu i informuje o zmianie', async () => {
+    seedCart('user-A')
+    db.reservations = [{ product_id: PRODUCT.id, quantity: 2, expires_at: new Date().toISOString() }]
+    db.products = [{ ...PRODUCT, price: 35 }]
+
+    const warnings = await useCartStore.getState().syncCart()
+
+    expect(useCartStore.getState().items[0].product.price).toBe(35)
+    expect(useCartStore.getState().getTotal()).toBe(70)
+    expect(warnings).toEqual(['Cena produktu "Miód akacjowy" zmieniła się na 35.00 zł.'])
+  })
+
+  it('usuwa produkt, którego nie ma już w sklepie', async () => {
+    seedCart('user-A')
+    db.reservations = [{ product_id: PRODUCT.id, quantity: 2, expires_at: new Date().toISOString() }]
+    db.products = []
+
+    const warnings = await useCartStore.getState().syncCart()
+
+    expect(useCartStore.getState().items).toEqual([])
+    expect(useCartStore.getState().reservedUntil).toBeNull()
+    expect(warnings).toHaveLength(1)
+  })
+
+  it('przyjmuje ilość z rezerwacji zapisanej w bazie', async () => {
+    seedCart('user-A')
+    db.reservations = [{ product_id: PRODUCT.id, quantity: 1, expires_at: new Date().toISOString() }]
+    db.products = [PRODUCT]
+
+    const warnings = await useCartStore.getState().syncCart()
+
+    expect(useCartStore.getState().items[0].quantity).toBe(1)
+    expect(warnings).toEqual(['Zaktualizowano ilość produktu "Miód akacjowy" w koszyku do 1 sztuk.'])
   })
 })
