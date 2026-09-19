@@ -6,6 +6,7 @@ import { Footer } from "@/components/footer";
 import { ToastProvider } from "@/components/toast";
 import { RealtimeClientListener } from "@/components/realtime-client-listener";
 import { CartAuthSync } from "@/components/cart-auth-sync";
+import { RecoveryRedirect } from "@/components/recovery-redirect";
 
 const inter = Inter({ subsets: ["latin", "latin-ext"], variable: "--font-inter" });
 const playfair = Playfair_Display({ subsets: ["latin", "latin-ext"], variable: "--font-playfair" });
@@ -44,6 +45,7 @@ export default function RootLayout({
         <ToastProvider>
           <RealtimeClientListener />
           <CartAuthSync />
+          <RecoveryRedirect />
           <a href="#main-content" className="skip-link">Przejdź do treści</a>
           <Navbar />
           <main id="main-content" className="min-h-screen page-enter flex-grow">
