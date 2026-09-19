@@ -7,6 +7,7 @@ DROP FUNCTION IF EXISTS public.cleanup_expired_reservations() CASCADE;
 DROP FUNCTION IF EXISTS public.update_cart_reservation(text, uuid, integer) CASCADE;
 DROP FUNCTION IF EXISTS public.get_cart_reservations(text) CASCADE;
 DROP FUNCTION IF EXISTS public.validate_product_prices() CASCADE;
+DROP FUNCTION IF EXISTS public.handle_order_cancellation() CASCADE;
 DROP FUNCTION IF EXISTS public.place_order_with_stock(uuid, numeric, text, text, text, jsonb, text) CASCADE;
 DROP FUNCTION IF EXISTS public.place_order_with_stock(uuid, numeric, text, text, text, jsonb) CASCADE;
 
@@ -59,7 +60,7 @@ CREATE TABLE public.orders (
 CREATE TABLE public.order_items (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   order_id uuid NOT NULL REFERENCES public.orders (id) ON DELETE CASCADE,
-  product_id uuid NOT NULL REFERENCES public.products (id) ON DELETE RESTRICT,
+  product_id uuid REFERENCES public.products (id) ON DELETE SET NULL,
   product_name text NOT NULL,
   quantity integer NOT NULL CHECK (quantity > 0),
   price numeric(10, 2) NOT NULL CHECK (price >= 0)
@@ -429,6 +430,44 @@ BEGIN
   RETURN v_order_id;
 END;
 $$;
+
+CREATE OR REPLACE FUNCTION public.handle_order_cancellation()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_was_cancelled boolean := lower(btrim(COALESCE(OLD.status, ''))) = 'anulowane';
+  v_is_cancelled boolean := lower(btrim(COALESCE(NEW.status, ''))) = 'anulowane';
+BEGIN
+  IF v_was_cancelled AND NOT v_is_cancelled THEN
+    RAISE EXCEPTION 'Anulowanego zamówienia nie można przywrócić.';
+  END IF;
+
+  IF v_is_cancelled AND NOT v_was_cancelled THEN
+    UPDATE public.products p
+    SET stock = p.stock + oi.quantity,
+        updated_at = now()
+    FROM (
+      SELECT product_id, sum(quantity)::integer AS quantity
+      FROM public.order_items
+      WHERE order_id = NEW.id AND product_id IS NOT NULL
+      GROUP BY product_id
+    ) oi
+    WHERE p.id = oi.product_id;
+  END IF;
+
+  RETURN NEW;
+END;
+$$;
+
+REVOKE ALL ON FUNCTION public.handle_order_cancellation() FROM PUBLIC, anon, authenticated;
+
+DROP TRIGGER IF EXISTS orders_handle_cancellation ON public.orders;
+CREATE TRIGGER orders_handle_cancellation
+  BEFORE UPDATE OF status ON public.orders
+  FOR EACH ROW EXECUTE FUNCTION public.handle_order_cancellation();
 
 CREATE OR REPLACE FUNCTION public.validate_product_prices()
 RETURNS trigger

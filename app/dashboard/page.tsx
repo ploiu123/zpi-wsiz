@@ -4,8 +4,16 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState, Suspense } from 'react'
 import { OrderWithItems } from '@/lib/types'
-import { e } from '@/lib/l'
+import { e, n, type V } from '@/lib/l'
 import { ClientRealtimeListener } from './client-realtime-listener'
+
+const ORDER_HEADINGS: Record<V, string> = {
+  'nowe': 'Zamówienie przyjęte',
+  'w realizacji': 'Zamówienie w trakcie realizacji',
+  'wysłane': 'Zamówienie wysłane',
+  'dostarczone': 'Zamówienie dostarczone',
+  'anulowane': 'Zamówienie anulowane',
+}
 
 function DashboardContent() {
   const router = useRouter()
@@ -181,16 +189,22 @@ function DashboardContent() {
             </div>
           ) : (
             <div className="space-y-6">
-              {orders.map((order) => (
-                <div key={order.id} className="bg-[#111] border border-white/10 rounded-2xl p-6">
+              {orders.map((order) => {
+                const status = n(order.status)
+                const cancelled = status === 'anulowane'
+                return (
+                <div key={order.id} className={`bg-[#111] border rounded-2xl p-6 ${cancelled ? 'border-red-500/20 opacity-70' : 'border-white/10'}`}>
                   <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-4 pb-4 border-b border-white/10">
                     <div>
-                      <div className="text-sm text-gray-400">Zamówienie w trakcie realizacji</div>
+                      <div className={`text-sm ${cancelled ? 'text-red-400 font-semibold' : 'text-gray-400'}`}>{ORDER_HEADINGS[status]}</div>
+                      {cancelled && (
+                        <div className="text-xs text-gray-500 mt-1">Zamówienie nie będzie realizowane, a produkty wróciły do sprzedaży.</div>
+                      )}
                       <div className="text-xs text-gray-500 font-mono mt-1">Stworzono: {new Date(order.created_at).toLocaleDateString('pl-PL')}</div>
                     </div>
                     <div className="text-right">
-                      <div className="text-amber-500 font-bold text-xl">{order.total_amount.toFixed(2)} zł</div>
-                      <div className="inline-block px-3 py-1 bg-amber-500/10 text-amber-500 text-xs font-bold rounded-full mt-2 uppercase tracking-wider">
+                      <div className={`font-bold text-xl ${cancelled ? 'text-gray-500 line-through' : 'text-amber-500'}`}>{order.total_amount.toFixed(2)} zł</div>
+                      <div className={`inline-block px-3 py-1 text-xs font-bold rounded-full mt-2 uppercase tracking-wider ${cancelled ? 'bg-red-500/10 text-red-400' : 'bg-amber-500/10 text-amber-500'}`}>
                         {e(order.status)}
                       </div>
                     </div>
@@ -211,13 +225,14 @@ function DashboardContent() {
                   </div>
                   
                   <div className="mt-4 pt-4 border-t border-white/10 text-sm">
-                     <div className="text-gray-500 text-xs mb-1">Dostarczymy do:</div>
+                     <div className="text-gray-500 text-xs mb-1">{cancelled ? 'Adres dostawy:' : 'Dostarczymy do:'}</div>
                      <div className="text-gray-300 bg-black/30 p-3 rounded-lg mt-1 outline outline-1 outline-white/5">
                         {order.shipping_address}, {order.shipping_postal_code} {order.shipping_city}
                      </div>
                   </div>
                 </div>
-              ))}
+                )
+              })}
             </div>
           )}
         </div>

@@ -25,6 +25,7 @@ export const ProductCard = memo(function ProductCard({ product }: { product: Pro
   const [showModal, setShowModal] = useState(false)
   const [addedToCart, setAddedToCart] = useState(false)
   const oldPrice = oldPriceOf(product)
+  const soldOut = product.stock <= 0
 
   const handleAddFromModal = useCallback(async () => {
     const success = await addItem(product)
@@ -41,7 +42,7 @@ export const ProductCard = memo(function ProductCard({ product }: { product: Pro
     <>
       <div
         onClick={() => setShowModal(true)}
-        className="bg-[#111]/80 backdrop-blur-md border border-white/10 rounded-[2rem] overflow-hidden hover:border-amber-500/30 hover:shadow-2xl hover:shadow-amber-500/10 transition-all duration-500 group flex flex-col cursor-pointer"
+        className={`bg-[#111]/80 backdrop-blur-md border border-white/10 rounded-[2rem] overflow-hidden hover:border-amber-500/30 hover:shadow-2xl hover:shadow-amber-500/10 transition-all duration-500 group flex flex-col cursor-pointer ${soldOut ? 'opacity-80' : ''}`}
       >
         <div className="relative aspect-square overflow-hidden bg-white/5">
           <div className="absolute inset-0 bg-gradient-to-t from-[#111] via-transparent to-transparent z-10" />
@@ -50,13 +51,20 @@ export const ProductCard = memo(function ProductCard({ product }: { product: Pro
               src={product.image_url} 
               alt={product.name} 
               fill 
-              className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+              className={`object-cover group-hover:scale-110 transition-transform duration-700 ease-out ${soldOut ? 'grayscale' : ''}`}
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
               unoptimized={isRemoteImage(product.image_url)}
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-amber-500/50 font-serif text-2xl">
               <PackageOpen className="w-12 h-12 text-amber-500/50" />
+            </div>
+          )}
+          {soldOut && (
+            <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/55">
+              <span className="px-4 py-2 rounded-full bg-red-500/90 text-white text-sm font-bold shadow-lg">
+                Brak w magazynie
+              </span>
             </div>
           )}
           <div className="absolute top-3 right-3 z-20">
@@ -103,7 +111,7 @@ export const ProductCard = memo(function ProductCard({ product }: { product: Pro
             className="w-full bg-white/5 hover:bg-gradient-to-r hover:from-amber-500 hover:to-amber-600 border border-white/10 hover:border-transparent text-white rounded-xl py-3.5 px-4 flex items-center justify-center gap-2 transition-all duration-300 group-hover:shadow-lg group-hover:shadow-amber-500/20 disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <ShoppingCart className="w-4 h-4" />
-            <span className="font-semibold">{product.stock > 0 ? 'Do koszyka' : 'Niedostępny'}</span>
+            <span className="font-semibold">{product.stock > 0 ? 'Do koszyka' : 'Brak w magazynie'}</span>
           </button>
         </div>
       </div>
@@ -210,7 +218,7 @@ export const ProductCard = memo(function ProductCard({ product }: { product: Pro
                   ) : (
                     <>
                       <ShoppingCart className="w-5 h-5" />
-                      <span>{product.stock > 0 ? 'Dodaj do koszyka' : 'Niedostępny'}</span>
+                      <span>{product.stock > 0 ? 'Dodaj do koszyka' : 'Brak w magazynie'}</span>
                     </>
                   )}
                 </button>

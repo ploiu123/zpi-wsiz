@@ -6,6 +6,10 @@ export function oldPriceOf(product: Pick<Product, 'price' | 'old_price'>): numbe
   return oldPrice > Number(product.price) ? oldPrice : null
 }
 
+export function sortAvailableFirst<T extends Pick<Product, 'stock'>>(products: T[]): T[] {
+  return [...products].sort((a, b) => Number(b.stock > 0) - Number(a.stock > 0))
+}
+
 export function isRemoteImage(src: string): boolean {
   return !src.startsWith('/')
 }

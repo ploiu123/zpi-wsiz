@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { ProductCard } from '@/components/product-card'
 import { Product } from '@/lib/types'
+import { sortAvailableFirst } from '@/lib/product-display'
 import { Leaf, Package, Award, Droplets, BookOpen, Monitor, Apple } from 'lucide-react'
 
 export default async function HomePage() {
@@ -17,7 +18,7 @@ export default async function HomePage() {
     console.error('Błąd pobierania produktów:', error.message)
   }
 
-  const items = (products as Product[]) || []
+  const items = sortAvailableFirst((products as Product[]) || [])
 
   return (
     <div className="pt-24 pb-16 px-4 md:px-8 max-w-7xl mx-auto">

@@ -31,7 +31,12 @@ export function AdminProductCatalog({ initialProducts }: { initialProducts: Prod
     const { error } = await supabase.from('products').delete().eq('id', id)
     setBusyId(null)
     if (error) {
-      setMsg({ type: 'error', text: error.message })
+      setMsg({
+        type: 'error',
+        text: error.code === '23503'
+          ? 'Nie można usunąć produktu, który występuje w złożonych zamówieniach.'
+          : error.message,
+      })
       return
     }
     setProducts((prev) => prev.filter((p) => p.id !== id))

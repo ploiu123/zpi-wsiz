@@ -5,6 +5,7 @@ import { AdminProductCatalog } from './admin-product-catalog'
 import { AdminRealtimeListener } from './admin-realtime-listener'
 import type { Product } from '@/lib/types'
 import { isAdminRole } from '@/lib/roles'
+import { n } from '@/lib/l'
 
 type AdminOrderRow = {
   id: string
@@ -75,7 +76,7 @@ export default async function AdminPage() {
                       </tr>
                     ) : (
                       orderRows.map((order) => (
-                        <tr key={order.id} className="border-t border-white/5 hover:bg-white/5">
+                        <tr key={order.id} className={`border-t border-white/5 hover:bg-white/5 ${n(order.status) === 'anulowane' ? 'opacity-60' : ''}`}>
                           <td className="px-6 py-4 whitespace-nowrap">
                             {order.created_at ? new Date(order.created_at).toLocaleDateString('pl-PL') : '—'}
                           </td>
@@ -83,7 +84,7 @@ export default async function AdminPage() {
                             <div className="text-white">{order.profiles?.full_name || 'Nieznany'}</div>
                             <div className="text-xs">{order.profiles?.email}</div>
                           </td>
-                          <td className="px-6 py-4 font-bold text-amber-500">{Number(order.total_amount || 0).toFixed(2)} zł</td>
+                          <td className={`px-6 py-4 font-bold ${n(order.status) === 'anulowane' ? 'text-gray-500 line-through' : 'text-amber-500'}`}>{Number(order.total_amount || 0).toFixed(2)} zł</td>
                           <td className="px-6 py-4">
                             <OrderStatusUpdater orderId={order.id} currentStatus={order.status} />
                           </td>

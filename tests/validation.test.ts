@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { r } from '@/lib/l'
-import { isRemoteImage, oldPriceOf, validateProductNumbers } from '@/lib/product-display'
+import { isRemoteImage, oldPriceOf, sortAvailableFirst, validateProductNumbers } from '@/lib/product-display'
 
 describe('bezpieczne przekierowanie po logowaniu', () => {
   it.each([
@@ -48,5 +48,18 @@ describe('zdjęcia produktów', () => {
   it('rozpoznaje zdjęcia z zewnętrznych serwerów', () => {
     expect(isRemoteImage('/products/miod.jpg')).toBe(false)
     expect(isRemoteImage('https://images.unsplash.com/photo')).toBe(true)
+  })
+})
+
+describe('kolejność produktów', () => {
+  it('produkty dostępne są przed wyprzedanymi, a kolejność w grupach się nie zmienia', () => {
+    const list = [
+      { name: 'A', stock: 0 },
+      { name: 'B', stock: 5 },
+      { name: 'C', stock: 0 },
+      { name: 'D', stock: 1 },
+    ]
+    expect(sortAvailableFirst(list).map((p) => p.name)).toEqual(['B', 'D', 'A', 'C'])
+    expect(list.map((p) => p.name)).toEqual(['A', 'B', 'C', 'D'])
   })
 })

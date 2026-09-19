@@ -71,7 +71,7 @@ export default async function ProductDetailPage(props: { params: Promise<{ id: s
              <p>
                {product.stock > 0 
                  ? <span>✅ Dostępność: <span className="text-green-500 font-bold ml-1">W magazynie ({product.stock} szt.)</span></span> 
-                 : <span>❌ Dostępność: <span className="text-red-500 font-bold ml-1">Brak na magazynie</span></span>
+                 : <span>❌ Dostępność: <span className="text-red-500 font-bold ml-1">Brak w magazynie — produkt chwilowo niedostępny</span></span>
                }
              </p>
              {oldPrice !== null && (

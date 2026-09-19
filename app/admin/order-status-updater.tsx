@@ -22,6 +22,15 @@ export function OrderStatusUpdater({
 
   const handleStatusChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newStatus = e.target.value as V
+    if (
+      newStatus === 'anulowane' &&
+      !confirm('Anulować zamówienie? Produkty wrócą do magazynu, a anulowania nie można cofnąć.')
+    ) {
+      e.target.value = status
+      return
+    }
+
+    const previous = status
     setStatus(newStatus)
     setLoading(true)
 
@@ -35,6 +44,7 @@ export function OrderStatusUpdater({
     if (!error) {
       router.refresh()
     } else {
+      setStatus(previous)
       alert('Błąd aktualizacji statusu: ' + error.message)
     }
   }
@@ -45,6 +55,17 @@ export function OrderStatusUpdater({
     if (s === 'wysłane') return 'text-blue-400 border-blue-500/30'
     if (s === 'nowe') return 'text-amber-500 border-amber-500/30'
     return 'text-gray-200 border-white/20'
+  }
+
+  if (status === 'anulowane') {
+    return (
+      <span
+        className="inline-block rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-1.5 text-xs font-bold text-red-400"
+        title="Produkty wróciły do magazynu. Anulowania nie można cofnąć."
+      >
+        Anulowane
+      </span>
+    )
   }
 
   return (

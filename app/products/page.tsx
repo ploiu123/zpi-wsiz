@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { ProductCard } from '@/components/product-card'
 import { Product } from '@/lib/types'
+import { sortAvailableFirst } from '@/lib/product-display'
 
 export const metadata = {
   title: 'Nasze Produkty | Złote Miody'
@@ -18,7 +19,7 @@ export default async function ProductsPage() {
     console.error('Błąd pobierania produktów:', error.message)
   }
 
-  const items = (products as Product[]) || []
+  const items = sortAvailableFirst((products as Product[]) || [])
 
   return (
     <div className="pt-32 pb-16 px-4 md:px-8 max-w-7xl mx-auto min-h-[80vh]">
